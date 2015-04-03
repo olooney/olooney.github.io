@@ -1,0 +1,302 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang="en-us" dir="ltr">
+<head>
+<!-- meta -->
+<meta http-equiv="content-type" content="text/html; charset=utf-8">
+<meta name="author" content="Oran Looney">
+<meta name="robots" content="INDEX,FOLLOW">
+<meta name="description" content="Oran quitely programming away and sharing a few of the lessons learned">
+<meta name="keywords" content="Programming,Code,Coding,Software,Software Development,Web,Web Development,Python,JavaScript,C++">
+<meta name="verify-v1" content="GmOM2OF0gDOQiM8uS0yKm1ZA0gUI8Hqk4BamNHp7iCg=">
+<meta name="viewport" content="width=800,initial-scale=0.6">
+<link rel="alternate" type="application/rss+xml" href="/feeds/blog/" title="OranLooney.com RSS Blog Feed">
+
+<title>OranLooney - Make CSS Sprites with the Python Image Library</title>
+
+<!-- style -->
+<link rel="stylesheet" type="text/css" href="/static/site/css/yui-reset-min.css">
+<link rel="stylesheet" type="text/css" href="/static/site/css/main.css">
+<link rel="stylesheet" type="text/css" media="print" href="/static/site/css/print.css">
+<!--[if lt IE 7.]>
+	<link rel="stylesheet" type="text/css" href="/static/site/css/icons_gif.css">
+<![endif]-->
+
+
+
+</head>
+
+
+<body>
+
+  <div id="banner">
+	<a href="/">OranLooney.com</a>
+	<h6>quietly programming away</h6>
+  </div>
+  <div class="box" id="sidebar">
+	
+		<form id="quick-search" method="get" action="/search/">
+			<div>
+				<input type="hidden" name="alltags">
+				<input type="text" name="keyword" class="keyword-field">
+				<button type="submit" class="search-submit-button">Search</button>
+		  	</div>
+		  </form>
+	
+
+    <ul class="menu">
+      
+        <li class="menu_home"><a href="/">Home</a></li>
+      
+
+      
+		<li class="menu_rss_feed"><a href="/feeds/blog/" title="subscribe to the RSS feed">RSS Feed</a></li>
+        <li class="menu_tags"><a href="/tags/" title="search articles by tag">Tags</a></li>
+        <li class="menu_index"><a href="/archive" title="search articles chronologically">Archive</a></li>
+        <li class="menu_break"></li>
+        <li class="menu_bookshelf" title="my books on librarything.com"><a href="http://www.librarything.com/catalog.php?view=olooney&amp;offset=0&amp;shelf_rows=10&amp;previousOffset=0&amp;shelf=shelf">Bookshelf</a></li>
+        <li class="menu_sig" title="my endorsement of Agile"><a href="http://agilemanifesto.org/sign/display.cgi?ms=000000203">Manifesto</a></li>
+
+        <li class="menu_about_site" title="about the site itself"><a href="/colophon/">Colophon</a></li>
+        <li class="menu_about_me"><a href="/author/" title="about the author">Author</a></li> 
+      
+      
+      
+      
+          <li class="menu_break"></li>
+        
+          <li class="menu_login"><a href="/admin/">Login</a></li> 
+        
+      
+    </ul>
+  </div>
+  <div id="main-wrapper">
+	
+      
+      <div class="content-page">
+        
+  <a href="/make-css-sprites-python-image-library/" class="title">Make CSS Sprites with the Python Image Library</a>
+
+  
+    <a href="http://www.flickr.com/photos/belgapixels/2703681565/">
+      <img alt="colorful lead photo" src="/static/media/images/lead/2703681565_18f67c28c4.jpg">
+    </a>
+  
+
+<div>
+  
+<p>I'm going to show you how to write a <a href="http://python.org/">Python</a> script to automatically rollup icons into a single sprite image.  The CSS to use those sprites is generated at the same time, by the same script.  I think you'll find this a <em>lot</em> more maintainable than doing it by hand.
+</p>
+<p>If you're familar with the CSS sprite technique, you can skip the next section, which gives a quick introduction.
+</p>
+
+<h2>Background</h2>
+<p>Icons can kill a page's performance, because there's some fixed overhead associated with loading an image, regardless of size.  For a small icon, say 16x16 pixels, this overhead dwarfs the time spent loading the actual data.
+</p>
+<p>CSS gurus figured out a way to avoid this: put all the icons into a single image, and use CSS to only show a little piece of the image at a time.  It's called the sprite technique because the rollup images resemble the <a href="http://images.google.com/images?q=sprite+sheet">sprite sheets</a> that graphic designers used to make for video games back in the day.
+</p>
+<p>It's a good technique: it saves bandwith and makes the user's experience more responsive.  But it's annoying to manually edit the rollup file when icons are added, removed, or edited, and then go into the CSS file and get the offsets to match. So, let's script it!
+</p>
+
+<h2>Script</h2>
+<p>Here's the <a href="/static/docs/make_master.py">complete script.</a> I'll come back and describe the important bits later, but first let's see how it works.
+</p>
+<p>It expects to be run in a directory that contains the icon files and a plain text file called icon_map.txt that defines a mapping from CSS classes to images:
+</p>
+<pre><code>menu_home:arrow_left.png
+menu_about_me:vcard.png
+menu_about_site:sitemap.png
+...
+menu_resume:page_word.png
+menu_index:page_key.png
+</code></pre><p>Only the images listed in this file will be included in the master sprite image.  The example lists PNG files, but you can use any format.  The images don't have to be the same format, but they <em>do</em> have to all be the same size.
+</p>
+<p>When the script runs, it creates four files:
+</p>
+<ul>
+ <li>
+     master.png, the sprite sheet in PNG format
+ </li>
+
+ <li>
+     master.gif, the sprite sheet in GIF format
+ </li>
+
+ <li>
+     icons_png.css, a css file that uses master.png
+ </li>
+
+ <li>
+     icons_gif.css, a css file that uses master.gif
+ </li>
+</ul>
+<p>Both generated icon sprite sheets look like this:
+</p>
+<p><img src="/static/images/sprite_sheet.png" alt="icon sprite sheet image"/>
+</p>
+<p>And the generated CSS files look like this:
+</p>
+<pre><code>li.menu_about_me {
+    background-image:url(/static/icons/master.gif);
+    background-position: 6px 4px;
+}
+li.menu_about_site {
+    background-image:url(/static/icons/master.gif);
+    background-position: 6px -28px;
+}
+li.menu_tags {
+    background-image:url(/static/icons/master.gif);
+    background-position: 6px -476px;
+}
+</code></pre><p>As you can see, each list item uses the master image for its background, but with the exact offset to show only one icon.
+</p>
+
+<h2>Why Both PNG and GIF?</h2>
+<p>I generate seperate images and css files for both PNG and GIF for two reasons:
+</p>
+<ul>
+ <li>
+     It's not obvious (or well-documented) how to get <a href="http://www.pythonware.com/products/pil/">PIL</a> to create a transparent GIF from scratch, so I wanted to give a concrete example of that.
+ </li>
+
+ <li>
+     My site actually uses conditional comments to use GIF for IE6, and PNG for everyone else, to work around the well-known IE6 bug.
+ </li>
+</ul>
+
+<h2>How Does the Script Work?</h2>
+<p>Three words: <a href="http://python.org/">Python</a> Image Library.  I use <a href="http://www.pythonware.com/products/pil/">PIL</a> to open each icon, paste them onto the master at increasing offset, and write out the master image in both formats.
+</p>
+<p>I start by parsing icon_map.txt into an array of pairs:
+</p>
+<pre><code>iconMapFile = open('icon_map.txt')
+iconMap = sorted( 
+                  line.rstrip().split(':') 
+                  for line in iconMapFile.readlines()
+                  if line.rstrip()
+)
+iconMapFile.close()
+</code></pre><p>Then I load all the icons:
+</p>
+<pre><code>images = [Image.open(filename) for cssClass, filename in iconMap]
+</code></pre><p>Since the images should all be the same size, I figure out the icon size from the first one and compute the correct size for the master:
+</p>
+<pre><code>image_width, image_height = images[0].size
+master_width = image_width
+master_height = (image_height * len(images) * 2) - image_height
+</code></pre><p>A new image is created for the master:
+</p>
+<pre><code>master = Image.new(
+    mode='RGBA',
+    size=(master_width, master_height),
+    color=(0,0,0,0))  # fully transparent
+</code></pre><p>And each icon is pasted on at its offset:
+</p>
+<pre><code>for count, image in enumerate(images):
+    location = image_height*count*2
+    master.paste(image,(0,location))
+</code></pre><p>Then I save the master in both formats:
+</p>
+<pre><code>master.save('master.gif', transparency=0 )
+master.save('master.png')
+</code></pre><p>That's it for the sprite sheet; next I generate the css files.  There's a basic pattern each CSS rule will follow:
+</p>
+<pre><code>cssTemplate = '''li.%s {
+    background-image:url(/static/icons/master.%s);
+    background-position: 6px %dpx;
+}
+'''
+</code></pre><p>And then making the CSS files is easy:
+</p>
+<pre><code>for format in ['png','gif']:
+    iconCssFile = open('icons_%s.css' % format ,'w')
+    for count, pair in enumerate(iconMap):
+        cssClass, filename = pair
+        location = image_height*count*2
+        iconCssFile.write(cssTemplate % (cssClass, format, 4-location))
+    iconCssFile.close()
+</code></pre>
+<h2>Hacking the Script</h2>
+<p>The <a href="/static/docs/make_master.py">script</a> isn't exactly <em>flexible</em>, is it?  All the file names and such are hard coded.  But since it's just a very short <a href="http://python.org/">Python</a> script, it's easier to just modify the script then it is to figure out how to configure it.  There's no real substance to it: all the real work is done by <a href="http://www.pythonware.com/products/pil/">PIL</a>, so this will best serve as example of how to use that excellent library.  It has a creative commons license, so go wild.
+</p>
+
+
+
+</div>
+<p>
+  <span class="signature">- Oran Looney</span>
+  <span class="signature-date">January 12th 2008</span>
+</p>
+  <p class="thank-you">
+    Thanks for reading.  Please subscribe to the <a href="/feeds/blog/">RSS feed</a> and remember that
+    future readers will thank you for leaving your comments and criticisms.
+    <a href="/feeds/blog/" title="Subscribe to RSS Feed" class="big-rss-link">Subscribe to RSS Feed</a>
+  </p>
+<p class="article-tags">
+     
+        <a href="/tag/python/">Python</a> 
+     
+        <a href="/tag/popular/">Popular</a> 
+     
+        <a href="/tag/tutorial/">Tutorial</a> 
+     
+        <a href="/tag/web/">Web</a> 
+    
+</p>
+
+
+      </div>
+      
+  
+  <div class="content-page comments" style="border-top: none">
+    <a name="comments"></a>
+    
+	  <h1>Comments (1)</h1>
+      <div>
+        
+          <div class="comment">
+    <div class="comment-date">November 20th 2010</div>
+	<h4><span class="comment-username">lezardo</span> said: </h4>
+	<p>Thanks for this script, good quality and exactly what I was looking for...</p>
+</div>
+
+        
+      </div>
+    
+    <h1>Leave a Comment</h1>
+    
+<form method="post" action="/make-css-sprites-python-image-library/leave-comment/" class="leave-comment-form">
+  <div style='display:none'><input type='hidden' name='csrfmiddlewaretoken' value='7c54419eea61d947291c188320a452fc' /></div>
+  <div>
+    Your Name: <br>
+    
+    <input id="id_user_name" type="text" name="user_name" maxlength="12" />
+  </div>
+  <div>
+    Comment: <br>
+    
+    <textarea id="id_content" rows="10" cols="40" name="content"></textarea>
+  </div>
+  <div>
+    Enter this phrase: <br>
+    
+    <img src="/static/site/images/captcha.png" alt="captcha">
+    <input id="id_captcha" type="text" name="captcha" maxlength="20" /> 
+  </div>
+  <div>
+    <input class="submit-button" type="submit" value="Leave Comment">
+  </div>
+</form>
+
+  </div>
+  
+
+	
+  </div>
+
+
+
+  <script src="http://www.google-analytics.com/urchin.js" type="text/javascript"></script>
+  <script type="text/javascript"> _uacct = "UA-2535855-1"; urchinTracker(); </script>
+
+</body>
+</html>

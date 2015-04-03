@@ -1,0 +1,223 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang="en-us" dir="ltr">
+<head>
+<!-- meta -->
+<meta http-equiv="content-type" content="text/html; charset=utf-8">
+<meta name="author" content="Oran Looney">
+<meta name="robots" content="INDEX,FOLLOW">
+<meta name="description" content="Oran quitely programming away and sharing a few of the lessons learned">
+<meta name="keywords" content="Programming,Code,Coding,Software,Software Development,Web,Web Development,Python,JavaScript,C++">
+<meta name="verify-v1" content="GmOM2OF0gDOQiM8uS0yKm1ZA0gUI8Hqk4BamNHp7iCg=">
+<meta name="viewport" content="width=800,initial-scale=0.6">
+<link rel="alternate" type="application/rss+xml" href="/feeds/blog/" title="OranLooney.com RSS Blog Feed">
+
+<title>OranLooney - Expanding Keywords to Links</title>
+
+<!-- style -->
+<link rel="stylesheet" type="text/css" href="/static/site/css/yui-reset-min.css">
+<link rel="stylesheet" type="text/css" href="/static/site/css/main.css">
+<link rel="stylesheet" type="text/css" media="print" href="/static/site/css/print.css">
+<!--[if lt IE 7.]>
+	<link rel="stylesheet" type="text/css" href="/static/site/css/icons_gif.css">
+<![endif]-->
+
+
+
+</head>
+
+
+<body>
+
+  <div id="banner">
+	<a href="/">OranLooney.com</a>
+	<h6>quietly programming away</h6>
+  </div>
+  <div class="box" id="sidebar">
+	
+		<form id="quick-search" method="get" action="/search/">
+			<div>
+				<input type="hidden" name="alltags">
+				<input type="text" name="keyword" class="keyword-field">
+				<button type="submit" class="search-submit-button">Search</button>
+		  	</div>
+		  </form>
+	
+
+    <ul class="menu">
+      
+        <li class="menu_home"><a href="/">Home</a></li>
+      
+
+      
+		<li class="menu_rss_feed"><a href="/feeds/blog/" title="subscribe to the RSS feed">RSS Feed</a></li>
+        <li class="menu_tags"><a href="/tags/" title="search articles by tag">Tags</a></li>
+        <li class="menu_index"><a href="/archive" title="search articles chronologically">Archive</a></li>
+        <li class="menu_break"></li>
+        <li class="menu_bookshelf" title="my books on librarything.com"><a href="http://www.librarything.com/catalog.php?view=olooney&amp;offset=0&amp;shelf_rows=10&amp;previousOffset=0&amp;shelf=shelf">Bookshelf</a></li>
+        <li class="menu_sig" title="my endorsement of Agile"><a href="http://agilemanifesto.org/sign/display.cgi?ms=000000203">Manifesto</a></li>
+
+        <li class="menu_about_site" title="about the site itself"><a href="/colophon/">Colophon</a></li>
+        <li class="menu_about_me"><a href="/author/" title="about the author">Author</a></li> 
+      
+      
+      
+      
+          <li class="menu_break"></li>
+        
+          <li class="menu_login"><a href="/admin/">Login</a></li> 
+        
+      
+    </ul>
+  </div>
+  <div id="main-wrapper">
+	
+      
+      <div class="content-page">
+        
+  <a href="/expanding-keywords-links/" class="title">Expanding Keywords to Links</a>
+
+  
+    <a href="http://www.flickr.com/photos/cambodia4kidsorg/260004685/">
+      <img alt="colorful lead photo" src="/static/media/images/lead/260004685_8d78d77db0.jpg">
+    </a>
+  
+
+<div>
+  
+<p>Certain keywords and phrases on this site, like <a href="http://cc2e.com/">Code Complete</a> , always appear as hyperlinks.  That's because I use regular expressions (and <a href="http://python.org/">Python</a>) to do it automatically.
+</p>
+<p>I'm sure there are many ways to do this.  Mine's pretty simple.  I maintain a table of keyword/URL pairs that I always want expanded on my site.  Every time I write an article, I add a few more.  (The advantage over just embedding them in the article is that those keywords then become hyperlinks on every article I've ever written or ever will write.)
+</p>
+<p>In the site's <code>settings.py</code> file, I compile this list into a function that makes all the replacements.  The advantage here is that a lot of the work takes place ahead of time.  When I tried it out on some lorem ipsum and even with dozens of keywords and hundreds of paragraphs of text, <code>timeit</code> measured it doing the replacements in about 1/20th of a second.  For the size of articles I write, it's pretty much instantaneous.
+</p>
+<p>I don't have to make the expansions at run-time, of course; I could use a utility to find and expand the links ahead of time.  But if Java has taught us nothing else, it's that things are cleaner when you do them at run-time, as late as possible.  If you're willing to pay the run-time cost, you can achieve cleaner, more maintainable code.
+</p>
+<p>Anyway.  Here's the code I use:
+</p>
+<pre><code>def makeLinkExpander(linkDictionary):
+    ''' Returns a function that wraps each key with an HTML link to its value.
+    The keys of linkDictionary should be all uppercase.
+    The replacement is case-insensitive and spans lines.
+    '''
+
+    import re
+    # regex will match any key in the dictionary
+    regex = re.compile( r'\s(%s)\s' % '|'.join(linkDictionary.keys()), \
+        re.IGNORECASE | re.MULTILINE )
+
+    def replaceMatch(match):
+        word = match.group(1)
+        return ' &lt;a href=&quot;%s&quot;&gt;%s&lt;/a&gt; ' % (linkDictionary[word.upper()], word)
+
+    def linkExpander(string):
+        return regex.sub(replaceMatch, string)
+    return linkExpander
+</code></pre><p>So this is kind of interesting; to match the keywords, I just compile a long regular expression
+</p>
+<pre><code>(keyword|expandMe|AnotherMatch|...)
+</code></pre><p>I don't escape the keywords, but that doesn't matter because I'm not going to choose anything other than <code>(\w| )+</code> for keywords.  I then take advantage of the fact that <a href="http://python.org/">Python</a>'s <code>re</code> module lets you supply a <em>function</em> as a substitution.  That gives me the flexibility I need to pass the match through the dictionary in a case-insensitive way.
+</p>
+<p>The other cool thing is that I define <code>linkExpander()</code>, the function that does the work, inside of <code>makeLinkExpander()</code> and then <em>return</em> linkExpander.  That's called a closure; it's a little bit like the Factory pattern, but it's a concept from functional programming.  We're constructing the function at run-time.  The advantage here is that a lot of the work (most notably, loading from the database) is done ahead of time.
+</p>
+<p>One thing that I considered but didn't implement was using <code>pickle</code> to store the pre-built link expander as a BLOB or in a file.  <code>settings.py</code> was a better solution in this scenario.  I never tried this with <code>pickle</code> so  I'm not 100% certain that it would work with the compiled regular expressions, but the basic idea is that since <a href="http://python.org/">Python</a> functions are just objects, we can serialize and save them off.
+</p>
+<p>That's something to keep in mind if you're building a complex function from a simple table each time your application loads: serialize the function and load it directly.  I suppose  load times would have get pretty noticeable before it's worth the (minor) trouble, but I've seen plenty of apps that struggle at load time.
+</p>
+<p>One last comment about my link expander: it could be a lot smarter.  You see how I match on any surrounding whitespace, but then pad the link with literal spaces?  That should keep it from matching inside of words, and all whitespace is the same in HTML. (Version 0.1 had some trouble expanding names inside of image filenames, which of course broke the images.) But clearly it doesn't cover <code>&lt;PRE&gt;</code> blocks and other edge cases.  I run it on the plain text version of the articles, before using <a href="http://daringfireball.net/projects/markdown/">markdown</a> to expand to HTML, so I don't I haven't had too much trouble with it yet.
+</p>
+<p>But I mean, come on!  It's a dozen lines of code that does something pretty cool.  <a href="http://python.org/">Python</a> and regex rule!
+</p>
+
+<h2>Update:</h2>
+<p>I've now changed the regex to absorb the a punctuation character after the end:
+</p>
+<pre><code>\s(?:(%s)([\)\-\'&quot;.,;:\s]))
+</code></pre><p>And simply preserve the second group as-is in the expansion:
+</p>
+<pre><code>def replaceMatch(match):
+    word = match.group(1)
+    punct = match.group(2)
+    return ' &lt;a href=&quot;%s&quot;&gt;%s&lt;/a&gt;%s' % \
+        (linkDictionary[word.upper()], word, punct)
+</code></pre><p>It was simply too common to put a period or comma after a keyword, so I decided to accept the slightly increased risk of breaking a link or or a tag to handle those cases.
+</p>
+
+
+
+</div>
+<p>
+  <span class="signature">- Oran Looney</span>
+  <span class="signature-date">April 26th 2007</span>
+</p>
+  <p class="thank-you">
+    Thanks for reading.  Please subscribe to the <a href="/feeds/blog/">RSS feed</a> and remember that
+    future readers will thank you for leaving your comments and criticisms.
+    <a href="/feeds/blog/" title="Subscribe to RSS Feed" class="big-rss-link">Subscribe to RSS Feed</a>
+  </p>
+<p class="article-tags">
+     
+        <a href="/tag/python/">Python</a> 
+     
+        <a href="/tag/tutorial/">Tutorial</a> 
+     
+        <a href="/tag/web/">Web</a> 
+    
+</p>
+
+
+      </div>
+      
+  
+  <div class="content-page comments" style="border-top: none">
+    <a name="comments"></a>
+    
+	  <h1>Comments (1)</h1>
+      <div>
+        
+          <div class="comment">
+    <div class="comment-date">September 12th 2012</div>
+	<h4><span class="comment-username">Necati</span> said: </h4>
+	<p>Ur right  lankan soul&#39; they are the world 2nd biesggt population but stil they can&#39;t produce best cricketers, example of best cricketers from small sri lanka= murali(1st project mystery off spinner,highst wicket taker in da world,introduced the Doosra),mahela(best logical captain,and asia cup 2008 best captain award winner),TM dilshan(the world best batsman alive,t20 2009most runs nd best player award winner and introduced new batting style  DILSCOOP&#39;),finaly ajantha mendis(2nd project mystery off spinner,asia cup2008 man of da trnmt inroduced the carram ball). (0)</p>
+</div>
+
+        
+      </div>
+    
+    <h1>Leave a Comment</h1>
+    
+<form method="post" action="/expanding-keywords-links/leave-comment/" class="leave-comment-form">
+  <div style='display:none'><input type='hidden' name='csrfmiddlewaretoken' value='7c54419eea61d947291c188320a452fc' /></div>
+  <div>
+    Your Name: <br>
+    
+    <input id="id_user_name" type="text" name="user_name" maxlength="12" />
+  </div>
+  <div>
+    Comment: <br>
+    
+    <textarea id="id_content" rows="10" cols="40" name="content"></textarea>
+  </div>
+  <div>
+    Enter this phrase: <br>
+    
+    <img src="/static/site/images/captcha.png" alt="captcha">
+    <input id="id_captcha" type="text" name="captcha" maxlength="20" /> 
+  </div>
+  <div>
+    <input class="submit-button" type="submit" value="Leave Comment">
+  </div>
+</form>
+
+  </div>
+  
+
+	
+  </div>
+
+
+
+  <script src="http://www.google-analytics.com/urchin.js" type="text/javascript"></script>
+  <script type="text/javascript"> _uacct = "UA-2535855-1"; urchinTracker(); </script>
+
+</body>
+</html>

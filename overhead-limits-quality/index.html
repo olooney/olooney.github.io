@@ -1,0 +1,378 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang="en-us" dir="ltr">
+<head>
+<!-- meta -->
+<meta http-equiv="content-type" content="text/html; charset=utf-8">
+<meta name="author" content="Oran Looney">
+<meta name="robots" content="INDEX,FOLLOW">
+<meta name="description" content="Oran quitely programming away and sharing a few of the lessons learned">
+<meta name="keywords" content="Programming,Code,Coding,Software,Software Development,Web,Web Development,Python,JavaScript,C++">
+<meta name="verify-v1" content="GmOM2OF0gDOQiM8uS0yKm1ZA0gUI8Hqk4BamNHp7iCg=">
+<meta name="viewport" content="width=800,initial-scale=0.6">
+<link rel="alternate" type="application/rss+xml" href="/feeds/blog/" title="OranLooney.com RSS Blog Feed">
+
+<title>OranLooney - Overhead Limits Quality</title>
+
+<!-- style -->
+<link rel="stylesheet" type="text/css" href="/static/site/css/yui-reset-min.css">
+<link rel="stylesheet" type="text/css" href="/static/site/css/main.css">
+<link rel="stylesheet" type="text/css" media="print" href="/static/site/css/print.css">
+<!--[if lt IE 7.]>
+	<link rel="stylesheet" type="text/css" href="/static/site/css/icons_gif.css">
+<![endif]-->
+
+
+
+</head>
+
+
+<body>
+
+  <div id="banner">
+	<a href="/">OranLooney.com</a>
+	<h6>quietly programming away</h6>
+  </div>
+  <div class="box" id="sidebar">
+	
+		<form id="quick-search" method="get" action="/search/">
+			<div>
+				<input type="hidden" name="alltags">
+				<input type="text" name="keyword" class="keyword-field">
+				<button type="submit" class="search-submit-button">Search</button>
+		  	</div>
+		  </form>
+	
+
+    <ul class="menu">
+      
+        <li class="menu_home"><a href="/">Home</a></li>
+      
+
+      
+		<li class="menu_rss_feed"><a href="/feeds/blog/" title="subscribe to the RSS feed">RSS Feed</a></li>
+        <li class="menu_tags"><a href="/tags/" title="search articles by tag">Tags</a></li>
+        <li class="menu_index"><a href="/archive" title="search articles chronologically">Archive</a></li>
+        <li class="menu_break"></li>
+        <li class="menu_bookshelf" title="my books on librarything.com"><a href="http://www.librarything.com/catalog.php?view=olooney&amp;offset=0&amp;shelf_rows=10&amp;previousOffset=0&amp;shelf=shelf">Bookshelf</a></li>
+        <li class="menu_sig" title="my endorsement of Agile"><a href="http://agilemanifesto.org/sign/display.cgi?ms=000000203">Manifesto</a></li>
+
+        <li class="menu_about_site" title="about the site itself"><a href="/colophon/">Colophon</a></li>
+        <li class="menu_about_me"><a href="/author/" title="about the author">Author</a></li> 
+      
+      
+      
+      
+          <li class="menu_break"></li>
+        
+          <li class="menu_login"><a href="/admin/">Login</a></li> 
+        
+      
+    </ul>
+  </div>
+  <div id="main-wrapper">
+	
+      
+      <div class="content-page">
+        
+  <a href="/overhead-limits-quality/" class="title">Overhead Limits Quality</a>
+
+  
+    <a href="http://www.flickr.com/photos/goincase/3941489893/">
+      <img alt="colorful lead photo" src="/static/media/images/lead/3941489893_1e249d603c.jpg">
+    </a>
+  
+
+<div>
+  
+<p>Light, not heavy, development processes allow for the highest quality code.
+</p>
+<p>This idea is quite popular these days. I'd like to offer an intuitive explanation for the &quot;unreasonable effectiveness&quot; of lightweight processes.  Let's start with an outline so you can see where I'm going, and then I'll dive into the details one by one.
+</p>
+
+<h2>Argument</h2>
+<ol>
+ <li><p>Code gets better as we work on it.
+</p>
+
+ </li>
+
+ <li><p>Work is broken into natural <em>units</em>: adding a feature or fixing a bug, for example.
+</p>
+
+ </li>
+
+ <li><p>Each unit adds a certain amount of <em>value</em> to the product, and has a certain <em>cost</em>.
+</p>
+<ul>
+ <li><p>Units are either <em>improvements</em> or <em>new development.</em>
+</p>
+
+ </li>
+
+ <li><p>Improvements increase quality and value, while new development only increases value.
+</p>
+
+ </li>
+</ul>
+
+ </li>
+
+ <li><p><em>ROI</em> (return on investment) is the ratio of value to work.
+</p>
+
+ </li>
+
+ <li><p>There are always plenty of units we could work on, but they have different ROIs.
+</p>
+
+ </li>
+
+ <li><p>The total cost is fixed, because programmer time is finite.
+</p>
+
+ </li>
+
+ <li><p>For our purposes, the value of a unit of work is fixed.
+</p>
+
+ </li>
+
+ <li><p>So, we maximize value by always working on the units with the highest ROI.
+</p>
+
+ </li>
+
+ <li><p>The cost is a combination of <em>inherent cost</em> and <em>overhead.</em>
+</p>
+
+ </li>
+
+ <li><p>A <em>heavy</em> process is one with lots of overhead, i.e. <strong>manual</strong> work that doesn't scale.
+</p>
+
+ </li>
+
+ <li><p>I'm going to argue that heavy processes add more overhead to improvements than to new development.
+</p>
+
+ </li>
+
+ <li><p>Thus, heavy processes decrease the ROI of improvements disproportionately.
+</p>
+
+ </li>
+
+ <li><p>As a result, new development becomes more attractive than improvements earlier, at a lower level of quality.
+</p>
+
+ </li>
+
+ <li><p>Therefore, heavy processes result in large amounts of low quality code.
+</p>
+
+ </li>
+</ol>
+
+<h2>Why do we care?</h2>
+<p>By my own definitions, value seems to be what's important.  Who cares about quality?  Well, <em>you</em> will, and your customer will.
+</p>
+<p>In the long term you'll care because of McConnell's General Principle of Software Quality: 
+</p>
+<blockquote><p>The General Principle of Software Quality is that improving quality reduces development costs.
+   - Steve McConnell, <a href="http://cc2e.com/">Code Complete</a> 
+</p>
+</blockquote><p>And your customers will care because it doesn't take long for an application to become feature complete: at that point, quality issues — such as intuitive UI, stability, and straight-forward configuration — become the key differentiators.
+</p>
+<p>Put these two together, and you can see why lack of quality is a problem: Not only is the code unpolished, but it's also hard to polish!  And when I say &quot;a problem,&quot; I mean the kind of problem that puts companies out of business.
+</p>
+<p>I said I would argue that heavy processes hit improvements the hardest, so let's do that now.
+</p>
+
+<h2>Classification of Overhead</h2>
+<p>Remember my definition of a heavy process:
+</p>
+<blockquote><p>A heavy process is one with lots of overhead, i.e. manual work that doesn't scale.
+</p>
+</blockquote><p>Manual work, of course, means human time, not heavy lifting.  &quot;Doesn't scale&quot; means the same tedious thing needs to be done for each unit of work.  This is a broad definition, and there are many ways a process can be &quot;heavy.&quot;  I can think of several specific specific tasks that tend to degenerate into manual labor:
+</p>
+<ul>
+ <li>
+     Administrative
+ </li>
+
+ <li>
+     Testing
+ </li>
+
+ <li>
+     Backwards Compatibility
+ </li>
+
+ <li>
+     Duplication
+ </li>
+
+ <li>
+     Deployment
+ </li>
+</ul>
+<p>We'll take a look at these one by one, and then draw some general conclusions by induction.
+</p>
+
+<h2>Administrative Overhead</h2>
+<p>Administrative work is only overhead if nothing comes of it: designs that no one ever reads, sign-offs that aren't based on detailed review, irrelevant questions on forms...  Particularly dangerous are processes that don't distinguish between small fixes and major development.  It doesn't make much sense to treat fixing a bug and designing a new module the same way.
+</p>
+<p>Improvements tend to be small (UI tweaks and bug fixes) and fixed administrative overhead kills the ROI for small changes.
+</p>
+<p>The solution is to have processes where administrative overhead is proportional to development cost.
+</p>
+
+<h2>Testing</h2>
+<p>Testing overhead hits small changes the hardest. In the absence of good unit testing and regression testing, every one-line bug fix or slight UI tweak requires tons of manual testing.  It's often the lack of these small finishing touches that makes an application feel buggy, sloppy, and inconsistent.  Testing overhead hits improvements hard because the code has to be tested all over again; it seems easier to just let such code be.
+</p>
+<p>The solution is to automate testing when possible and to make good, conscious, flexible decisions about the level and type of testing appropriate for each change.
+</p>
+
+<h2>Backward Compatibility</h2>
+<p>Backwards compatibility can be a major headache.  Once code is being used by a large user base, breaking compatibility with saved files, database schemas, and client-server communication protocols is only acceptable for major releases and always has significant overhead.  Since it's rarely possible to preserve backwards compatibility in a clean and elegant way, kludges are done that complicate code and lead to future maintenance problems.  By nature, the overhead of backwards compatibility applies only to improvements.
+</p>
+<blockquote><p>Elegance is rarely backwards compatible, and backwards compatibility is never elegant.
+</p>
+</blockquote><p>The solution is beta testing.  Give yourself a window to make essential but backwards-incompatible changes.
+</p>
+
+<h2>Duplication</h2>
+<p>Duplication of knowledge in system occurs whenever changes in two completely separate places need to be made in parallel (say in the client object model and the database tables.) Unfortunately, this requires discipline, because code with lots of duplication seems to work just fine at first.  The flaws appear later, during maintenance, when it become apparent that every small change requires encyclopedic knowledge of the module and hours of tedious work.  For this reason, duplication <em>only</em> affects improvements.  In my opinion, there is no acceptable level of duplication - it's always pure overhead.
+</p>
+<p>Centralizing knowledge is hard without strong support from the entire team, including management.  It's up front work for long-term benefit: that's hard for us mere mortals.  And duplication begets more duplication: if the development touches code with lots of duplication, it's rarely possible to Do The Right Thing without re-writing the problem code.
+</p>
+<p>The solution is an team-wide commitment to centralizing knowledge.
+</p>
+
+<h2>Deployment</h2>
+<p>It's a lot of work to get code packaged up and delivered to customers.  One of the most attractive things about writing web apps is the transparent deployment.  For other code, the usual solution is to only release versions every year or two, which minimizes this cost.
+</p>
+<p>That gets blown out of the water for patches and enterprise systems.  Frequent deployment gets expensive fast.
+</p>
+<p>The key to avoiding manual overhead is to develop powerful automated deployment tools.  The <code>diff</code> and <code>patch</code> utilities revolutionized Unix development, and <a href="http://wiki.rubyonrails.org/rails/pages/Capistrano">Capistrano</a> helps make <a href="http://www.ruby-lang.org/en/">Ruby</a> on Rails a smart choice.  Until automated tools are in place, deployment will be painful.
+</p>
+
+<h2>Q.E.D.</h2>
+<p>Now that we've taken a look at the common kinds of overhead in software development, we can see that they all <em>only</em> or <em>disproportionately</em> affect improvements.  A quick recap of the remainder of my argument is in order:
+</p>
+<ul>
+ <li>
+     this overhead pushes the ROI of improvements down
+ </li>
+
+ <li>
+     which favors new development over improvements
+ </li>
+
+ <li>
+     which results in lots of low quality code
+ </li>
+
+ <li>
+     which is fatal in the long term.
+ </li>
+</ul>
+
+<h2>Back to Business</h2>
+<p>Now, some level of overhead may be acceptable.  It's often the right business decision.  <em>But every bit of overhead limits the quality of the code.</em>  Overhead can be the right business decisions — <strong>if</strong> you're consciously trading quality for value.  The problem is that the tradeoff is often quite hard to see.
+</p>
+<p>In fact, attempts to increase code quality almost always <em>increase</em> the overhead of making a change or doing new development:
+</p>
+<ul>
+ <li>
+     What the manager says: &quot;Submit a design doc for approval.&quot;
+ </li>
+
+ <li>
+     That the programmer hears: &quot;That's stupid; go do something useful instead.&quot;
+ </li>
+</ul>
+<p>That's an example of administrative overhead, but the phenomenon is quite general: decisions are repeatedly made that increase future overhead.
+</p>
+<p>The large cost of small improvements goes unnoticed because the changes <strong>are never made</strong>.  Every time someone thinks of a small change to make the system cooler, then decides not to do it because there's too much busywork, the system suffers.  In particularly pathological situations, bug trackers aren't even submitted, because no one believes the fixes will ever be made and the bug submission process itself is weighed down by overhead.
+</p>
+<blockquote><p>The real, invisible price of a heavy process is the large number of improvements that never get done.
+</p>
+</blockquote><p>There is a solution for each of the specific types of overhead I considered.  Each solution is a move towards sophistication: By doing more kinds of things, and doing them up front, we reduce overhead and enable higher levels of quality to be reached.
+</p>
+
+
+
+</div>
+<p>
+  <span class="signature">- Oran Looney</span>
+  <span class="signature-date">June 5th 2007</span>
+</p>
+  <p class="thank-you">
+    Thanks for reading.  Please subscribe to the <a href="/feeds/blog/">RSS feed</a> and remember that
+    future readers will thank you for leaving your comments and criticisms.
+    <a href="/feeds/blog/" title="Subscribe to RSS Feed" class="big-rss-link">Subscribe to RSS Feed</a>
+  </p>
+<p class="article-tags">
+     
+        <a href="/tag/engineering/">Engineering</a> 
+    
+</p>
+
+
+      </div>
+      
+  
+  <div class="content-page comments" style="border-top: none">
+    <a name="comments"></a>
+    
+	  <h1>Comments (1)</h1>
+      <div>
+        
+          <div class="comment">
+    <div class="comment-date">September 13th 2012</div>
+	<h4><span class="comment-username">Delfina</span> said: </h4>
+	<p>, this update did not fix the Google tasks duclipate problem, However on my Galaxy tab &amp; mobile it did not make anything worse.I downloaded this app today along with quite a few others, because with my arthritis typing on a tablet makes it easier for me; but allowing me the option to sync with my google account made this app a plus over the others.Following my first sync on Astrid with Google tasks all of my active and closed task showed active &amp; that I had 76 tasks, my next sync before and after the update It now have 276 tasks active tasks. When I received my first notification from my cell and tablet that were the same task, but not at the same time so when I checked completed or snoozed the one one my tablet it didnt synce with my mobile. Please help me, Thanks, Mona </p>
+</div>
+
+        
+      </div>
+    
+    <h1>Leave a Comment</h1>
+    
+<form method="post" action="/overhead-limits-quality/leave-comment/" class="leave-comment-form">
+  <div style='display:none'><input type='hidden' name='csrfmiddlewaretoken' value='7c54419eea61d947291c188320a452fc' /></div>
+  <div>
+    Your Name: <br>
+    
+    <input id="id_user_name" type="text" name="user_name" maxlength="12" />
+  </div>
+  <div>
+    Comment: <br>
+    
+    <textarea id="id_content" rows="10" cols="40" name="content"></textarea>
+  </div>
+  <div>
+    Enter this phrase: <br>
+    
+    <img src="/static/site/images/captcha.png" alt="captcha">
+    <input id="id_captcha" type="text" name="captcha" maxlength="20" /> 
+  </div>
+  <div>
+    <input class="submit-button" type="submit" value="Leave Comment">
+  </div>
+</form>
+
+  </div>
+  
+
+	
+  </div>
+
+
+
+  <script src="http://www.google-analytics.com/urchin.js" type="text/javascript"></script>
+  <script type="text/javascript"> _uacct = "UA-2535855-1"; urchinTracker(); </script>
+
+</body>
+</html>

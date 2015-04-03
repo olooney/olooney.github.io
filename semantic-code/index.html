@@ -1,0 +1,224 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang="en-us" dir="ltr">
+<head>
+<!-- meta -->
+<meta http-equiv="content-type" content="text/html; charset=utf-8">
+<meta name="author" content="Oran Looney">
+<meta name="robots" content="INDEX,FOLLOW">
+<meta name="description" content="Oran quitely programming away and sharing a few of the lessons learned">
+<meta name="keywords" content="Programming,Code,Coding,Software,Software Development,Web,Web Development,Python,JavaScript,C++">
+<meta name="verify-v1" content="GmOM2OF0gDOQiM8uS0yKm1ZA0gUI8Hqk4BamNHp7iCg=">
+<meta name="viewport" content="width=800,initial-scale=0.6">
+<link rel="alternate" type="application/rss+xml" href="/feeds/blog/" title="OranLooney.com RSS Blog Feed">
+
+<title>OranLooney - Semantic Code</title>
+
+<!-- style -->
+<link rel="stylesheet" type="text/css" href="/static/site/css/yui-reset-min.css">
+<link rel="stylesheet" type="text/css" href="/static/site/css/main.css">
+<link rel="stylesheet" type="text/css" media="print" href="/static/site/css/print.css">
+<!--[if lt IE 7.]>
+	<link rel="stylesheet" type="text/css" href="/static/site/css/icons_gif.css">
+<![endif]-->
+
+
+
+</head>
+
+
+<body>
+
+  <div id="banner">
+	<a href="/">OranLooney.com</a>
+	<h6>quietly programming away</h6>
+  </div>
+  <div class="box" id="sidebar">
+	
+		<form id="quick-search" method="get" action="/search/">
+			<div>
+				<input type="hidden" name="alltags">
+				<input type="text" name="keyword" class="keyword-field">
+				<button type="submit" class="search-submit-button">Search</button>
+		  	</div>
+		  </form>
+	
+
+    <ul class="menu">
+      
+        <li class="menu_home"><a href="/">Home</a></li>
+      
+
+      
+		<li class="menu_rss_feed"><a href="/feeds/blog/" title="subscribe to the RSS feed">RSS Feed</a></li>
+        <li class="menu_tags"><a href="/tags/" title="search articles by tag">Tags</a></li>
+        <li class="menu_index"><a href="/archive" title="search articles chronologically">Archive</a></li>
+        <li class="menu_break"></li>
+        <li class="menu_bookshelf" title="my books on librarything.com"><a href="http://www.librarything.com/catalog.php?view=olooney&amp;offset=0&amp;shelf_rows=10&amp;previousOffset=0&amp;shelf=shelf">Bookshelf</a></li>
+        <li class="menu_sig" title="my endorsement of Agile"><a href="http://agilemanifesto.org/sign/display.cgi?ms=000000203">Manifesto</a></li>
+
+        <li class="menu_about_site" title="about the site itself"><a href="/colophon/">Colophon</a></li>
+        <li class="menu_about_me"><a href="/author/" title="about the author">Author</a></li> 
+      
+      
+      
+      
+          <li class="menu_break"></li>
+        
+          <li class="menu_login"><a href="/admin/">Login</a></li> 
+        
+      
+    </ul>
+  </div>
+  <div id="main-wrapper">
+	
+      
+      <div class="content-page">
+        
+  <a href="/semantic-code/" class="title">Semantic Code</a>
+
+  
+    <a href="http://www.flickr.com/photos/zakwitnij/2750044326/">
+      <img alt="colorful lead photo" src="/static/media/images/lead/2750044326_210420f275.jpg">
+    </a>
+  
+
+<div>
+  
+<blockquote><p><a href="http://www.answers.com/topic/semantic">se·man·tic</a> (sĭ-măn'tĭk) adj. <br> &nbsp; &nbsp;
+   1. Of or relating to meaning, especially meaning in language.
+</p>
+</blockquote><p>Programming destroys meaning.  When we program, we first replace concepts with symbols and then replace those symbols with arbitrary codes &mdash; that's why it's called coding.  <br>
+</p>
+<p>At its worst programming is  <em>write-only</em>: the program accomplishes a task, but is incomprehensible to humans.  See, for example, <a href="http://www.pbm.com/~lindahl/mel.html">the story of Mel.</a>  Such a program is correct, yet at the same time meaningless.
+</p>
+
+<h2>Semantic Functions</h2>
+<p>The opposite of write-only programming is <em>semantic programming</em>: writing code that has meaning encoded into it.  Let's take an example from C: <code>strcpy()</code>.  Instead of calling <code>strcpy()</code>, you could write this:
+</p>
+<pre><code>    while( *p++ = *q++ );
+</code></pre><p>A good programmer will be able to puzzle out what you <em>meant</em> if he or she is familiar with pointers and null-terminated strings.  If instead we call <code>strcpy()</code>, equivalent code is executed but we've also made in clear that we <em>mean</em> to copy a string.  <code>strcpy()</code> is more than just a block of code to execute; it is also a symbol with meaning, and when we use it we add meaning to the program.
+</p>
+<p>This becomes important when the implementation is not perfect, as it never is.  Consider this alternative code snippet:
+</p>
+<pre><code>    while( *q ) *p++ = *q++;
+</code></pre><p>Which behaves identically to the above snippet for <em>almost</em> all inputs.  Which one is correct?  What did the programmer intend?  Did he or she do it on purpose?  There's no way to know from the code; all semantic meaning is gone.
+</p>
+<p>Functions like <code>strcpy()</code> are semantic symbols, and as such allow you to inject meaning directly into your code&mdash;not into the comments or even the variable names, but the structure of the code itself.
+</p>
+<p>Likewise, you can create new semantic symbols by writing functions that do one &mdash; and only one &mdash; thing and giving them a descriptive names.  <br>
+</p>
+<blockquote><p>Functions should be short and sweet, and do just one thing.<br/>
+   - Linus Torvalds
+</p>
+</blockquote><p>The <a href="http://lxr.linux.no/linux/Documentation/CodingStyle#L342">Linux Coding Style</a> guide contains <a href="http://lxr.linux.no/linux/Documentation/CodingStyle#L342">good, practical advice</a> on how to write meaningful functions.  A program built out of such semantic functions will be more meaningful, hence more readable and understandable.
+</p>
+
+<h2>Semantic Methods</h2>
+<p>In the object-oriented world, semantic programing means providing methods with good semantics.  An Array class doesn't <em>need</em> to provide a method for accessing the last element, because programmers could simply write:
+</p>
+<pre><code>    myArray[myArray.length-1]
+</code></pre><p>and still be guaranteed constant-time access.  But this isn't semantic; you're saying <em>how</em> to do something, instead of <em>what</em> you want to do, programming procedurally instead of declaratively.  It would be better to be able to write:
+</p>
+<pre><code>    myArray.last()
+</code></pre><p><em>How</em> is it better, you may ask?  Well, how should this code behave for an empty array?  With the <code>last()</code> method that decision is encapsulated in the Array class.  Even functions &quot;too simple to screw up&quot; can have edge cases anyone can miss when slamming out &quot;just one line of code.&quot;
+</p>
+<p>The client is busy trying to solve their own problem.  Having to write a even a simple algorithm (take the length, subtract one, get the element at that index) to get the last element is a distraction.    That shoud be <a href="http://everything2.com/e2node/Somebody%2520Else%2527s%2520Problem%2520Field">SEP</a>: Somebody Else's Problem.  (Specifically, Array's implementer.)
+</p>
+<p>Another example is the <code>.empty()</code> method provided for containers in the C++ STL.  Why not simply compare <code>.length()</code> to 0?  Because not all containers can compute their length in constant time.  <code>list&lt;&gt;</code>, which is implemented as a bi-directionally linked-list, must walk from the start node to the end code in to determine its own length.  However, to determine if it contains at least one node takes only constant time.
+</p>
+<p>The principle is the same: let the client define <em>what</em> to do, and let the object figure out <em>how</em> to do it.  The &quot;how&quot; might be different between different implementations of the interface, and it might change over time; therefore it should be encapsulated in the object.  By providing the semantic <code>.empty()</code> method, STL contains encapsulate that behavior and provide practical performance and maintainence advantages.
+</p>
+<p>To enable the client to declare <em>what</em> needs to be done without any <em>how</em>, we need to write semantic methods, like <code>.last()</code> and <code>.empty()</code>, that have clear, meaningful responsibilities.  Doing so makes it easier for programmers to learn the object's API, makes the client code simplier and more declarative, and improves encapsulation.  <br>
+</p>
+
+<h2>Implementing Semantic Objects</h2>
+<p>So, semantic methods are useful to the object's client, because they don't have to think about implementations, but can simply say what they want and let the object provide it.  That's useful to the client, but doesn't it impose a burden on the classes implementor?
+</p>
+<p>No.  The reverse is the case; providing semantic methods gives the implementor great freedom to change the underlying implementation and prevents the object from being pushed into a passive, &quot;data&quot; role.
+</p>
+<p>Suppose a class provides various &quot;get&quot; methods &mdash; <code>getName()</code>, <code>getAge()</code>, <code>getGender()</code>, and so on &mdash; but no <code>getDescription()</code>  method.  The client can certainly construct a string representation of the object, but the class has no control over it... in particular it has no way to update those cobbled-together descriptions when the class changes and new fields are added.  In general, we <em>never</em> want the client to have to write procedural code acting on our object, and should provide semantic methods they can call instead.
+</p>
+<p>( C++ programmers may be familar with the idea of writing non-method, non-friend functions to provide convenience functionality that can be implemented in terms of the classes public interface.  That's fine; the important thing is to provide the semantics along with the object, so what I've said about methods applies here too.)
+</p>
+<p>Programming destroys meaning.  However, this destruction does not need  to be wholesale.  With a little thought we can preserve much of the meaning.  Such &quot;semantic code&quot; can be understood, re-used, debugged, and modified far more easily than &quot;write-only code.&quot;
+</p>
+
+
+
+</div>
+<p>
+  <span class="signature">- Oran Looney</span>
+  <span class="signature-date">April 30th 2008</span>
+</p>
+  <p class="thank-you">
+    Thanks for reading.  Please subscribe to the <a href="/feeds/blog/">RSS feed</a> and remember that
+    future readers will thank you for leaving your comments and criticisms.
+    <a href="/feeds/blog/" title="Subscribe to RSS Feed" class="big-rss-link">Subscribe to RSS Feed</a>
+  </p>
+<p class="article-tags">
+     
+        <a href="/tag/problem-solving/">Problem Solving</a> 
+     
+        <a href="/tag/coding-style/">Coding Style</a> 
+     
+        <a href="/tag/engineering/">Engineering</a> 
+    
+</p>
+
+
+      </div>
+      
+  
+  <div class="content-page comments" style="border-top: none">
+    <a name="comments"></a>
+    
+	  <h1>Comments (1)</h1>
+      <div>
+        
+          <div class="comment">
+    <div class="comment-date">September 12th 2012</div>
+	<h4><span class="comment-username">Doana</span> said: </h4>
+	<p>Pretty neat idea, I bet you could use a dynamic QR code to send popele different information depending on what time of day that it is.   That way Jack in the box could target the late night drinkers with breakfast sandwiches and the early morning commuters with coffee.</p>
+</div>
+
+        
+      </div>
+    
+    <h1>Leave a Comment</h1>
+    
+<form method="post" action="/semantic-code/leave-comment/" class="leave-comment-form">
+  <div style='display:none'><input type='hidden' name='csrfmiddlewaretoken' value='7c54419eea61d947291c188320a452fc' /></div>
+  <div>
+    Your Name: <br>
+    
+    <input id="id_user_name" type="text" name="user_name" maxlength="12" />
+  </div>
+  <div>
+    Comment: <br>
+    
+    <textarea id="id_content" rows="10" cols="40" name="content"></textarea>
+  </div>
+  <div>
+    Enter this phrase: <br>
+    
+    <img src="/static/site/images/captcha.png" alt="captcha">
+    <input id="id_captcha" type="text" name="captcha" maxlength="20" /> 
+  </div>
+  <div>
+    <input class="submit-button" type="submit" value="Leave Comment">
+  </div>
+</form>
+
+  </div>
+  
+
+	
+  </div>
+
+
+
+  <script src="http://www.google-analytics.com/urchin.js" type="text/javascript"></script>
+  <script type="text/javascript"> _uacct = "UA-2535855-1"; urchinTracker(); </script>
+
+</body>
+</html>

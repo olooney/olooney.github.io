@@ -1,0 +1,283 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang="en-us" dir="ltr">
+<head>
+<!-- meta -->
+<meta http-equiv="content-type" content="text/html; charset=utf-8">
+<meta name="author" content="Oran Looney">
+<meta name="robots" content="INDEX,FOLLOW">
+<meta name="description" content="Oran quitely programming away and sharing a few of the lessons learned">
+<meta name="keywords" content="Programming,Code,Coding,Software,Software Development,Web,Web Development,Python,JavaScript,C++">
+<meta name="verify-v1" content="GmOM2OF0gDOQiM8uS0yKm1ZA0gUI8Hqk4BamNHp7iCg=">
+<meta name="viewport" content="width=800,initial-scale=0.6">
+<link rel="alternate" type="application/rss+xml" href="/feeds/blog/" title="OranLooney.com RSS Blog Feed">
+
+<title>OranLooney - Productive Problem Solving</title>
+
+<!-- style -->
+<link rel="stylesheet" type="text/css" href="/static/site/css/yui-reset-min.css">
+<link rel="stylesheet" type="text/css" href="/static/site/css/main.css">
+<link rel="stylesheet" type="text/css" media="print" href="/static/site/css/print.css">
+<!--[if lt IE 7.]>
+	<link rel="stylesheet" type="text/css" href="/static/site/css/icons_gif.css">
+<![endif]-->
+
+
+
+</head>
+
+
+<body>
+
+  <div id="banner">
+	<a href="/">OranLooney.com</a>
+	<h6>quietly programming away</h6>
+  </div>
+  <div class="box" id="sidebar">
+	
+		<form id="quick-search" method="get" action="/search/">
+			<div>
+				<input type="hidden" name="alltags">
+				<input type="text" name="keyword" class="keyword-field">
+				<button type="submit" class="search-submit-button">Search</button>
+		  	</div>
+		  </form>
+	
+
+    <ul class="menu">
+      
+        <li class="menu_home"><a href="/">Home</a></li>
+      
+
+      
+		<li class="menu_rss_feed"><a href="/feeds/blog/" title="subscribe to the RSS feed">RSS Feed</a></li>
+        <li class="menu_tags"><a href="/tags/" title="search articles by tag">Tags</a></li>
+        <li class="menu_index"><a href="/archive" title="search articles chronologically">Archive</a></li>
+        <li class="menu_break"></li>
+        <li class="menu_bookshelf" title="my books on librarything.com"><a href="http://www.librarything.com/catalog.php?view=olooney&amp;offset=0&amp;shelf_rows=10&amp;previousOffset=0&amp;shelf=shelf">Bookshelf</a></li>
+        <li class="menu_sig" title="my endorsement of Agile"><a href="http://agilemanifesto.org/sign/display.cgi?ms=000000203">Manifesto</a></li>
+
+        <li class="menu_about_site" title="about the site itself"><a href="/colophon/">Colophon</a></li>
+        <li class="menu_about_me"><a href="/author/" title="about the author">Author</a></li> 
+      
+      
+      
+      
+          <li class="menu_break"></li>
+        
+          <li class="menu_login"><a href="/admin/">Login</a></li> 
+        
+      
+    </ul>
+  </div>
+  <div id="main-wrapper">
+	
+      
+      <div class="content-page">
+        
+  <a href="/productive-problem-solving/" class="title">Productive Problem Solving</a>
+
+  
+    <a href="http://www.flickr.com/photos/sloth_rider/392367929/">
+      <img alt="colorful lead photo" src="/static/media/images/lead/392367929_ea07953682.jpg">
+    </a>
+  
+
+<div>
+  
+<p>Imagine the worst programmer possible.  Here's how he writes code:
+</p>
+<ol>
+ <li>
+     Open up the source in an editor and hits some keys at random.
+ </li>
+
+ <li>
+     Try to compile.
+ </li>
+
+ <li>
+     If it doesn't compile, undo the change and try again.
+ </li>
+
+ <li>
+     If it does compile, send it out to QA.
+ </li>
+
+ <li>
+     If QA doesn't like it, throw away the change.
+ </li>
+
+ <li>
+     Rinse, Lather, Repeat.
+ </li>
+</ol>
+<p>Now here's what I want you to see, to really wrap your mind around: <em>this guy designed the human brain.</em>
+</p>
+<p>It took him a few billion years, but he did it.
+</p>
+<p>Given the basic mechanism of evolution, there is no reason whatsoever to believe that our minds are elegant. We're better off seeing it as the ultimate legacy system, a massive layering of egregious hacks and duplicate code.
+</p>
+<p>The human mind is not well organized.  We can look for rules, but we should expect exceptions.  We can't <em>prove</em> anything about such a messy system, but we can proceed empirically.  <br>
+</p>
+<p>The reason I'm going off about brains is that I'm about to talk about problem solving in an abstract way, as if it were a simple optimization problem.  I have to!  Whenever we talk about the human mind, there are so many details that when we try to be thorough, we just end up being obscure.  So let's just agree to speak concisely about a complex topic, and to remember &quot;but of course there are obvious exceptions.&quot;
+</p>
+
+<h2>Productivity</h2>
+<p>By &quot;productive problem solving,&quot; I mean solving reasonably difficult problems in a reasonable amount of time.  I don't mean solving problems super quickly, since that relies on flashes of insight, which is unreliable. And I don't mean solving truly difficult and interesting problems, which is an advanced subject. I mean solving problems with time scales of hours or days; problems difficult enough that the solution - or the method - isn't obvious, but problems that we can look at and be certain of solving given enough time.  <br>
+</p>
+<p>You know.  Like work.
+</p>
+<p>Let's define productivity as decreasing the solution time while minimizing risk.
+</p>
+<p> <img src="/static/productivity/definition.png" alt="productivity equation"/>
+</p>
+<p>Now that we have a definition for productivity, What can be done to be optimize it? I'm going to focus on one powerful and very general solution: divide and conquer.
+</p>
+
+<h2>Divide and Conquer</h2>
+<p>Stuck on a problem that seems too complex to approach?  Divide it into smaller problems, solve those, and integrate the solutions. I'm not talking about <a href="http://en.wikipedia.org/wiki/Quicksort">quicksort</a> here;  Such algorithms do very well by dividing a problem into multiple smaller problems <em>of the same form</em>. When humans divide problems, they divide them into to <em>dissimilar</em> problems. In <a href="http://en.wikipedia.org/wiki/Zen_and_the_Art_of_Motorcycle_Maintenance">Zen and the Art of Motorcycle Maintenance</a> this is called Phaedrus's knife:
+</p>
+<blockquote><p>Phædrus was a master with this knife, and used it with dexterity and a sense of power. With a single stroke of analytic thought he split the whole world into parts of his own choosing, split the parts and split the fragments of the parts, finer and finer and finer until he had reduced it to what he wanted it to be.
+</p>
+</blockquote><p>The knife is about finding ways to focus on the different aspects of a complex system serially, one at a time. We do this all the time, in daily life and at work.  We can only hold about seven objects in working memory, so of course we have to chop things up before they'll fit.
+</p>
+<p>Let's see if Henry Ford's assembly line can make things clearer.  Instead of dividing by work: &quot;You build those 5 cars and I'll build these 5 cars,&quot; Ford divided by role: &quot;You build ten  engines, and I'll build ten frames.&quot;  This was a good cut because each sub-problem is <em>simpler</em> than the original problem.  Our brains don't handle complexity very well, so simpler also means faster and easier.
+</p>
+<p>The Ford example actually understates my case. In manufacturing, simplicity makes a relatively small contribution towards productivity: at the end of the day, we still have do a lot of real work.  But in programming, simplicity is the whole thing.  Instead of a 10 percent, we can expect to see 50 to 100 percent gains.
+</p>
+
+<h2>The Formula</h2>
+<p>Why do I think that?  It's because the difficulty of a problem, measured in the time it takes to solve it, is non-linear in complexity:
+</p>
+<p><img src="/static/productivity/time-and-complexity.png" alt="time and complexity"/>
+</p>
+<p>I just pulled the quadratic exponent out of a hat, but as a <a href="http://en.wikipedia.org/wiki/Heuristic_(computer_science)">heuristic</a> it's reasonable.  I happen to think the exponent is somewhere between 1 and 2, but prefer to use something easy to compute with.  This formula implies that if I could get a really clean cut and divide a problem into two pieces of half complexity each, I'd reduce the total time by a factor of two!  And if I could cleanly cut each of those problems, I'd reduce the total time by a factor of four...
+</p>
+<p>But obviously this can't go on forever.  There are at least two limiting factors:
+</p>
+<ul>
+ <li>
+     A clean cut's pretty hard. Typically, both sub-problems will be more than half as complex as original.
+ </li>
+
+ <li>
+     Making any kind of cut at all takes time, so there's some overhead.
+ </li>
+</ul>
+
+<h2>Cutting Diamonds</h2>
+<p>In fact, there's <em>a lot</em> of overhead to making a good cut.  Hours and days can slip by while we ponder design patterns and architectures and development process.  It's a bit like cutting a diamond; it takes a lot of skill and concentration to make a cut that adds value to it.  <br>
+</p>
+<p>And not all cuts are good: the seven-layer OSI networking model is a perfect example of a cut that just didn't work.  Nice try though, guys!  So obviously there are risks involved.
+</p>
+<p>But if we get it right... oh man.  Design pattern enthusiasts like to claim that patterns produce more maintainable code with weaker coupling.  Which means that programmers can replace the components easily, which means they will, which means that if you create a well designed system, sooner or later every bit of it is going to be replaced.  Even after every line of code has been replaced, there's your pure, elegant cut straight down the middle.  Beautiful.
+</p>
+<p>For example: the distinction between a <em>parser</em> and a <em>lexer.</em>  This is unarguably a brilliant cut.  I can test my formula against this example: How much longer would it take to write a full parser as a single module, versus writing the tokenizer and parser separately?  Since this is an example of a &quot;clean cut&quot;, my formula would say about a factor of two.  You can judge for yourself if that's accurate; I think it's about right.
+</p>
+
+<h2>Remember Productivity?</h2>
+<p>Wait a minute.  What am I going on about?  Brilliant cuts that re-shape the world?  What's that got to do with productivity?  In software development, a cut generally goes by the name &quot;design.&quot; The point of my diamond cutting analogy was that the benefits of a good design last forever.  On a typical project, that means they accrue over the life of the project. The larger the project, the larger the benefit.
+</p>
+<p>But there's a limit.
+</p>
+<p>The model doesn't imply that we should dissect a problem until there's nothing left.  It implies that we should carefully divide it into a few sub-problems, and then get to work.  Beyond a certain point, there's no point.  So a couple of practical corollaries:
+</p>
+<ul>
+ <li>
+     Favor &quot;heavy&quot; classes.  A class with a dozen lines of code is suspicious.  A dozen classes each with a dozen lines of code is <em>very</em> suspicious.
+ </li>
+
+ <li>
+     Don't over design the &quot;inside&quot; of a module. If the module is cohesive and presents a clean interface, the <em>design</em> of the internals isn't that important; focus on other aspects of quality instead.
+ </li>
+
+ <li>
+     Nest.  If we can afford three hours of design, spend an hour to cut the problem in half, and then cut each half in half.
+ </li>
+</ul>
+<p>Oh yes, I almost forgot: there's another aspect to productivity, isn't there?  <br>
+</p>
+<p><img src="/static/productivity/definition.png" alt="productivity equation"/>
+</p>
+<p><em>Risk.</em>  Always remember that design is risky.  We can't guarantee we'll reduce the problem time much, so even if we're decreasing the time required to complete the project by doing more design, we're hurting productivity by increasing risk.  The exact cost depends on the project and circumstances, but it's something to keep in mind.
+</p>
+<p>I actually use my formula, including the arbitrary exponent of two, to help me make estimates on projects.  In my short career I've made mistakes both ways, over-designing and under-designing, and I feel it's a happy medium.  What this <a href="http://en.wikipedia.org/wiki/Heuristic_(computer_science)">heuristic</a> lacks in accuracy it makes up for by being simple enough for my poor little brain to actually use.
+</p>
+
+
+
+</div>
+<p>
+  <span class="signature">- Oran Looney</span>
+  <span class="signature-date">May 2nd 2007</span>
+</p>
+  <p class="thank-you">
+    Thanks for reading.  Please subscribe to the <a href="/feeds/blog/">RSS feed</a> and remember that
+    future readers will thank you for leaving your comments and criticisms.
+    <a href="/feeds/blog/" title="Subscribe to RSS Feed" class="big-rss-link">Subscribe to RSS Feed</a>
+  </p>
+<p class="article-tags">
+     
+        <a href="/tag/philosophy/">Philosophy</a> 
+     
+        <a href="/tag/problem-solving/">Problem Solving</a> 
+    
+</p>
+
+
+      </div>
+      
+  
+  <div class="content-page comments" style="border-top: none">
+    <a name="comments"></a>
+    
+	  <h1>Comments (1)</h1>
+      <div>
+        
+          <div class="comment">
+    <div class="comment-date">September 11th 2012</div>
+	<h4><span class="comment-username">Koko</span> said: </h4>
+	<p>I truly wanted to write down a quick ramerk to thank you for these pleasant secrets you are showing at this website. My time-consuming internet lookup has at the end been rewarded with really good know-how to go over with my contacts. I ‘d express that we readers actually are undoubtedly blessed to dwell in a fantastic community with many outstanding individuals with insightful concepts. I feel rather grateful to have used the web site and look forward to tons of more cool times reading here. Thank you once more for all the details.</p>
+</div>
+
+        
+      </div>
+    
+    <h1>Leave a Comment</h1>
+    
+<form method="post" action="/productive-problem-solving/leave-comment/" class="leave-comment-form">
+  <div style='display:none'><input type='hidden' name='csrfmiddlewaretoken' value='7c54419eea61d947291c188320a452fc' /></div>
+  <div>
+    Your Name: <br>
+    
+    <input id="id_user_name" type="text" name="user_name" maxlength="12" />
+  </div>
+  <div>
+    Comment: <br>
+    
+    <textarea id="id_content" rows="10" cols="40" name="content"></textarea>
+  </div>
+  <div>
+    Enter this phrase: <br>
+    
+    <img src="/static/site/images/captcha.png" alt="captcha">
+    <input id="id_captcha" type="text" name="captcha" maxlength="20" /> 
+  </div>
+  <div>
+    <input class="submit-button" type="submit" value="Leave Comment">
+  </div>
+</form>
+
+  </div>
+  
+
+	
+  </div>
+
+
+
+  <script src="http://www.google-analytics.com/urchin.js" type="text/javascript"></script>
+  <script type="text/javascript"> _uacct = "UA-2535855-1"; urchinTracker(); </script>
+
+</body>
+</html>

@@ -1,0 +1,272 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang="en-us" dir="ltr">
+<head>
+<!-- meta -->
+<meta http-equiv="content-type" content="text/html; charset=utf-8">
+<meta name="author" content="Oran Looney">
+<meta name="robots" content="INDEX,FOLLOW">
+<meta name="description" content="Oran quitely programming away and sharing a few of the lessons learned">
+<meta name="keywords" content="Programming,Code,Coding,Software,Software Development,Web,Web Development,Python,JavaScript,C++">
+<meta name="verify-v1" content="GmOM2OF0gDOQiM8uS0yKm1ZA0gUI8Hqk4BamNHp7iCg=">
+<meta name="viewport" content="width=800,initial-scale=0.6">
+<link rel="alternate" type="application/rss+xml" href="/feeds/blog/" title="OranLooney.com RSS Blog Feed">
+
+<title>OranLooney - Sassy Tron Theme</title>
+
+<!-- style -->
+<link rel="stylesheet" type="text/css" href="/static/site/css/yui-reset-min.css">
+<link rel="stylesheet" type="text/css" href="/static/site/css/main.css">
+<link rel="stylesheet" type="text/css" media="print" href="/static/site/css/print.css">
+<!--[if lt IE 7.]>
+	<link rel="stylesheet" type="text/css" href="/static/site/css/icons_gif.css">
+<![endif]-->
+
+
+
+</head>
+
+
+<body>
+
+  <div id="banner">
+	<a href="/">OranLooney.com</a>
+	<h6>quietly programming away</h6>
+  </div>
+  <div class="box" id="sidebar">
+	
+		<form id="quick-search" method="get" action="/search/">
+			<div>
+				<input type="hidden" name="alltags">
+				<input type="text" name="keyword" class="keyword-field">
+				<button type="submit" class="search-submit-button">Search</button>
+		  	</div>
+		  </form>
+	
+
+    <ul class="menu">
+      
+        <li class="menu_home"><a href="/">Home</a></li>
+      
+
+      
+		<li class="menu_rss_feed"><a href="/feeds/blog/" title="subscribe to the RSS feed">RSS Feed</a></li>
+        <li class="menu_tags"><a href="/tags/" title="search articles by tag">Tags</a></li>
+        <li class="menu_index"><a href="/archive" title="search articles chronologically">Archive</a></li>
+        <li class="menu_break"></li>
+        <li class="menu_bookshelf" title="my books on librarything.com"><a href="http://www.librarything.com/catalog.php?view=olooney&amp;offset=0&amp;shelf_rows=10&amp;previousOffset=0&amp;shelf=shelf">Bookshelf</a></li>
+        <li class="menu_sig" title="my endorsement of Agile"><a href="http://agilemanifesto.org/sign/display.cgi?ms=000000203">Manifesto</a></li>
+
+        <li class="menu_about_site" title="about the site itself"><a href="/colophon/">Colophon</a></li>
+        <li class="menu_about_me"><a href="/author/" title="about the author">Author</a></li> 
+      
+      
+      
+      
+          <li class="menu_break"></li>
+        
+          <li class="menu_login"><a href="/admin/">Login</a></li> 
+        
+      
+    </ul>
+  </div>
+  <div id="main-wrapper">
+	
+      
+      <div class="content-page">
+        
+  <a href="/sassy-tron/" class="title">Sassy Tron Theme</a>
+
+  
+    <img alt="colorful lead photo" src="/static/media/images/lead/sassy_tron_lead.png">
+  
+
+<div>
+  
+<p>Last week, I made &quot;Tron&quot; theme for my site using pure CSS.  I was pleased with the resulting look, but wasn't pleased with the CSS code: there way <em>way</em> too much duplication.  I'd been itching to try out some of the latest tools for generating CSS, so I went back and simplified the code with <a href="http://sass-lang.com/docs.html">Sass</a>, using its new &quot;Sassy CSS&quot; syntax, and couldn't be happier with the results.  Here's what I did and how <a href="http://sass-lang.com/docs.html">Sass</a> helped me do it.
+</p>
+<ul>
+ <li>
+     Original CSS: <a href="http://oranlooney.com/static/tron/css/old_main.css">old_main.css</a>
+ </li>
+
+ <li>
+     Sassy CSS: <a href="http://oranlooney.com/static/tron/css/main.scss">main.scss</a>
+ </li>
+
+ <li>
+     Generated CSS: <a href="http://oranlooney.com/static/tron/css/main.css">main.css</a>
+ </li>
+
+ <li>
+     <a href="http://oranlooney.com/static/tron/index.html">Live Example of the Sassy Overhaul</a>
+ </li>
+</ul>
+
+<h2>Transitioning</h2>
+<p>Sass now supports &quot;sassy CSS,&quot; which is a superset of CSS, just like <a href="http://lesscss.org/">LESS</a>.  Previously, Sass supported only terser, more concise syntax.  The older syntax is still supported but not recommended, but IMHO, the &quot;superset of CSS&quot; syntax is Right and the &quot;alternative to CSS&quot; syntax is Wrong.  Two reasons:
+</p>
+<ol>
+ <li>
+     It's <em>much</em> easier to get started; just copy your legacy CSS and you already have valid, if ugly, Sassy CSS that you can clean up as you go.
+ </li>
+
+ <li>
+     It's way easier to learn, and there's nothing to &quot;unlearn.&quot;  You can just start learning new and useful syntaxes right away.
+ </li>
+</ol>
+<p>I literally was able to follow the 3 step process shown at the top of the SASS website, mutatis mutandis:
+</p>
+<pre><code>$ gem install haml
+$ mv main.css main.scss
+$ sass --watch main.scss:main.css
+</code></pre><p>(Except I had to mess around installing <a href="http://www.ruby-lang.org/en/">Ruby</a> and <a href="http://www.ruby-lang.org/en/">Ruby</a> Gems first; I'm not a Rails developer.)
+</p>
+<p>Once I had my naïve Sassy CSS file started, I was able to start simplifying.
+</p>
+
+<h2>Centralizing Color Definitions</h2>
+<p>The Tron theme I was starting from was basically a monochrome color scheme: any given color on the page may be a little lighter or darker, more transparent or opaque, but always the same hue.  And yet there were dozens of color definitions scattered throughout the file!  It was particularly painful for me because I was working from a reference photo, and had to adjust the hue several times to get everything to look &quot;right.&quot;
+</p>
+<p>So the first thing I did was use a variable to define my colors at the top of the file:
+</p>
+<pre><code>$main-color: rgb(21,171,195); // blue-green
+$highlight-color: rgb(36,198,224);
+$code-color: rgb(39,215,243);
+</code></pre><p>That let me search and replace and get a lot of definitions in one place, but we can take it a step farther, and using <a href="http://sass-lang.com/docs/yardoc/Sass/Script/Color.html">SASS color manipulations</a> to base everything off of a single master color:
+</p>
+<pre><code>$main-color: rgb(21,171,195);:// blue-green
+$highlight-color: lighten($main-color, 20%);
+$code-color: lighten($main-color, 25%);
+</code></pre><p>Which is OK because it's a monochrome color scheme and those colors really are logically tied together.  <br>
+</p>
+<p>I'm also using a good deal of transparency, but there I'm able to the <code>fade_out</code> function to set opacity independently of the color:
+</p>
+<pre><code>background-color: fade_out($highlight-color, 0.7);
+</code></pre><p>This is awesome: if I decided it should look more like the green-screen consoles of yore, I could change every color on the page by editing a single line:
+</p>
+<pre><code>$main-color: green;
+</code></pre><img src="http://oranlooney.com/static/tron/green_tron.png">
+
+<p>See?
+</p>
+<p>(Of course, image colors don't change; that's outside the scope of CSS, but that's easy enough to fix with the Adjust Hue tool after the page looks &quot;right.&quot;)
+</p>
+
+<h2>Glow Mixin</h2>
+<p>Lot's of things in the design &quot;glow,&quot; and this is achieved with box shadows set to a bright color and a 0 offset.  Unfortunately, you currently have to repeat yourself 3 times before all browsers understand you when you talk about box shadows:
+</p>
+<pre><code>-moz-box-shadow: 0 0 5px rgb(21,171,195);
+-webkit-box-shadow: 0 0 5px rgb(21,171,195);
+box-shadow: 0 0 5px rgb(21,171,195);
+</code></pre><p>Ugh.
+</p>
+<p>SASS has a solution for these kinds of problems though, called a mixin.  A mixin lets you define a block of rules that you can re-use later.
+</p>
+<p>Looking through the legacy CSS, I saw that I was using different radiuses and colors for different elements, but always the same <code>0 0</code> offset, so my glow mixin took two parameters, radius and color:
+</p>
+<pre><code>@mixin glow($radius, $color) {
+    -moz-box-shadow: 0 0 $radius $color;
+    -webkit-box-shadow: 0 0 $radius $color;
+    box-shadow: 0 0 $radius $color;
+}
+</code></pre><p>The mixin payed for itself right away because I was able to use it <strong>six</strong> times:
+</p>
+<pre><code>@include glow(9px, $main-color);
+@include glow(10px, $highlight-color);
+@include glow(5px, $main-color);
+@include glow(10px, fade_out($main-color, 0.5));
+@include glow(10px, $highlight-color);
+@include glow(5px, $main-color);
+</code></pre><p>Every single one of those uses was previously a block of three completely redundant lines.  Obviously, the readability is hugely improved, as is the ability to rapidly experiment with different variations without having to worry about keeping everything in sync.
+</p>
+
+<h2>Roundy Plugin</h2>
+<p>The other visual element I was using over and over again was rounded corners.  This also suffers from the tower of Babel problem, so I wrote a simple mixin for it too:
+</p>
+<pre><code>@mixin roundy($radius) {
+    -moz-border-radius: $radius;
+    -webkit-border-radius: $radius;
+    border-radius: $radius;
+}
+</code></pre><p>Mixins are just a huge <a href="http://en.wikipedia.org/wiki/Don%27t_repeat_yourself">DRY</a> win.  With raw CSS, the only way to get any kind of re-use out of a style was to give its own class and then tag the elements you want to look that way with the class; that's what I was doing before with the <code>.roundy</code> class.  But that's terrible, because it moves the decision up into the markup instead of leaving it in the stylesheet.
+</p>
+
+<h2>Analysis</h2>
+<p>The simple truth is that raw CSS doesn't provide any centralization or re-use.  That's probably a good thing; keeping the CSS standard simple and trivially machine readable has probably helped browsers implement it consistently.  But like assembly code, easily machine readable doesn't equate to easily human writable.  CSS calls out to be machine generated.  In fact, if you're minifying your CSS, you're <em>already</em> machine generating it!
+</p>
+<p>So for my part, I'm drinking the Kool-aid and switching my development over to generated CSS.  By sticking to tools like <a href="http://lesscss.org/">LESS</a> or <a href="http://sass-lang.com/docs.html">SASS</a> that provide a superset of features on top of CSS, I'll make sure to stay close enough to CSS that I can debug and manipulate it in the browser, and it will be easy to migrate projects over... and if I ever change my mind, I can just take generated CSS, make it authoritative, and throw away the Sassy source files.
+</p>
+
+
+
+</div>
+<p>
+  <span class="signature">- Oran Looney</span>
+  <span class="signature-date">January 29th 2011</span>
+</p>
+  <p class="thank-you">
+    Thanks for reading.  Please subscribe to the <a href="/feeds/blog/">RSS feed</a> and remember that
+    future readers will thank you for leaving your comments and criticisms.
+    <a href="/feeds/blog/" title="Subscribe to RSS Feed" class="big-rss-link">Subscribe to RSS Feed</a>
+  </p>
+<p class="article-tags">
+    
+</p>
+
+
+      </div>
+      
+  
+  <div class="content-page comments" style="border-top: none">
+    <a name="comments"></a>
+    
+	  <h1>Comments (1)</h1>
+      <div>
+        
+          <div class="comment">
+    <div class="comment-date">July 2nd 2012</div>
+	<h4><span class="comment-username">TheDoctor</span> said: </h4>
+	<p>Very Cool.  Like the classic Tron Feel.</p>
+</div>
+
+        
+      </div>
+    
+    <h1>Leave a Comment</h1>
+    
+<form method="post" action="/sassy-tron/leave-comment/" class="leave-comment-form">
+  <div style='display:none'><input type='hidden' name='csrfmiddlewaretoken' value='7c54419eea61d947291c188320a452fc' /></div>
+  <div>
+    Your Name: <br>
+    
+    <input id="id_user_name" type="text" name="user_name" maxlength="12" />
+  </div>
+  <div>
+    Comment: <br>
+    
+    <textarea id="id_content" rows="10" cols="40" name="content"></textarea>
+  </div>
+  <div>
+    Enter this phrase: <br>
+    
+    <img src="/static/site/images/captcha.png" alt="captcha">
+    <input id="id_captcha" type="text" name="captcha" maxlength="20" /> 
+  </div>
+  <div>
+    <input class="submit-button" type="submit" value="Leave Comment">
+  </div>
+</form>
+
+  </div>
+  
+
+	
+  </div>
+
+
+
+  <script src="http://www.google-analytics.com/urchin.js" type="text/javascript"></script>
+  <script type="text/javascript"> _uacct = "UA-2535855-1"; urchinTracker(); </script>
+
+</body>
+</html>

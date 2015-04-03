@@ -1,0 +1,446 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang="en-us" dir="ltr">
+<head>
+<!-- meta -->
+<meta http-equiv="content-type" content="text/html; charset=utf-8">
+<meta name="author" content="Oran Looney">
+<meta name="robots" content="INDEX,FOLLOW">
+<meta name="description" content="Oran quitely programming away and sharing a few of the lessons learned">
+<meta name="keywords" content="Programming,Code,Coding,Software,Software Development,Web,Web Development,Python,JavaScript,C++">
+<meta name="verify-v1" content="GmOM2OF0gDOQiM8uS0yKm1ZA0gUI8Hqk4BamNHp7iCg=">
+<meta name="viewport" content="width=800,initial-scale=0.6">
+<link rel="alternate" type="application/rss+xml" href="/feeds/blog/" title="OranLooney.com RSS Blog Feed">
+
+<title>OranLooney - The Minimal Interpreted Scripting Language</title>
+
+<!-- style -->
+<link rel="stylesheet" type="text/css" href="/static/site/css/yui-reset-min.css">
+<link rel="stylesheet" type="text/css" href="/static/site/css/main.css">
+<link rel="stylesheet" type="text/css" media="print" href="/static/site/css/print.css">
+<!--[if lt IE 7.]>
+	<link rel="stylesheet" type="text/css" href="/static/site/css/icons_gif.css">
+<![endif]-->
+
+
+
+</head>
+
+
+<body>
+
+  <div id="banner">
+	<a href="/">OranLooney.com</a>
+	<h6>quietly programming away</h6>
+  </div>
+  <div class="box" id="sidebar">
+	
+		<form id="quick-search" method="get" action="/search/">
+			<div>
+				<input type="hidden" name="alltags">
+				<input type="text" name="keyword" class="keyword-field">
+				<button type="submit" class="search-submit-button">Search</button>
+		  	</div>
+		  </form>
+	
+
+    <ul class="menu">
+      
+        <li class="menu_home"><a href="/">Home</a></li>
+      
+
+      
+		<li class="menu_rss_feed"><a href="/feeds/blog/" title="subscribe to the RSS feed">RSS Feed</a></li>
+        <li class="menu_tags"><a href="/tags/" title="search articles by tag">Tags</a></li>
+        <li class="menu_index"><a href="/archive" title="search articles chronologically">Archive</a></li>
+        <li class="menu_break"></li>
+        <li class="menu_bookshelf" title="my books on librarything.com"><a href="http://www.librarything.com/catalog.php?view=olooney&amp;offset=0&amp;shelf_rows=10&amp;previousOffset=0&amp;shelf=shelf">Bookshelf</a></li>
+        <li class="menu_sig" title="my endorsement of Agile"><a href="http://agilemanifesto.org/sign/display.cgi?ms=000000203">Manifesto</a></li>
+
+        <li class="menu_about_site" title="about the site itself"><a href="/colophon/">Colophon</a></li>
+        <li class="menu_about_me"><a href="/author/" title="about the author">Author</a></li> 
+      
+      
+      
+      
+          <li class="menu_break"></li>
+        
+          <li class="menu_login"><a href="/admin/">Login</a></li> 
+        
+      
+    </ul>
+  </div>
+  <div id="main-wrapper">
+	
+      
+      <div class="content-page">
+        
+  <a href="/minimal-interpreted-scripting-language/" class="title">The Minimal Interpreted Scripting Language</a>
+
+  
+    <a href="http://www.flickr.com/photos/coyotejack/2566090619/">
+      <img alt="colorful lead photo" src="/static/media/images/lead/2566090619_47f8bae2ec.jpg">
+    </a>
+  
+
+<div>
+  
+<p>If you're thinking of creating a scripting language for your application, reading this article could save your life.
+</p>
+<p>Well, maybe not your entire life, but at least a lot of time.  And when you get right down to it, isn't time just a small piece of your life?
+</p>
+<p>Configuration is a key feature that differentiates real applications from student projects.  Making an application configurable <em>sounds</em> simple because it mirrors good programming practice: hard code nothing, make everything flexible. In practice it turns out to be a little tricky, so we're going to take a look at what makes it challenging and what we can do to avoid getting into serious trouble.
+</p>
+
+<h2>Naïve Configuration</h2>
+<p>Configurability starts with switches and options, but before long rules, macros, and business logic start creeping in.  Try to deal with the demands for ever increasing flexibility in an ad-hoc manner and you'll end up maintaining an arcane semi-language with combinatorial interactions that infect your entire application and reduce development to a snail's pace.  <br>
+</p>
+<p>And getting out of a mess may not be so easy.  You see, there's a real difference between soft-coding and configuration that you expose to your users: backwards compatibility.  Users want their old configuration files to work as-is when they upgrade.  While dealing with older configuration files should be easy in theory, in practice it constrains you to 
+</p>
+<ul>
+ <li>
+     continually add complexity to the format and never simplify anything
+ </li>
+
+ <li>
+     support multiple versions of your configuration engine
+ </li>
+
+ <li>
+     or write conversions to update old configuration files.
+ </li>
+</ul>
+<p>None of these are impossible, just expensive.  But it sounds like it would be better to:
+</p>
+<ul>
+ <li>
+     Provide a cleanly extensible framework
+ </li>
+
+ <li>
+     decouple the configuration from the rest of the application
+ </li>
+</ul>
+
+<h2>Scripting Languages to the Rescue!</h2>
+<p>It sounds like it's time to bring in a full fledged scripting language.  <br>
+</p>
+<p>For many applications, the need for a scripting language is so obvious that we can justify creating our own language or embedding one of the large, powerful scripting languages.  But for most applications the case is less clear cut.  Faced with a limited scope, we turn to macros and the like.
+</p>
+<p>Don't do this.
+</p>
+<p>The ad-hoc options are swamps and quagmires.  However cheap it seems now, supporting these systems is murder.  The completeness of a full blown language will cover cases you couldn't even imagine when you started, while the ad-hoc solutions will cause problems likewise beyond your wildest imagination.  In the end, it's a lot more fun to do things well then the live with the consequences of doing them badly.
+</p>
+<p>But we're still facing that limited scope.  We don't want to go overboard, but we do want to make sure the language we choose really will be extensible and complete enough to cover us for the foreseeable future.  Which brings us to the crux of the article:
+</p>
+<blockquote><p>What is the minimal interpreted scripting language?
+</p>
+</blockquote><p>Now, that's going to need some definitions:
+</p>
+<ul>
+ <li>
+     <code>minimal</code> in terms of both footprint and learning curve.
+ </li>
+
+ <li>
+     a programming `language' must have a certain set of constructs: if-then-else, looping, function definitions, and variable binding or their equivalents.
+ </li>
+
+ <li>
+     <code>interpreted</code> means run-time parsing and evaluation plus automatic memory management.  We want to buy simplicity with CPU cycles.
+ </li>
+
+ <li>
+     <code>script</code> interacts with some larger environment (our application) exposing lower level data and making lower level calls through a simple interface.
+ </li>
+</ul>
+<p>Before we go any further, I want to make it clear that I'm not <em>recommending</em> a minimal language.  I'm saying that you should absolutely, positively, not implement anything <em>less</em> than it.  Of course a few simple switches are fine, so here's a rule-of-thumb for when to switch:
+</p>
+<blockquote><p>When we need to support <code>if-then-else</code>, it's time to implement a complete language.
+</p>
+</blockquote>
+<h2>The Straw Man Language</h2>
+<p>The physicist <a href="http://www.feynman.com/">Feynman</a> said, &quot;what I cannot create I do not understand.&quot;  To look for the minimum interpreted scripting language, we'll attempt to create it.  Now, any standard language is far superior to a custom one, simply by virtue of being standard.  So we won't actually be trying to create a working language, but just scribbling out a prototype.  We'll work in <a href="http://python.org/">Python</a>, despite the inherit silliness of implementing a scripting language in a scripting language.  If all goes well, the lessons learned will point us towards a better, standard language.  I call my little <a href="http://python.org/">Python</a> prototype &quot;straw man.&quot;
+</p>
+<blockquote><p>Plan to throw one away; you will, anyhow. 
+   - Frederick Brooks
+</p>
+</blockquote>
+<h2>To AST or not to AST</h2>
+<p>A language needs a parser, but the responsibility of the parser is a design decision. We can execute as we parse, or we can simply build an <a href="http://en.wikipedia.org/wiki/Abstract_syntax_tree">Abstract Syntax Tree</a> for later evaluation.  As a quick reminder, an <a href="http://en.wikipedia.org/wiki/Abstract_syntax_tree">AST</a> is a tree that represents the structure of a program:
+</p>
+<p><img src="/static/misl/ast.png" alt="AST Diagram"/>
+</p>
+<p>The most unusual thing about an AST (from a programmer's perspective) is that it makes a distinction between <em>symbols</em> and <em>values</em>.  <code>if</code> is a symbol, while <code>&quot;if&quot;</code> would be a value.  There are really two kinds of nodes in an AST tree: symbol nodes and value nodes.  That makes it a subtly different (and more interesting) structure than a value-only tree.
+</p>
+<p>If we wanted to execute the instructions as we parsed them, a <a href="http://en.wikipedia.org/wiki/Stack-based_language">Stack-based language</a> would be the way to go.  That doesn't even limit us to <a href="http://en.wikipedia.org/wiki/Polish_notation">prefix notation</a> thanks to <a href="http://en.wikipedia.org/wiki/Shunting_yard_algorithm">Dijkstra's shunting yard algorithm</a> and would eliminate a layer.
+</p>
+<p>However, it's not a layer we want to eliminate.  Executing during parsing means implementing the language within the events of a parser, which gets messy for anything more complex than a calculator.  Another disadvantage is that we may not detect a syntax error, such as an unclosed parenthesis, until much of the program has been evaluated.  This can lead to wild side effects, which is unacceptable: we don't want the user to have to restart the application because of a typo in a script!
+</p>
+<p>On the other hand, The AST provides long-term maintainability by decoupling the run-time engine from mere syntax, and we'll see below why an AST is a nice thing to have around.So we'll go with a two stage interpreter: one pass to build the AST, and a second to run it.  That's a safe, well-explored strategy.
+</p>
+
+<h2>Mere Syntax</h2>
+<p>I'm going to side-step the problem of using a <a href="http://en.wikipedia.org/wiki/LR_parser">real parser</a> and use a simple stack-based parser, which isn't classy but quite easy to implement.  We'll break tokens on whitespace.  Following the AST model closely, the parser expects that any symbol will be followed by an optional list of symbols enclosed in parenthesizes:
+</p>
+<pre><code>set(count add(count 1))
+</code></pre><p>So, for my straw man language, I'm basically going with a prefix notation that closely resembles the common function call.  This part of the code isn't interesting, but you can read it in <a href="/static/misl/strawman.html">the source</a> if you like.  I've also introduced a touch of syntactic sugar: a <code>do()</code> block may written as <code>{ }</code>.  Below we'll see <code>{ }</code> does what we expect, and simply evaluates each expression in it.  <br>
+</p>
+
+<h2>First Look</h2>
+<p>Here's a real example of an straw man program:
+</p>
+<pre><code>set(x 17);
+set(y 8);
+print( &quot;x=&quot; x &quot;y=&quot; y);
+print( &quot;changing x...&quot;);
+set(x 9);
+print( &quot;x=&quot; x &quot;y=&quot; y);
+if( gt(x y)
+    { print(&quot;x is greater than y.&quot;); set(z x); }
+    { print(&quot;x is not greater than y.&quot;); set(z y); }
+   );
+print( &quot;greatest of x and y:&quot; z );
+print( &quot;total of x and y:&quot; add( x y) );
+</code></pre><p>and its output:
+</p>
+<pre><code>x= 17 y= 8
+changing x...
+x= 9 y= 8
+x is greater than y.
+greatest of x and y: 9
+total of x and y: 17
+</code></pre><p>All of the 'functions' (<code>set</code>, <code>print</code>, <code>gt</code>, <code>add</code>) in this program are primitives, that is, they are identified and computed by the core interpreter.  The only really complex primitive is <code>set()</code>, the assignment operator.  To make this work, we have to have to carry around the concept of an environment, a mapping from variables to values. This adds complexity to the system, but without assignment the language would be unusable. (I know this because it was hard to write test cases before implementing <code>set()</code>.)  We'll add stuff like user defined functions below, but there are plenty of lessons to be learned from implementing these few primitives, so I'll cover that first.
+</p>
+
+<h2>Primitives</h2>
+<p>The first lesson is not to evaluate everything: the <code>else</code> clause of the <code>if</code> never get's hit, and we don't evaluate the <code>x</code> in <code>set(x 17)</code> but instead treat it as a symbol.  It's hard to imagine how we'd implement things like conditionals and loops if we can't control which subnodes get evaluated, which get treated as symbols, and which are simply ignored.
+</p>
+<p>This is interesting because it suggests that an operator to suppress evaluation would be useful.  If an AST node isn't evaluated, then what is it?  Well, I suppose it would be <em>data</em>:
+</p>
+<pre><code>set(tree data(&quot;Friends&quot; (&quot;John&quot; &quot;Jill&quot;) &quot;Pets&quot; (&quot;Spot&quot; &quot;Tiger&quot;) ))
+print(tree)
+foreach(branch tree {
+  print(val(branch) &quot;:&quot;)
+  foreach(leaf branch {
+    print(&quot;  &quot; leaf)
+  })
+})
+</code></pre><p>Here, the variable <code>tree</code> is being bound to this AST:
+</p>
+<p><img src="/static/misl/ast-data.png" alt="Data Diagram"/>
+</p>
+<p>When a data node is evaluated, it simply returns itself.  In this sense, it's a stopping point for evaluation, and the effect is that it acts like an array or tree.  Here's the output of the above:
+</p>
+<pre><code>data(Friends(John Jill) Pets(Spot Tiger))
+Friends :
+   John
+   Jill
+Pets :
+   Spot
+   Tiger
+</code></pre><p>I said before that an AST was a handy thing to have around.  Now we see why: all I have to do is denote that a given subtree is data, not code, and I get arrays (actually, trees, since we can nest them) for free.  This certainly sounds <em>minimal</em>.
+</p>
+<p>Now recall that I made the point that an AST is richer than a tree in that it contains both symbols or values.  In the above example, we only used values inside the data structure, but we could use symbols too.  In fact, we can have <em>straw man code</em> inside the data structure.  This sounds promising, so lets explore it.
+</p>
+
+<h2>Quotes</h2>
+<p>For data to be meaningful as code, we have to be able to run it.  We introduce a <code>quote</code> primitive, that returns it's first subnode when evaluated.  (Actually, I called it something else at first, but changed it's name to quote for reasons we'll see below.)  Notice the difference between <code>data</code> and <code>quote</code>; data is a stopping point, while quote is merely a delay.  Repeatedly evaluating <code>data</code> always yields itself, but a <code>quote</code> is stripped off by each evaluation.  To force repeated evaluation, I've also introduced the <code>eval</code> primitive:
+</p>
+<pre><code>set(code quote(print (&quot;hello world!&quot;)) )
+print (&quot;code = '&quot; code &quot;'&quot;)
+print (&quot;when I evaluate the code, I should see 'hello world' as a side effect:&quot;)
+eval(code)
+</code></pre><p>and the output:
+</p>
+<pre><code>code = ' print(hello world!) '
+when I evaluate the code, I should see 'hello world' as a side effect:
+hello world!
+</code></pre><p>(See <a href="/static/misl/strawman.html">the source</a> for more complex examples.)  So now we've completed the loop: we can treat code as data, and data as code, and we have a unifying syntax for both.  I've argued that what we need to avoid the ad-hoc swap is a <em>complete</em> system, and we certainly seem to be heading in that direction; in fact we seem to be getting everything practically for free!
+</p>
+
+<h2>Finally, Functions!</h2>
+<p>The one thing we haven't built at this point is the universal concept of a <em>user-defined function.</em>  Just to wrap up the loose threads, I'll go over that briefly here.  However, the prototype is already complete enough to make it clear what the minimal interpreted scripting language is, so you may just want to skip on down to the next section.
+</p>
+<p>We need two things before users can write their own functions:
+</p>
+<ul>
+ <li>
+     a primitive that binds a list of parameters to code
+ </li>
+
+ <li>
+     interpreter functionality that calls a function when it gets hit.
+ </li>
+</ul>
+<p>The primitive is traditionally called <code>lambda</code>, and it simply returns an AST with a <code>function</code> node on top and the parameter symbols and code as subnodes.  The actual work gets done later, when the <code>function</code> node is evaluated.  Then the interpreter creates a new environment for the function (binding the arguments of the function call the parameter symbols) and evaluates the function code.
+</p>
+<p>Since it's all in <a href="/static/misl/strawman.html">the source</a>, let's just throw up a quick example for user-defined functions and move on:
+</p>
+<pre><code>set(f lambda ( quote(x) add(x 1) ))
+print( f(2))
+set(metric lambda ( quote(x y) add(product(x x) product(y y)) ) )
+print( metric(5 10) )
+print( metric(3 4) )
+</code></pre><p>Output:
+</p>
+<pre><code>3
+125
+25
+</code></pre>
+<h2>Enlightenment</h2>
+<p>The critical decision was to re-use the structure of the code as a data structure.  If two concepts are similar enough, you can halve your work by combining them.  (For example, Java recognized that a <em>class</em> is essentially the same thing as a <em>program</em> and unified the two.)  Things seem to work out nicely and a lot of functionality comes along for free.
+</p>
+<p>The standard language that has this property is LISP.  In fact, LISP uses an even simpler data structure to describe both data and code.  I used an AST node that was the combination of a value and list of subnodes:
+</p>
+<p><img src="/static/misl/small-ast.png" alt="Small AST Diagram"/>
+</p>
+<p>LISP instead has the <code>cons</code>, which is simple a pair of pointers <code>car</code> and <code>cdr</code>.  A list in LISP is a linked list: each element is a <code>cons</code>, <code>cdr</code> points to the next <code>cons</code>, and <code>car</code> points to the value.  This can in particular duplicate my AST data structure, but lists in LISPs are easier to work with (for example, you join two lists by setting the last element of one to point to the first element of the other) and the <code>cons</code> is a flexible datatype that can be used to build far more than lists.  <br>
+</p>
+<p><img src="/static/misl/cons.png" alt="CONS DIAGRAM"/>
+</p>
+<p>As for functions, we saw that simply by providing control over the evaluations of arguments allowed us to define control structures very easily.  LISP lets you do this too, with <a href="http://www.apl.jhu.edu/~hall/Lisp-Notes/Macros.html">macros</a>.  The evaulation of a macro is pushed to the preprocessor, but the syntax is familiar.
+</p>
+<p>LISP enjoys all the advantages of the straw man language, but has a more mature design, standard libraries, and plenty of educational material.  So we conclude that LISP is the minimal interpreted scripting language.
+</p>
+
+<h2>Sliced Bread?</h2>
+<p>Note that it's not LISP's theoretical strengths that lead us to it, but entirely practical considerations.  Script tends is generally very basic; we don't need (or even particularly want) support for symbolic manipulation or tail-end recursion.  LISP isn't the greatest language ever (although I'm sure some would disagree), but it is seems to be the smallest.  To recap the argument:
+</p>
+<ol>
+ <li>
+     We want it to be interpreted, and a well-designed interpreted language will have a data structure that represents the shape of the program.
+ </li>
+
+ <li>
+     We can avoid special programming for arrays and other data structures by exposing the internal structure as a data structure in the language itself.
+ </li>
+
+ <li>
+     And that makes it very easy to treat data as code, which gives us functions for free.
+ </li>
+</ol>
+<p>This design reduces complexity by perhaps a factor of three, and that's probably unbeatable.  In retrospect, it isn't terribly surprising.  In the early days of programming, a small footprint wasn't a feature: it was a requirement.  LISP has been successfully automating applications like Emacs and AutoCAD for many decades now.  Unsurprisingly, I'm not the first one to think this way:
+</p>
+<blockquote><p><a href="http://philip.greenspun.com/research/">Greenspun's Tenth Rule of Programming</a>: &quot;Any sufficiently complicated C or Fortran program contains an ad-hoc, informally-specified bug-ridden slow implementation of half of Common Lisp.&quot; 
+</p>
+</blockquote><p>I'm sure the LISP or Scheme communities are already aware of this, but their focus is on LISP's functional and symbol manipulation abilities, not the practical advantage of LISP's elegant design, <a href="http://www.boctaoe.com/">BOCTAOE</a>. I'd known a little about LISP (otherwise I wouldn't have recognized the similarities to straw man) but thought of it a language that expressed things in an alien, non-intuitive way for the purposes of supporting arcane meta-programming.  I took a less biased look at LISP while writing this article, and it's clear even from <a href="http://www-formal.stanford.edu/jmc/recursive.html">McCarthy's original article</a> that simplicity is a major goal.
+</p>
+<p>Now, I'm not an expert in LISP, which makes me perfectly qualified to judge LISP's ease-of-use.  It's <a href="http://www.answers.com/epsilon&amp;r=67">epsilon</a>.  LISP is usable in the sense that it covers all the bases, but it's syntax is a little alien.
+</p>
+<p>I can't recommend exposing non-programmers to LISP's syntax directly, but one advantage of LISP's extremely regular syntax is that it is trivial to machine generate.  We might consider exposing a subset of the functionality in user-friendly language, for example. Or perhaps a constrained GUI rule builder, like <a href="http://office.microsoft.com/en-us/outlook/HP052428971033.aspx">Outlook's rules.</a>  That's less work than creating your own language, you hit the ground running with a fully functional system, programmers can still get their hands dirty, and if you're lucky you might end up with a great library of community-submitted scripts.
+</p>
+<p>I haven't done any research into the different dialects of LISP, but from what I've read, <a href="http://www.gnu.org/software/guile/">GNU Guile</a> is a LISP dialect specifically designed as an embedded C library (haven't tried it, though.)  <br>
+</p>
+<p>Now, I'm not recommending <a href="http://www.gnu.org/software/guile/">Guile</a> or LISP specifically.  We should take care to avoid the ad-hoc configuration swamp, and LISP defines one edge of that swamp:
+</p>
+<p><img src="/static/misl/ad-hoc-swamp.png" alt="ad-hoc swap cartoon"/>
+</p>
+<p>We should also consider the many alternative lightweight scripting languages, such as Io or Lua.  You may even be able to afford <a href="http://python.org/">Python</a>.  And I don't want to deter you from sticking to the other side of the swamp, either: many applications provide an excellent, highly polished user experience by locking down configuration options and concentrating on common use cases.  Here are good places to start on each side:
+</p>
+<ul>
+ <li>
+     <a href="http://developer.apple.com/documentation/UserExperience/Conceptual/OSXHIGuidelines/XHIGIntro/chapter_1_section_1.html">Apple User Interface Guidelines</a>
+ </li>
+
+ <li>
+     <a href="http://www.timestretch.com/FractalBenchmark.html">Speed Comparison of Scripting Languages</a>
+ </li>
+</ul>
+
+
+
+</div>
+<p>
+  <span class="signature">- Oran Looney</span>
+  <span class="signature-date">May 20th 2007</span>
+</p>
+  <p class="thank-you">
+    Thanks for reading.  Please subscribe to the <a href="/feeds/blog/">RSS feed</a> and remember that
+    future readers will thank you for leaving your comments and criticisms.
+    <a href="/feeds/blog/" title="Subscribe to RSS Feed" class="big-rss-link">Subscribe to RSS Feed</a>
+  </p>
+<p class="article-tags">
+     
+        <a href="/tag/python/">Python</a> 
+     
+        <a href="/tag/popular/">Popular</a> 
+    
+</p>
+
+
+      </div>
+      
+  
+  <div class="content-page comments" style="border-top: none">
+    <a name="comments"></a>
+    
+	  <h1>Comments (3)</h1>
+      <div>
+        
+          <div class="comment">
+    <div class="comment-date">September 12th 2012</div>
+	<h4><span class="comment-username">Boog</span> said: </h4>
+	<p>Woah nelly, how about them apepls!</p>
+</div>
+
+        
+          <div class="comment">
+    <div class="comment-date">June 30th 2011</div>
+	<h4><span class="comment-username">webguy</span> said: </h4>
+	<p>Having data and code use the same structure is called &quot;Homoiconicity.&quot; LISP is of course a key example.
+
+http://en.wikipedia.org/wiki/Homoiconicity</p>
+</div>
+
+        
+          <div class="comment">
+    <div class="comment-date">July 3rd 2008</div>
+	<h4><span class="comment-username">matt</span> said: </h4>
+	<p>There is a language that combines all the advntages of Lisp with full GUI support: NewtonScript. It does exactly wht you describe (plus named records).
+
+Too sad it is dead
+
+mm at metthiasm dot com</p>
+</div>
+
+        
+      </div>
+    
+    <h1>Leave a Comment</h1>
+    
+<form method="post" action="/minimal-interpreted-scripting-language/leave-comment/" class="leave-comment-form">
+  <div style='display:none'><input type='hidden' name='csrfmiddlewaretoken' value='7c54419eea61d947291c188320a452fc' /></div>
+  <div>
+    Your Name: <br>
+    
+    <input id="id_user_name" type="text" name="user_name" maxlength="12" />
+  </div>
+  <div>
+    Comment: <br>
+    
+    <textarea id="id_content" rows="10" cols="40" name="content"></textarea>
+  </div>
+  <div>
+    Enter this phrase: <br>
+    
+    <img src="/static/site/images/captcha.png" alt="captcha">
+    <input id="id_captcha" type="text" name="captcha" maxlength="20" /> 
+  </div>
+  <div>
+    <input class="submit-button" type="submit" value="Leave Comment">
+  </div>
+</form>
+
+  </div>
+  
+
+	
+  </div>
+
+
+
+  <script src="http://www.google-analytics.com/urchin.js" type="text/javascript"></script>
+  <script type="text/javascript"> _uacct = "UA-2535855-1"; urchinTracker(); </script>
+
+</body>
+</html>

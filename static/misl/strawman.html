@@ -1,0 +1,362 @@
+<pre><font face="Lucida,Courier New"><font color="#004080">'''
+Implements the Straw Man (SM) language.  SM is intended to explore
+a minimal scripting language.  This module is a prototype and has undergone
+heavy tweaking, and has many known bugs.  However,
+the test cases at the end do all work more or less as promised.
+
+To get a feel for SM, run the modules and examine the output of each test
+case.
+'''</font>
+<font color="#C00000">from</font> <font color="#000000">copy</font> <font color="#C00000">import</font> <font color="#000000">copy</font>
+<font color="#C00000">import</font> <font color="#000000">re</font>
+
+<font color="#008000"># define a token in the straw-main language.
+</font><font color="#000000">tokenRE</font> <font color="#0000C0">=</font> <font color="#000000">re</font><font color="#0000C0">.</font><font color="#000000">compile</font><font color="#0000C0">(</font><font color="#004080">r'".*?"|\(|\)|\}|\{|;|[^(){}\s]+'</font><font color="#0000C0">)</font>
+<font color="#008000"># used to detect proper symbols; everything else is assumed to be a literal.
+</font><font color="#000000">symbolRE</font> <font color="#0000C0">=</font> <font color="#000000">re</font><font color="#0000C0">.</font><font color="#000000">compile</font><font color="#0000C0">(</font><font color="#004080">r'[a-z][a-z0-9_]*'</font><font color="#0000C0">)</font>
+
+<font color="#C00000">class</font> <font color="#000000">Node</font><font color="#0000C0">(</font><font color="#000000">object</font><font color="#0000C0">)</font><font color="#0000C0">:</font>
+    <font color="#004080">'An empty symbol node.'</font>
+    <font color="#C00000">def</font> <font color="#000000">__init__</font><font color="#0000C0">(</font><font color="#000000">self</font><font color="#0000C0">,</font> <font color="#000000">symbol</font><font color="#0000C0">)</font><font color="#0000C0">:</font>
+        <font color="#000000">self</font><font color="#0000C0">.</font><font color="#000000">sym</font> <font color="#0000C0">=</font> <font color="#000000">symbol</font>
+        <font color="#000000">self</font><font color="#0000C0">.</font><font color="#000000">args</font> <font color="#0000C0">=</font> <font color="#0000C0">[</font><font color="#0000C0">]</font>
+        <font color="#000000">self</font><font color="#0000C0">.</font><font color="#000000">val</font> <font color="#0000C0">=</font> <font color="#000000">symbol</font>
+    <font color="#C00000">def</font> <font color="#000000">__str__</font><font color="#0000C0">(</font><font color="#000000">self</font><font color="#0000C0">)</font><font color="#0000C0">:</font>
+        <font color="#C00000">if</font> <font color="#C00000">not</font> <font color="#000000">self</font><font color="#0000C0">.</font><font color="#000000">args</font><font color="#0000C0">:</font>
+            <font color="#C00000">return</font> <font color="#000000">str</font><font color="#0000C0">(</font><font color="#000000">self</font><font color="#0000C0">.</font><font color="#000000">val</font><font color="#0000C0">)</font>
+        <font color="#C00000">else</font><font color="#0000C0">:</font>
+            <font color="#000000">arg_strings</font> <font color="#0000C0">=</font> <font color="#000000">map</font><font color="#0000C0">(</font><font color="#000000">str</font><font color="#0000C0">,</font><font color="#000000">self</font><font color="#0000C0">.</font><font color="#000000">args</font><font color="#0000C0">)</font>
+            <font color="#C00000">return</font> <font color="#004080">"%s(%s)"</font> <font color="#0000C0">%</font> <font color="#0000C0">(</font><font color="#000000">self</font><font color="#0000C0">.</font><font color="#000000">val</font><font color="#0000C0">,</font> <font color="#004080">" "</font><font color="#0000C0">.</font><font color="#000000">join</font><font color="#0000C0">(</font><font color="#000000">arg_strings</font><font color="#0000C0">)</font><font color="#0000C0">)</font>
+
+
+<font color="#C00000">class</font> <font color="#000000">DoNode</font><font color="#0000C0">(</font><font color="#000000">Node</font><font color="#0000C0">)</font><font color="#0000C0">:</font>
+    <font color="#004080">'An empty "do" symbol node, which uses the {} syntactic sugar.'</font>
+    <font color="#C00000">def</font> <font color="#000000">__init__</font><font color="#0000C0">(</font><font color="#000000">self</font><font color="#0000C0">)</font><font color="#0000C0">:</font>
+        <font color="#000000">self</font><font color="#0000C0">.</font><font color="#000000">sym</font> <font color="#0000C0">=</font> <font color="#004080">'do'</font>
+        <font color="#000000">self</font><font color="#0000C0">.</font><font color="#000000">args</font> <font color="#0000C0">=</font> <font color="#0000C0">[</font><font color="#0000C0">]</font>
+    <font color="#C00000">def</font> <font color="#000000">__str__</font><font color="#0000C0">(</font><font color="#000000">self</font><font color="#0000C0">)</font><font color="#0000C0">:</font>
+        <font color="#C00000">return</font> <font color="#004080">"{%s}"</font> <font color="#0000C0">%</font> <font color="#004080">"; "</font><font color="#0000C0">.</font><font color="#000000">join</font><font color="#0000C0">(</font><font color="#000000">map</font><font color="#0000C0">(</font><font color="#000000">str</font><font color="#0000C0">,</font> <font color="#000000">self</font><font color="#0000C0">.</font><font color="#000000">args</font><font color="#0000C0">)</font><font color="#0000C0">)</font>
+
+<font color="#C00000">class</font> <font color="#000000">ValueNode</font><font color="#0000C0">(</font><font color="#000000">Node</font><font color="#0000C0">)</font><font color="#0000C0">:</font>
+    <font color="#004080">'A value node bound to a particular value at creation.'</font>
+    <font color="#C00000">def</font> <font color="#000000">__init__</font><font color="#0000C0">(</font><font color="#000000">self</font><font color="#0000C0">,</font> <font color="#000000">value</font><font color="#0000C0">)</font><font color="#0000C0">:</font>
+        <font color="#000000">self</font><font color="#0000C0">.</font><font color="#000000">sym</font> <font color="#0000C0">=</font> <font color="#004080">'value'</font>
+        <font color="#000000">self</font><font color="#0000C0">.</font><font color="#000000">val</font> <font color="#0000C0">=</font> <font color="#000000">value</font>
+        <font color="#000000">self</font><font color="#0000C0">.</font><font color="#000000">args</font> <font color="#0000C0">=</font> <font color="#0000C0">[</font><font color="#0000C0">]</font>
+    <font color="#C00000">def</font> <font color="#000000">val</font><font color="#0000C0">(</font><font color="#000000">self</font><font color="#0000C0">)</font><font color="#0000C0">:</font>
+        <font color="#C00000">return</font> <font color="#000000">self</font><font color="#0000C0">.</font><font color="#000000">val</font>
+
+<font color="#C00000">class</font> <font color="#000000">Stack</font><font color="#0000C0">(</font><font color="#000000">list</font><font color="#0000C0">)</font><font color="#0000C0">:</font>
+    <font color="#004080">' a thin wrapper around list() to make it more stack-like.'</font>
+    <font color="#C00000">def</font> <font color="#000000">peek</font><font color="#0000C0">(</font><font color="#000000">self</font><font color="#0000C0">)</font><font color="#0000C0">:</font>
+        <font color="#004080">' returns the top of the stack. '</font>
+        <font color="#C00000">return</font> <font color="#000000">self</font><font color="#0000C0">[</font><font color="#0000C0">-</font><font color="#0080C0">1</font><font color="#0000C0">]</font>
+
+    <font color="#C00000">def</font> <font color="#000000">push</font><font color="#0000C0">(</font><font color="#000000">self</font><font color="#0000C0">,</font> <font color="#000000">top</font><font color="#0000C0">)</font><font color="#0000C0">:</font>
+        <font color="#004080">' adds an element to the top of the stack. '</font>
+        <font color="#000000">self</font><font color="#0000C0">.</font><font color="#000000">append</font><font color="#0000C0">(</font><font color="#000000">top</font><font color="#0000C0">)</font>
+
+
+<font color="#C00000">def</font> <font color="#000000">parse</font><font color="#0000C0">(</font><font color="#000000">string</font><font color="#0000C0">)</font><font color="#0000C0">:</font>
+    <font color="#004080">'returns an AST for the SM grammer.'</font>
+    <font color="#000000">main</font> <font color="#0000C0">=</font> <font color="#000000">Node</font><font color="#0000C0">(</font><font color="#004080">'do'</font><font color="#0000C0">)</font>
+    <font color="#008000"># I love this trick; when working with any
+</font>    <font color="#008000"># kind of tree, we can often avoid treating
+</font>    <font color="#008000"># the root as a special case by simply
+</font>    <font color="#008000"># starting with a dummy node above the root.
+</font>    <font color="#000000">context</font> <font color="#0000C0">=</font> <font color="#000000">Stack</font><font color="#0000C0">(</font><font color="#0000C0">)</font>
+    <font color="#000000">context</font><font color="#0000C0">.</font><font color="#000000">push</font><font color="#0000C0">(</font><font color="#000000">main</font><font color="#0000C0">)</font>
+
+    <font color="#C00000">for</font> <font color="#000000">match</font> <font color="#C00000">in</font> <font color="#000000">tokenRE</font><font color="#0000C0">.</font><font color="#000000">finditer</font><font color="#0000C0">(</font><font color="#000000">string</font><font color="#0000C0">)</font><font color="#0000C0">:</font>
+        <font color="#000000">token</font> <font color="#0000C0">=</font> <font color="#000000">match</font><font color="#0000C0">.</font><font color="#000000">group</font><font color="#0000C0">(</font><font color="#0080C0">0</font><font color="#0000C0">)</font>
+        <font color="#C00000">if</font> <font color="#000000">token</font> <font color="#0000C0">==</font> <font color="#004080">";"</font><font color="#0000C0">:</font>
+            <font color="#C00000">if</font> <font color="#000000">context</font><font color="#0000C0">.</font><font color="#000000">peek</font><font color="#0000C0">(</font><font color="#0000C0">)</font><font color="#0000C0">.</font><font color="#000000">sym</font> <font color="#0000C0">!=</font> <font color="#004080">'do'</font><font color="#0000C0">:</font>
+                <font color="#C00000">raise</font> <font color="#000000">SyntaxError</font><font color="#0000C0">,</font> <font color="#004080">"misplaced semicolon!"</font>
+        <font color="#C00000">elif</font> <font color="#000000">token</font> <font color="#0000C0">==</font> <font color="#004080">'('</font><font color="#0000C0">:</font>
+            <font color="#C00000">if</font> <font color="#000000">context</font><font color="#0000C0">.</font><font color="#000000">peek</font><font color="#0000C0">(</font><font color="#0000C0">)</font> <font color="#0000C0">==</font> <font color="#000000">ast</font><font color="#0000C0">:</font> <font color="#C00000">raise</font> <font color="#000000">SyntaxError</font><font color="#0000C0">,</font> <font color="#004080">"'(' does not follow symbol!"</font>
+            <font color="#000000">context</font><font color="#0000C0">.</font><font color="#000000">push</font><font color="#0000C0">(</font><font color="#000000">ast</font><font color="#0000C0">)</font>
+        <font color="#C00000">elif</font> <font color="#000000">token</font> <font color="#0000C0">==</font> <font color="#004080">')'</font><font color="#0000C0">:</font>
+            <font color="#000000">context</font><font color="#0000C0">.</font><font color="#000000">pop</font><font color="#0000C0">(</font><font color="#0000C0">)</font>
+        <font color="#C00000">elif</font> <font color="#000000">token</font> <font color="#0000C0">==</font> <font color="#004080">'{'</font><font color="#0000C0">:</font>
+            <font color="#000000">ast</font> <font color="#0000C0">=</font> <font color="#000000">DoNode</font><font color="#0000C0">(</font><font color="#0000C0">)</font>
+            <font color="#000000">context</font><font color="#0000C0">.</font><font color="#000000">peek</font><font color="#0000C0">(</font><font color="#0000C0">)</font><font color="#0000C0">.</font><font color="#000000">args</font><font color="#0000C0">.</font><font color="#000000">append</font><font color="#0000C0">(</font><font color="#000000">ast</font><font color="#0000C0">)</font>
+            <font color="#000000">context</font><font color="#0000C0">.</font><font color="#000000">push</font><font color="#0000C0">(</font><font color="#000000">ast</font><font color="#0000C0">)</font>
+        <font color="#C00000">elif</font> <font color="#000000">token</font> <font color="#0000C0">==</font> <font color="#004080">'}'</font><font color="#0000C0">:</font>
+            <font color="#C00000">if</font> <font color="#000000">context</font><font color="#0000C0">.</font><font color="#000000">peek</font><font color="#0000C0">(</font><font color="#0000C0">)</font><font color="#0000C0">.</font><font color="#000000">sym</font> <font color="#0000C0">!=</font> <font color="#004080">'do'</font><font color="#0000C0">:</font> <font color="#C00000">raise</font> <font color="#000000">SyntaxError</font><font color="#0000C0">,</font> <font color="#004080">"'}' terminating non-do block!"</font>
+            <font color="#000000">context</font><font color="#0000C0">.</font><font color="#000000">pop</font><font color="#0000C0">(</font><font color="#0000C0">)</font>
+        <font color="#C00000">elif</font> <font color="#000000">symbolRE</font><font color="#0000C0">.</font><font color="#000000">match</font><font color="#0000C0">(</font><font color="#000000">token</font><font color="#0000C0">)</font><font color="#0000C0">:</font>
+            <font color="#000000">ast</font> <font color="#0000C0">=</font> <font color="#000000">Node</font><font color="#0000C0">(</font><font color="#000000">token</font><font color="#0000C0">)</font>
+            <font color="#000000">context</font><font color="#0000C0">.</font><font color="#000000">peek</font><font color="#0000C0">(</font><font color="#0000C0">)</font><font color="#0000C0">.</font><font color="#000000">args</font><font color="#0000C0">.</font><font color="#000000">append</font><font color="#0000C0">(</font><font color="#000000">ast</font><font color="#0000C0">)</font>
+        <font color="#C00000">else</font><font color="#0000C0">:</font> <font color="#008000"># must be a literal</font>
+            <font color="#000000">ast</font> <font color="#0000C0">=</font> <font color="#000000">ValueNode</font><font color="#0000C0">(</font><font color="#000000">eval</font><font color="#0000C0">(</font><font color="#000000">token</font><font color="#0000C0">)</font><font color="#0000C0">)</font>
+            <font color="#000000">context</font><font color="#0000C0">.</font><font color="#000000">peek</font><font color="#0000C0">(</font><font color="#0000C0">)</font><font color="#0000C0">.</font><font color="#000000">args</font><font color="#0000C0">.</font><font color="#000000">append</font><font color="#0000C0">(</font><font color="#000000">ast</font><font color="#0000C0">)</font>
+    <font color="#C00000">return</font> <font color="#000000">main</font>
+
+<font color="#008000">### eval functions for each primitive ###
+</font><font color="#C00000">def</font> <font color="#000000">indexSafe</font><font color="#0000C0">(</font><font color="#000000">f</font><font color="#0000C0">)</font><font color="#0000C0">:</font>
+    <font color="#004080">'decorator to handle a common exception'</font>
+    <font color="#C00000">def</font> <font color="#000000">newF</font><font color="#0000C0">(</font><font color="#0000C0">*</font><font color="#000000">x</font><font color="#0000C0">,</font><font color="#0000C0">**</font><font color="#000000">y</font><font color="#0000C0">)</font><font color="#0000C0">:</font>
+        <font color="#C00000">try</font><font color="#0000C0">:</font>
+            <font color="#C00000">return</font> <font color="#000000">f</font><font color="#0000C0">(</font><font color="#0000C0">*</font><font color="#000000">x</font><font color="#0000C0">,</font><font color="#0000C0">**</font><font color="#000000">y</font><font color="#0000C0">)</font>
+        <font color="#C00000">except</font><font color="#0000C0">:</font>
+            <font color="#C00000">return</font> <font color="#000000">ValueNode</font><font color="#0000C0">(</font><font color="#004080">''</font><font color="#0000C0">)</font>
+    <font color="#C00000">return</font> <font color="#000000">newF</font>
+
+<font color="#0000C0">@</font><font color="#000000">indexSafe</font>
+<font color="#C00000">def</font> <font color="#000000">evalIf</font><font color="#0000C0">(</font><font color="#000000">ast</font><font color="#0000C0">,</font><font color="#000000">env</font><font color="#0000C0">)</font><font color="#0000C0">:</font>
+    <font color="#C00000">if</font> <font color="#000000">evaluate</font><font color="#0000C0">(</font><font color="#000000">ast</font><font color="#0000C0">.</font><font color="#000000">args</font><font color="#0000C0">[</font><font color="#0080C0">0</font><font color="#0000C0">]</font><font color="#0000C0">,</font> <font color="#000000">env</font><font color="#0000C0">)</font><font color="#0000C0">:</font>
+        <font color="#C00000">return</font> <font color="#000000">evaluate</font><font color="#0000C0">(</font><font color="#000000">ast</font><font color="#0000C0">.</font><font color="#000000">args</font><font color="#0000C0">[</font><font color="#0080C0">1</font><font color="#0000C0">]</font><font color="#0000C0">,</font> <font color="#000000">env</font><font color="#0000C0">)</font>
+    <font color="#C00000">else</font><font color="#0000C0">:</font>
+        <font color="#C00000">return</font> <font color="#000000">evaluate</font><font color="#0000C0">(</font><font color="#000000">ast</font><font color="#0000C0">.</font><font color="#000000">args</font><font color="#0000C0">[</font><font color="#0080C0">2</font><font color="#0000C0">]</font><font color="#0000C0">,</font> <font color="#000000">env</font><font color="#0000C0">)</font>
+<font color="#0000C0">@</font><font color="#000000">indexSafe</font>
+<font color="#C00000">def</font> <font color="#000000">evalSet</font><font color="#0000C0">(</font><font color="#000000">ast</font><font color="#0000C0">,</font><font color="#000000">env</font><font color="#0000C0">)</font><font color="#0000C0">:</font>
+    <font color="#000000">name</font> <font color="#0000C0">=</font> <font color="#000000">ast</font><font color="#0000C0">.</font><font color="#000000">args</font><font color="#0000C0">[</font><font color="#0080C0">0</font><font color="#0000C0">]</font><font color="#0000C0">.</font><font color="#000000">sym</font>
+    <font color="#000000">value</font> <font color="#0000C0">=</font> <font color="#000000">evaluate</font><font color="#0000C0">(</font><font color="#000000">ast</font><font color="#0000C0">.</font><font color="#000000">args</font><font color="#0000C0">[</font><font color="#0080C0">1</font><font color="#0000C0">]</font><font color="#0000C0">,</font> <font color="#000000">env</font><font color="#0000C0">)</font>
+    <font color="#000000">env</font><font color="#0000C0">[</font><font color="#000000">name</font><font color="#0000C0">]</font> <font color="#0000C0">=</font> <font color="#000000">value</font>
+    <font color="#C00000">return</font> <font color="#000000">value</font>
+
+<font color="#0000C0">@</font><font color="#000000">indexSafe</font>
+<font color="#C00000">def</font> <font color="#000000">evalGt</font><font color="#0000C0">(</font><font color="#000000">ast</font><font color="#0000C0">,</font><font color="#000000">env</font><font color="#0000C0">)</font><font color="#0000C0">:</font>
+    <font color="#000000">left</font> <font color="#0000C0">=</font> <font color="#000000">int</font><font color="#0000C0">(</font><font color="#000000">evaluate</font><font color="#0000C0">(</font><font color="#000000">ast</font><font color="#0000C0">.</font><font color="#000000">args</font><font color="#0000C0">[</font><font color="#0080C0">0</font><font color="#0000C0">]</font><font color="#0000C0">,</font> <font color="#000000">env</font><font color="#0000C0">)</font><font color="#0000C0">.</font><font color="#000000">val</font><font color="#0000C0">)</font>
+    <font color="#000000">right</font> <font color="#0000C0">=</font> <font color="#000000">int</font><font color="#0000C0">(</font><font color="#000000">evaluate</font><font color="#0000C0">(</font><font color="#000000">ast</font><font color="#0000C0">.</font><font color="#000000">args</font><font color="#0000C0">[</font><font color="#0080C0">1</font><font color="#0000C0">]</font><font color="#0000C0">,</font> <font color="#000000">env</font><font color="#0000C0">)</font><font color="#0000C0">.</font><font color="#000000">val</font><font color="#0000C0">)</font>
+    <font color="#C00000">return</font> <font color="#004080">'true'</font> <font color="#C00000">if</font> <font color="#000000">left</font> <font color="#0000C0">&gt;</font> <font color="#000000">right</font> <font color="#C00000">else</font> <font color="#004080">''</font>
+
+<font color="#0000C0">@</font><font color="#000000">indexSafe</font>
+<font color="#C00000">def</font> <font color="#000000">evalPrint</font><font color="#0000C0">(</font><font color="#000000">ast</font><font color="#0000C0">,</font><font color="#000000">env</font><font color="#0000C0">)</font><font color="#0000C0">:</font>
+    <font color="#000000">ret</font> <font color="#0000C0">=</font> <font color="#004080">''</font>
+    <font color="#C00000">for</font> <font color="#000000">arg</font> <font color="#C00000">in</font> <font color="#000000">ast</font><font color="#0000C0">.</font><font color="#000000">args</font><font color="#0000C0">:</font>
+        <font color="#000000">ret</font> <font color="#0000C0">=</font> <font color="#000000">evaluate</font><font color="#0000C0">(</font><font color="#000000">arg</font><font color="#0000C0">,</font> <font color="#000000">env</font><font color="#0000C0">)</font>
+        <font color="#C00000">print</font> <font color="#000000">ret</font><font color="#0000C0">,</font>
+    <font color="#C00000">print</font>
+    <font color="#C00000">return</font> <font color="#000000">ret</font>
+
+<font color="#0000C0">@</font><font color="#000000">indexSafe</font>
+<font color="#C00000">def</font> <font color="#000000">evalDo</font><font color="#0000C0">(</font><font color="#000000">ast</font><font color="#0000C0">,</font><font color="#000000">env</font><font color="#0000C0">)</font><font color="#0000C0">:</font>
+    <font color="#000000">ret</font> <font color="#0000C0">=</font> <font color="#004080">''</font>
+    <font color="#C00000">for</font> <font color="#000000">arg</font> <font color="#C00000">in</font> <font color="#000000">ast</font><font color="#0000C0">.</font><font color="#000000">args</font><font color="#0000C0">:</font>
+        <font color="#C00000">if</font> <font color="#000000">arg</font><font color="#0000C0">.</font><font color="#000000">sym</font> <font color="#0000C0">==</font> <font color="#004080">'return'</font><font color="#0000C0">:</font>
+            <font color="#C00000">if</font> <font color="#000000">len</font><font color="#0000C0">(</font><font color="#000000">arg</font><font color="#0000C0">.</font><font color="#000000">args</font><font color="#0000C0">)</font> <font color="#0000C0">==</font> <font color="#0080C0">0</font><font color="#0000C0">:</font> <font color="#C00000">return</font> <font color="#004080">''</font>
+            <font color="#C00000">return</font> <font color="#000000">evaluate</font><font color="#0000C0">(</font><font color="#000000">arg</font><font color="#0000C0">.</font><font color="#000000">args</font><font color="#0000C0">[</font><font color="#0080C0">0</font><font color="#0000C0">]</font><font color="#0000C0">,</font> <font color="#000000">env</font><font color="#0000C0">)</font>
+        <font color="#C00000">else</font><font color="#0000C0">:</font>
+            <font color="#000000">ret</font> <font color="#0000C0">=</font> <font color="#000000">evaluate</font><font color="#0000C0">(</font><font color="#000000">arg</font><font color="#0000C0">,</font> <font color="#000000">env</font><font color="#0000C0">)</font>
+    <font color="#C00000">return</font> <font color="#000000">ret</font>
+
+<font color="#0000C0">@</font><font color="#000000">indexSafe</font>
+<font color="#C00000">def</font> <font color="#000000">evalAdd</font><font color="#0000C0">(</font><font color="#000000">ast</font><font color="#0000C0">,</font><font color="#000000">env</font><font color="#0000C0">)</font><font color="#0000C0">:</font>
+
+    <font color="#000000">left</font>  <font color="#0000C0">=</font> <font color="#000000">int</font><font color="#0000C0">(</font><font color="#000000">evaluate</font><font color="#0000C0">(</font><font color="#000000">ast</font><font color="#0000C0">.</font><font color="#000000">args</font><font color="#0000C0">[</font><font color="#0080C0">0</font><font color="#0000C0">]</font><font color="#0000C0">,</font> <font color="#000000">env</font><font color="#0000C0">)</font><font color="#0000C0">.</font><font color="#000000">val</font><font color="#0000C0">)</font>
+    <font color="#000000">right</font> <font color="#0000C0">=</font> <font color="#000000">int</font><font color="#0000C0">(</font><font color="#000000">evaluate</font><font color="#0000C0">(</font><font color="#000000">ast</font><font color="#0000C0">.</font><font color="#000000">args</font><font color="#0000C0">[</font><font color="#0080C0">1</font><font color="#0000C0">]</font><font color="#0000C0">,</font> <font color="#000000">env</font><font color="#0000C0">)</font><font color="#0000C0">.</font><font color="#000000">val</font><font color="#0000C0">)</font>
+    <font color="#C00000">return</font> <font color="#000000">ValueNode</font><font color="#0000C0">(</font><font color="#000000">str</font><font color="#0000C0">(</font><font color="#000000">left</font> <font color="#0000C0">+</font> <font color="#000000">right</font><font color="#0000C0">)</font><font color="#0000C0">)</font>
+
+<font color="#0000C0">@</font><font color="#000000">indexSafe</font>
+<font color="#C00000">def</font> <font color="#000000">evalEqual</font><font color="#0000C0">(</font><font color="#000000">ast</font><font color="#0000C0">,</font><font color="#000000">env</font><font color="#0000C0">)</font><font color="#0000C0">:</font>
+    <font color="#000000">left</font> <font color="#0000C0">=</font> <font color="#000000">evaluate</font><font color="#0000C0">(</font><font color="#000000">ast</font><font color="#0000C0">.</font><font color="#000000">args</font><font color="#0000C0">[</font><font color="#0080C0">0</font><font color="#0000C0">]</font><font color="#0000C0">,</font> <font color="#000000">env</font><font color="#0000C0">)</font>
+    <font color="#000000">right</font> <font color="#0000C0">=</font> <font color="#000000">evaluate</font><font color="#0000C0">(</font><font color="#000000">ast</font><font color="#0000C0">.</font><font color="#000000">args</font><font color="#0000C0">[</font><font color="#0080C0">1</font><font color="#0000C0">]</font><font color="#0000C0">,</font> <font color="#000000">env</font><font color="#0000C0">)</font>
+    <font color="#C00000">return</font> <font color="#000000">True</font> <font color="#C00000">if</font> <font color="#000000">left</font> <font color="#0000C0">==</font> <font color="#000000">right</font> <font color="#C00000">else</font> <font color="#000000">False</font>
+
+<font color="#0000C0">@</font><font color="#000000">indexSafe</font>
+<font color="#C00000">def</font> <font color="#000000">evalQuote</font><font color="#0000C0">(</font><font color="#000000">ast</font><font color="#0000C0">,</font> <font color="#000000">env</font><font color="#0000C0">)</font><font color="#0000C0">:</font>
+    <font color="#C00000">return</font> <font color="#000000">copy</font><font color="#0000C0">(</font><font color="#000000">ast</font><font color="#0000C0">.</font><font color="#000000">args</font><font color="#0000C0">[</font><font color="#0080C0">0</font><font color="#0000C0">]</font><font color="#0000C0">)</font>
+
+<font color="#0000C0">@</font><font color="#000000">indexSafe</font>
+<font color="#C00000">def</font> <font color="#000000">evalEval</font><font color="#0000C0">(</font><font color="#000000">ast</font><font color="#0000C0">,</font> <font color="#000000">env</font><font color="#0000C0">)</font><font color="#0000C0">:</font>
+        <font color="#C00000">return</font>  <font color="#000000">evaluate</font><font color="#0000C0">(</font><font color="#000000">evaluate</font><font color="#0000C0">(</font><font color="#000000">ast</font><font color="#0000C0">.</font><font color="#000000">args</font><font color="#0000C0">[</font><font color="#0080C0">0</font><font color="#0000C0">]</font><font color="#0000C0">,</font><font color="#000000">env</font><font color="#0000C0">)</font><font color="#0000C0">,</font> <font color="#000000">env</font><font color="#0000C0">)</font>
+
+<font color="#0000C0">@</font><font color="#000000">indexSafe</font>
+<font color="#C00000">def</font> <font color="#000000">evalString</font><font color="#0000C0">(</font><font color="#000000">ast</font><font color="#0000C0">,</font> <font color="#000000">env</font><font color="#0000C0">)</font><font color="#0000C0">:</font>
+    <font color="#C00000">return</font>  <font color="#000000">ValueNode</font><font color="#0000C0">(</font><font color="#000000">str</font><font color="#0000C0">(</font><font color="#000000">ast</font><font color="#0000C0">)</font><font color="#0000C0">)</font>
+
+<font color="#0000C0">@</font><font color="#000000">indexSafe</font>
+<font color="#C00000">def</font> <font color="#000000">evalParse</font><font color="#0000C0">(</font><font color="#000000">ast</font><font color="#0000C0">,</font> <font color="#000000">env</font><font color="#0000C0">)</font><font color="#0000C0">:</font>
+    <font color="#000000">string</font> <font color="#0000C0">=</font> <font color="#000000">str</font><font color="#0000C0">(</font><font color="#000000">evaluate</font><font color="#0000C0">(</font><font color="#000000">ast</font><font color="#0000C0">.</font><font color="#000000">args</font><font color="#0000C0">[</font><font color="#0080C0">0</font><font color="#0000C0">]</font><font color="#0000C0">,</font> <font color="#000000">env</font><font color="#0000C0">)</font><font color="#0000C0">.</font><font color="#000000">val</font><font color="#0000C0">)</font>
+    <font color="#C00000">return</font> <font color="#000000">parse</font><font color="#0000C0">(</font><font color="#000000">string</font><font color="#0000C0">)</font>
+
+<font color="#0000C0">@</font><font color="#000000">indexSafe</font>
+<font color="#C00000">def</font> <font color="#000000">evalLambda</font><font color="#0000C0">(</font><font color="#000000">ast</font><font color="#0000C0">,</font> <font color="#000000">env</font><font color="#0000C0">)</font><font color="#0000C0">:</font>
+    <font color="#000000">parameters</font> <font color="#0000C0">=</font> <font color="#000000">ast</font><font color="#0000C0">.</font><font color="#000000">args</font><font color="#0000C0">[</font><font color="#0080C0">0</font><font color="#0000C0">]</font><font color="#0000C0">.</font><font color="#000000">args</font>  <font color="#008000"># not evaluated!</font>
+    <font color="#000000">expression</font> <font color="#0000C0">=</font> <font color="#000000">ast</font><font color="#0000C0">.</font><font color="#000000">args</font><font color="#0000C0">[</font><font color="#0080C0">1</font><font color="#0000C0">]</font>
+    <font color="#000000">l</font> <font color="#0000C0">=</font> <font color="#000000">Node</font><font color="#0000C0">(</font><font color="#004080">'function'</font><font color="#0000C0">)</font>
+    <font color="#000000">p</font> <font color="#0000C0">=</font> <font color="#000000">Node</font><font color="#0000C0">(</font><font color="#004080">'parameters'</font><font color="#0000C0">)</font>
+    <font color="#000000">p</font><font color="#0000C0">.</font><font color="#000000">args</font> <font color="#0000C0">=</font> <font color="#000000">parameters</font>
+    <font color="#000000">l</font><font color="#0000C0">.</font><font color="#000000">args</font> <font color="#0000C0">=</font> <font color="#0000C0">[</font> <font color="#000000">p</font><font color="#0000C0">,</font> <font color="#000000">expression</font> <font color="#0000C0">]</font>
+    <font color="#C00000">return</font> <font color="#000000">l</font>
+
+<font color="#C00000">def</font> <font color="#000000">evalData</font><font color="#0000C0">(</font><font color="#000000">ast</font><font color="#0000C0">,</font> <font color="#000000">env</font><font color="#0000C0">)</font><font color="#0000C0">:</font>
+    <font color="#C00000">return</font> <font color="#000000">ast</font>
+
+<font color="#0000C0">@</font><font color="#000000">indexSafe</font>
+<font color="#C00000">def</font> <font color="#000000">evalProduct</font><font color="#0000C0">(</font><font color="#000000">ast</font><font color="#0000C0">,</font> <font color="#000000">env</font><font color="#0000C0">)</font><font color="#0000C0">:</font>
+    <font color="#000000">left</font>  <font color="#0000C0">=</font> <font color="#000000">int</font><font color="#0000C0">(</font><font color="#000000">evaluate</font><font color="#0000C0">(</font><font color="#000000">ast</font><font color="#0000C0">.</font><font color="#000000">args</font><font color="#0000C0">[</font><font color="#0080C0">0</font><font color="#0000C0">]</font><font color="#0000C0">,</font><font color="#000000">env</font><font color="#0000C0">)</font><font color="#0000C0">.</font><font color="#000000">val</font><font color="#0000C0">)</font>
+    <font color="#000000">right</font> <font color="#0000C0">=</font> <font color="#000000">int</font><font color="#0000C0">(</font><font color="#000000">evaluate</font><font color="#0000C0">(</font><font color="#000000">ast</font><font color="#0000C0">.</font><font color="#000000">args</font><font color="#0000C0">[</font><font color="#0080C0">1</font><font color="#0000C0">]</font><font color="#0000C0">,</font><font color="#000000">env</font><font color="#0000C0">)</font><font color="#0000C0">.</font><font color="#000000">val</font><font color="#0000C0">)</font>
+    <font color="#C00000">return</font> <font color="#000000">ValueNode</font><font color="#0000C0">(</font><font color="#000000">str</font><font color="#0000C0">(</font><font color="#000000">left</font> <font color="#0000C0">*</font> <font color="#000000">right</font><font color="#0000C0">)</font><font color="#0000C0">)</font>
+
+<font color="#0000C0">@</font><font color="#000000">indexSafe</font>
+<font color="#C00000">def</font> <font color="#000000">evalVal</font><font color="#0000C0">(</font><font color="#000000">ast</font><font color="#0000C0">,</font> <font color="#000000">env</font><font color="#0000C0">)</font><font color="#0000C0">:</font>
+    <font color="#C00000">return</font> <font color="#000000">ValueNode</font><font color="#0000C0">(</font><font color="#000000">evaluate</font><font color="#0000C0">(</font><font color="#000000">ast</font><font color="#0000C0">.</font><font color="#000000">args</font><font color="#0000C0">[</font><font color="#0080C0">0</font><font color="#0000C0">]</font><font color="#0000C0">,</font> <font color="#000000">env</font><font color="#0000C0">)</font><font color="#0000C0">.</font><font color="#000000">val</font><font color="#0000C0">)</font>
+
+<font color="#0000C0">@</font><font color="#000000">indexSafe</font>
+<font color="#C00000">def</font> <font color="#000000">evalFor</font><font color="#0000C0">(</font><font color="#000000">ast</font><font color="#0000C0">,</font> <font color="#000000">env</font><font color="#0000C0">)</font><font color="#0000C0">:</font>
+    <font color="#004080">'for(init,condition,increment,body)'</font>
+    <font color="#000000">evaluate</font><font color="#0000C0">(</font><font color="#000000">ast</font><font color="#0000C0">.</font><font color="#000000">args</font><font color="#0000C0">[</font><font color="#0080C0">0</font><font color="#0000C0">]</font><font color="#0000C0">,</font> <font color="#000000">env</font><font color="#0000C0">)</font>
+    <font color="#000000">ret</font> <font color="#0000C0">=</font> <font color="#000000">ValueNode</font><font color="#0000C0">(</font><font color="#004080">''</font><font color="#0000C0">)</font>
+    <font color="#C00000">while</font> <font color="#000000">evaluate</font><font color="#0000C0">(</font><font color="#000000">ast</font><font color="#0000C0">.</font><font color="#000000">args</font><font color="#0000C0">[</font><font color="#0080C0">1</font><font color="#0000C0">]</font><font color="#0000C0">,</font> <font color="#000000">env</font><font color="#0000C0">)</font><font color="#0000C0">:</font>
+        <font color="#000000">ret</font> <font color="#0000C0">=</font> <font color="#000000">evaluate</font><font color="#0000C0">(</font><font color="#000000">ast</font><font color="#0000C0">.</font><font color="#000000">args</font><font color="#0000C0">[</font><font color="#0080C0">3</font><font color="#0000C0">]</font><font color="#0000C0">,</font> <font color="#000000">env</font><font color="#0000C0">)</font>
+        <font color="#000000">evaluate</font><font color="#0000C0">(</font><font color="#000000">ast</font><font color="#0000C0">.</font><font color="#000000">args</font><font color="#0000C0">[</font><font color="#0080C0">2</font><font color="#0000C0">]</font><font color="#0000C0">,</font> <font color="#000000">env</font><font color="#0000C0">)</font>
+    <font color="#C00000">return</font> <font color="#000000">ret</font>
+
+<font color="#0000C0">@</font><font color="#000000">indexSafe</font>
+<font color="#C00000">def</font> <font color="#000000">evalForEach</font><font color="#0000C0">(</font><font color="#000000">ast</font><font color="#0000C0">,</font> <font color="#000000">env</font><font color="#0000C0">)</font><font color="#0000C0">:</font>
+    <font color="#000000">symbol</font> <font color="#0000C0">=</font> <font color="#000000">ast</font><font color="#0000C0">.</font><font color="#000000">args</font><font color="#0000C0">[</font><font color="#0080C0">0</font><font color="#0000C0">]</font><font color="#0000C0">.</font><font color="#000000">sym</font>
+    <font color="#000000">collection</font> <font color="#0000C0">=</font> <font color="#000000">evaluate</font><font color="#0000C0">(</font><font color="#000000">ast</font><font color="#0000C0">.</font><font color="#000000">args</font><font color="#0000C0">[</font><font color="#0080C0">1</font><font color="#0000C0">]</font><font color="#0000C0">,</font><font color="#000000">env</font><font color="#0000C0">)</font>
+    <font color="#000000">body</font> <font color="#0000C0">=</font> <font color="#000000">ast</font><font color="#0000C0">.</font><font color="#000000">args</font><font color="#0000C0">[</font><font color="#0080C0">2</font><font color="#0000C0">]</font>
+    <font color="#000000">ret</font> <font color="#0000C0">=</font> <font color="#000000">ValueNode</font><font color="#0000C0">(</font><font color="#004080">''</font><font color="#0000C0">)</font>
+    <font color="#C00000">for</font> <font color="#000000">arg</font> <font color="#C00000">in</font> <font color="#000000">collection</font><font color="#0000C0">.</font><font color="#000000">args</font><font color="#0000C0">:</font>
+        <font color="#000000">env</font><font color="#0000C0">[</font><font color="#000000">symbol</font><font color="#0000C0">]</font> <font color="#0000C0">=</font> <font color="#000000">arg</font>
+        <font color="#000000">ret</font> <font color="#0000C0">=</font> <font color="#000000">evaluate</font><font color="#0000C0">(</font><font color="#000000">body</font><font color="#0000C0">,</font><font color="#000000">env</font><font color="#0000C0">)</font>
+    <font color="#C00000">return</font> <font color="#000000">ret</font>
+
+<font color="#000000">keywords</font> <font color="#0000C0">=</font> <font color="#0000C0">{</font><font color="#004080">'do'</font><font color="#0000C0">:</font><font color="#000000">evalDo</font><font color="#0000C0">,</font>
+           <font color="#004080">'if'</font><font color="#0000C0">:</font><font color="#000000">evalIf</font><font color="#0000C0">,</font>
+           <font color="#004080">'set'</font><font color="#0000C0">:</font><font color="#000000">evalSet</font><font color="#0000C0">,</font>
+           <font color="#004080">'gt'</font><font color="#0000C0">:</font><font color="#000000">evalGt</font><font color="#0000C0">,</font>
+           <font color="#004080">'print'</font><font color="#0000C0">:</font><font color="#000000">evalPrint</font><font color="#0000C0">,</font>
+           <font color="#004080">'add'</font><font color="#0000C0">:</font><font color="#000000">evalAdd</font><font color="#0000C0">,</font>
+            <font color="#004080">'eq'</font><font color="#0000C0">:</font><font color="#000000">evalEqual</font><font color="#0000C0">,</font>
+            <font color="#004080">'quote'</font><font color="#0000C0">:</font><font color="#000000">evalQuote</font><font color="#0000C0">,</font>
+            <font color="#004080">'q'</font><font color="#0000C0">:</font><font color="#000000">evalQuote</font><font color="#0000C0">,</font>
+            <font color="#004080">'eval'</font><font color="#0000C0">:</font><font color="#000000">evalEval</font><font color="#0000C0">,</font>
+            <font color="#004080">'string'</font><font color="#0000C0">:</font><font color="#000000">evalString</font><font color="#0000C0">,</font>
+            <font color="#004080">'parse'</font><font color="#0000C0">:</font><font color="#000000">evalParse</font><font color="#0000C0">,</font>
+            <font color="#004080">'data'</font><font color="#0000C0">:</font><font color="#000000">evalData</font><font color="#0000C0">,</font>
+            <font color="#004080">'d'</font><font color="#0000C0">:</font><font color="#000000">evalData</font><font color="#0000C0">,</font>
+            <font color="#004080">'lambda'</font><font color="#0000C0">:</font><font color="#000000">evalLambda</font><font color="#0000C0">,</font>
+            <font color="#004080">'product'</font><font color="#0000C0">:</font><font color="#000000">evalProduct</font><font color="#0000C0">,</font>
+            <font color="#004080">'val'</font><font color="#0000C0">:</font><font color="#000000">evalVal</font><font color="#0000C0">,</font>
+            <font color="#004080">'for'</font><font color="#0000C0">:</font><font color="#000000">evalFor</font><font color="#0000C0">,</font>
+            <font color="#004080">'foreach'</font><font color="#0000C0">:</font><font color="#000000">evalForEach</font><font color="#0000C0">,</font>
+           <font color="#0000C0">}</font>
+<font color="#C00000">def</font> <font color="#000000">evaluate</font><font color="#0000C0">(</font><font color="#000000">ast</font><font color="#0000C0">,</font> <font color="#000000">env</font><font color="#0000C0">=</font><font color="#0000C0">{</font><font color="#0000C0">}</font><font color="#0000C0">)</font><font color="#0000C0">:</font>
+    <font color="#004080">' evaluates an Node given an environment.'</font>
+    <font color="#C00000">if</font> <font color="#000000">ast</font><font color="#0000C0">.</font><font color="#000000">sym</font> <font color="#C00000">in</font> <font color="#000000">keywords</font><font color="#0000C0">:</font>
+        <font color="#C00000">return</font> <font color="#000000">keywords</font><font color="#0000C0">[</font><font color="#000000">ast</font><font color="#0000C0">.</font><font color="#000000">sym</font><font color="#0000C0">]</font><font color="#0000C0">(</font><font color="#000000">ast</font><font color="#0000C0">,</font> <font color="#000000">env</font><font color="#0000C0">)</font>
+    <font color="#C00000">elif</font> <font color="#000000">ast</font><font color="#0000C0">.</font><font color="#000000">sym</font> <font color="#C00000">in</font> <font color="#000000">env</font><font color="#0000C0">:</font>
+        <font color="#000000">value</font> <font color="#0000C0">=</font> <font color="#000000">env</font><font color="#0000C0">[</font><font color="#000000">ast</font><font color="#0000C0">.</font><font color="#000000">sym</font><font color="#0000C0">]</font>
+        <font color="#C00000">if</font> <font color="#000000">hasattr</font><font color="#0000C0">(</font><font color="#000000">value</font><font color="#0000C0">,</font><font color="#004080">'sym'</font><font color="#0000C0">)</font> <font color="#C00000">and</font> <font color="#000000">value</font><font color="#0000C0">.</font><font color="#000000">sym</font> <font color="#0000C0">==</font> <font color="#004080">'function'</font><font color="#0000C0">:</font>
+            <font color="#C00000">return</font> <font color="#000000">functionCall</font><font color="#0000C0">(</font><font color="#000000">value</font><font color="#0000C0">,</font> <font color="#000000">ast</font><font color="#0000C0">,</font> <font color="#000000">env</font><font color="#0000C0">)</font>
+        <font color="#C00000">else</font><font color="#0000C0">:</font>
+            <font color="#C00000">return</font> <font color="#000000">value</font>
+    <font color="#C00000">else</font><font color="#0000C0">:</font>
+        <font color="#C00000">return</font> <font color="#000000">ast</font>
+
+<font color="#C00000">def</font> <font color="#000000">functionCall</font><font color="#0000C0">(</font><font color="#000000">function</font><font color="#0000C0">,</font> <font color="#000000">call</font><font color="#0000C0">,</font> <font color="#000000">env</font><font color="#0000C0">)</font><font color="#0000C0">:</font>
+    <font color="#000000">arguments</font> <font color="#0000C0">=</font> <font color="#0000C0">[</font> <font color="#000000">evaluate</font><font color="#0000C0">(</font><font color="#000000">arg</font><font color="#0000C0">,</font> <font color="#000000">env</font><font color="#0000C0">)</font> <font color="#C00000">for</font> <font color="#000000">arg</font> <font color="#C00000">in</font> <font color="#000000">call</font><font color="#0000C0">.</font><font color="#000000">args</font> <font color="#0000C0">]</font>
+    <font color="#000000">parameters</font> <font color="#0000C0">=</font> <font color="#0000C0">[</font> <font color="#000000">param</font><font color="#0000C0">.</font><font color="#000000">sym</font> <font color="#C00000">for</font> <font color="#000000">param</font> <font color="#C00000">in</font> <font color="#000000">function</font><font color="#0000C0">.</font><font color="#000000">args</font><font color="#0000C0">[</font><font color="#0080C0">0</font><font color="#0000C0">]</font><font color="#0000C0">.</font><font color="#000000">args</font><font color="#0000C0">]</font>
+    <font color="#000000">code</font> <font color="#0000C0">=</font> <font color="#000000">function</font><font color="#0000C0">.</font><font color="#000000">args</font><font color="#0000C0">[</font><font color="#0080C0">1</font><font color="#0000C0">]</font>
+
+    <font color="#000000">localEnv</font> <font color="#0000C0">=</font> <font color="#000000">dict</font><font color="#0000C0">(</font><font color="#000000">zip</font><font color="#0000C0">(</font><font color="#000000">parameters</font><font color="#0000C0">,</font> <font color="#000000">arguments</font><font color="#0000C0">)</font><font color="#0000C0">)</font>
+    <font color="#000000">localEnv</font><font color="#0000C0">.</font><font color="#000000">update</font><font color="#0000C0">(</font><font color="#000000">env</font><font color="#0000C0">)</font>
+    <font color="#C00000">return</font> <font color="#000000">evaluate</font><font color="#0000C0">(</font><font color="#000000">code</font><font color="#0000C0">,</font> <font color="#000000">localEnv</font><font color="#0000C0">)</font>
+
+<font color="#C00000">def</font> <font color="#000000">run</font><font color="#0000C0">(</font><font color="#000000">codeString</font><font color="#0000C0">,</font><font color="#000000">env</font><font color="#0000C0">=</font><font color="#0000C0">{</font><font color="#0000C0">}</font><font color="#0000C0">)</font><font color="#0000C0">:</font>
+    <font color="#004080">'parses and evaluates an SM expression.'</font>
+    <font color="#C00000">return</font> <font color="#000000">evaluate</font><font color="#0000C0">(</font><font color="#000000">parse</font><font color="#0000C0">(</font><font color="#000000">codeString</font><font color="#0000C0">)</font><font color="#0000C0">,</font><font color="#000000">env</font><font color="#0000C0">)</font>
+
+<font color="#000000">tests</font> <font color="#0000C0">=</font> <font color="#0000C0">[</font><font color="#0000C0">]</font>
+
+<font color="#000000">tests</font><font color="#0000C0">.</font><font color="#000000">append</font><font color="#0000C0">(</font> <font color="#004080">'''
+set(x 1)
+for(set(i 0) gt(8 i) set(i add(i 1)) {
+  print("2 to the " i " = " x)
+  set(x add(x x))
+})
+'''</font><font color="#0000C0">)</font>
+
+<font color="#000000">tests</font><font color="#0000C0">.</font><font color="#000000">append</font><font color="#0000C0">(</font> <font color="#004080">'''
+set(x 17);
+set(y 8);
+print( "x=" x "y=" y);
+print( "changing x...");
+set(x 9);
+print( "x=" x "y=" y);
+if( gt(x y)
+    { print("x is greater than y."); set(z x); }
+    { print("x is not greater than y."); set(z y); }
+   );
+print( "greatest of x and y:" z );
+print( "total of x and y:" add( x y) );
+'''</font><font color="#0000C0">)</font>
+
+<font color="#000000">tests</font><font color="#0000C0">.</font><font color="#000000">append</font><font color="#0000C0">(</font> <font color="#004080">'''
+set(string "Love");
+if ( eq(string "Love")
+    { set(string "Hate");}
+   )
+print("string = " string)
+return(z);
+print( "not reached!" );
+'''</font><font color="#0000C0">)</font>
+
+<font color="#000000">tests</font><font color="#0000C0">.</font><font color="#000000">append</font><font color="#0000C0">(</font> <font color="#004080">'''
+set(code quote(print ("hello world!")) )
+print ("code = '" code "'")
+print ("when I evaluate the code, I should see 'hello world' as a side effect:")
+eval(code)'''</font><font color="#0000C0">)</font>
+
+<font color="#000000">tests</font><font color="#0000C0">.</font><font color="#000000">append</font><font color="#0000C0">(</font> <font color="#004080">'''
+set(x 1)
+set(y 2)
+set( sum quote(add(x y))  )
+print ( "sum = " sum )
+print ( "add(x y) = " add(x y))
+print ( "eval(sum) = " eval(sum) )
+print ( "setting x to 10..." )
+set(x 10)
+print ( "eval(sum) = " eval(sum) )
+'''</font><font color="#0000C0">)</font>
+
+<font color="#000000">tests</font><font color="#0000C0">.</font><font color="#000000">append</font><font color="#0000C0">(</font> <font color="#004080">'''
+set(code_string "print(hello world!)")
+set(code parse(code_string))
+print (code_string)
+print (code)
+eval(code)
+'''</font><font color="#0000C0">)</font>
+
+<font color="#000000">tests</font><font color="#0000C0">.</font><font color="#000000">append</font><font color="#0000C0">(</font> <font color="#004080">'''
+set(f lambda ( quote(x) add(x 1) ))
+print( f(2))
+set(metric lambda ( quote(x y) add(product(x x) product(y y)) ) )
+print( metric(5 10) )
+print( metric(3 4) )
+'''</font><font color="#0000C0">)</font>
+
+<font color="#000000">tests</font><font color="#0000C0">.</font><font color="#000000">append</font><font color="#0000C0">(</font> <font color="#004080">'''
+for( set(i 0) gt(10 i) set(i add(i 1)) {
+  print("i=" i)  
+})
+'''</font><font color="#0000C0">)</font>
+
+<font color="#000000">tests</font><font color="#0000C0">.</font><font color="#000000">append</font><font color="#0000C0">(</font> <font color="#004080">'''
+set(list data(1 2 3))
+print(list)
+foreach(element list {
+  print(element)
+})
+'''</font><font color="#0000C0">)</font>
+
+<font color="#000000">tests</font><font color="#0000C0">.</font><font color="#000000">append</font><font color="#0000C0">(</font> <font color="#004080">'''
+set(tree data("Friends" ("John" "Jill") "Pets" ("Spot" "Tiger") ))
+print(tree)
+foreach(branch tree {
+  print(val(branch) ":")
+  foreach(leaf branch {
+    print("  " leaf)
+  })
+})
+'''</font><font color="#0000C0">)</font>
+
+<font color="#C00000">for</font> <font color="#000000">t</font> <font color="#C00000">in</font> <font color="#000000">tests</font><font color="#0000C0">:</font>
+    <font color="#C00000">print</font> <font color="#004080">"code:"</font><font color="#0000C0">,</font><font color="#000000">t</font>
+    <font color="#C00000">print</font> <font color="#004080">"output:"</font>
+    <font color="#000000">run</font><font color="#0000C0">(</font><font color="#000000">t</font><font color="#0000C0">,</font><font color="#0000C0">{</font><font color="#0000C0">}</font><font color="#0000C0">)</font>
+    <font color="#C00000">print</font><font color="#000000"></font></font></pre>

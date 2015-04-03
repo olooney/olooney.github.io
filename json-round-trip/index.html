@@ -1,0 +1,355 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang="en-us" dir="ltr">
+<head>
+<!-- meta -->
+<meta http-equiv="content-type" content="text/html; charset=utf-8">
+<meta name="author" content="Oran Looney">
+<meta name="robots" content="INDEX,FOLLOW">
+<meta name="description" content="Oran quitely programming away and sharing a few of the lessons learned">
+<meta name="keywords" content="Programming,Code,Coding,Software,Software Development,Web,Web Development,Python,JavaScript,C++">
+<meta name="verify-v1" content="GmOM2OF0gDOQiM8uS0yKm1ZA0gUI8Hqk4BamNHp7iCg=">
+<meta name="viewport" content="width=800,initial-scale=0.6">
+<link rel="alternate" type="application/rss+xml" href="/feeds/blog/" title="OranLooney.com RSS Blog Feed">
+
+<title>OranLooney - JSON Round Trip with node.js</title>
+
+<!-- style -->
+<link rel="stylesheet" type="text/css" href="/static/site/css/yui-reset-min.css">
+<link rel="stylesheet" type="text/css" href="/static/site/css/main.css">
+<link rel="stylesheet" type="text/css" media="print" href="/static/site/css/print.css">
+<!--[if lt IE 7.]>
+	<link rel="stylesheet" type="text/css" href="/static/site/css/icons_gif.css">
+<![endif]-->
+
+
+
+</head>
+
+
+<body>
+
+  <div id="banner">
+	<a href="/">OranLooney.com</a>
+	<h6>quietly programming away</h6>
+  </div>
+  <div class="box" id="sidebar">
+	
+		<form id="quick-search" method="get" action="/search/">
+			<div>
+				<input type="hidden" name="alltags">
+				<input type="text" name="keyword" class="keyword-field">
+				<button type="submit" class="search-submit-button">Search</button>
+		  	</div>
+		  </form>
+	
+
+    <ul class="menu">
+      
+        <li class="menu_home"><a href="/">Home</a></li>
+      
+
+      
+		<li class="menu_rss_feed"><a href="/feeds/blog/" title="subscribe to the RSS feed">RSS Feed</a></li>
+        <li class="menu_tags"><a href="/tags/" title="search articles by tag">Tags</a></li>
+        <li class="menu_index"><a href="/archive" title="search articles chronologically">Archive</a></li>
+        <li class="menu_break"></li>
+        <li class="menu_bookshelf" title="my books on librarything.com"><a href="http://www.librarything.com/catalog.php?view=olooney&amp;offset=0&amp;shelf_rows=10&amp;previousOffset=0&amp;shelf=shelf">Bookshelf</a></li>
+        <li class="menu_sig" title="my endorsement of Agile"><a href="http://agilemanifesto.org/sign/display.cgi?ms=000000203">Manifesto</a></li>
+
+        <li class="menu_about_site" title="about the site itself"><a href="/colophon/">Colophon</a></li>
+        <li class="menu_about_me"><a href="/author/" title="about the author">Author</a></li> 
+      
+      
+      
+      
+          <li class="menu_break"></li>
+        
+          <li class="menu_login"><a href="/admin/">Login</a></li> 
+        
+      
+    </ul>
+  </div>
+  <div id="main-wrapper">
+	
+      
+      <div class="content-page">
+        
+  <a href="/json-round-trip/" class="title">JSON Round Trip with node.js</a>
+
+  
+    <a href="http://www.flickr.com/photos/notsogoodphotography/3958281492/">
+      <img alt="colorful lead photo" src="/static/media/images/lead/3958281492_da16207ff0.jpg">
+    </a>
+  
+
+<div>
+  
+<p>I've been playing around with node.js a lot recently, because, well, server-side JavaScript is the future of web development, at least for rich internet applications. Basically, if your project uses a lot of JavaScript on the client and primarily uses AJAX and JSON to communicate with the server, then the parsimony, code reuse, and low impedance mismatch of also using JavaScript on the server mean that you'll be at least twice as fast as teams that have to deal with two languages, write separate utilities for the server and client, and massage messages to work in both languages.
+</p>
+<p>One of the first things you need to do, if you're serious about writing a RIA with a JavaScript backend, is be able to quickly send messages to and from the server. JSON is obviously the best format for JavaScript-to-JavaScript communication. So, I set up a simple example of a node.js server that can both send and receive JSON objects via AJAX, and cache them in memory on the server. The full code of the example is out on <a href="http://github.com/">github</a>:
+</p>
+<ul>
+ <li>
+     <a href="https://github.com/olooney/json-cache-example/">https://github.com/olooney/json-cache-example/</a>
+ </li>
+</ul>
+<p>I'm going to pluck out the juicy bits right here, though, and explain them.
+</p>
+
+<h2>Client To Server</h2>
+<p>The first thing you need to do is be able to POST a JSON object. This is easy enough with <a href="http://jquery.com/">jQuery</a>:
+</p>
+<pre><code>function put(id, data, callback) {
+    $.ajax('http://127.0.0.1:8181/' + id + '/', {
+        type: 'POST',
+        data: JSON.stringify(data),
+        contentType: 'text/json',
+        success: function() { if ( callback ) callback(true); },
+        error  : function() { if ( callback ) callback(false); }
+    });
+}
+</code></pre><p>Note that the body of the POST is <em>not</em> URL encoded, like that of a POSTed form: that's verbose and wasteful, and gets us nothing since we'd have to decode it on the server anyway. Note also that I'm using <code>JSON.stringify</code>. This is in the ECMA-262 standard, built into modern browsers, and Douglas Crockford has written a <a href="https://github.com/douglascrockford/JSON-js">JSON compatibility library</a> for legacy browsers.
+</p>
+<p>The next step is to receive that message on the server. Inside of a HTTP response handler:
+</p>
+<pre><code>http.createServer(function(request, response) {
+    ...
+    if ( request.method === 'POST' ) {
+        // the body of the POST is JSON payload.
+        var data = '';
+        request.addListener('data', function(chunk) { data += chunk; });
+        request.addListener('end', function() {
+            store[id] = JSON.parse(data);
+            response.writeHead(200, {'content-type': 'text/plain' });
+            response.end()
+        });
+    }
+    ...
+}
+</code></pre><p>The request is emitting multiple &quot;data&quot; events, each with a piece of the JSON string: we have to accumulate all of these into one string. When all data is received, the &quot;end&quot; event is emitted, and we can proceed to parse the now-complete JSON string. In this case our handling consists only of tucking away the deserialized object in the store. Afterwards, we return a empty document with a &quot;200 OK&quot; status.
+</p>
+<p>I should probably do error handling on the JSON.parse as it's likely to throw an exception, but I forgot. Typical error handling looks like this:
+</p>
+<pre><code>try {
+    store[id] = JSON.parse(data);
+} catch ( e ) {
+    response.writeHead(500, {'content-type': 'text/plain' });
+    response.write('ERROR:' + e);
+    response.end('\n');
+}
+</code></pre>
+<h2>Server To Client</h2>
+<p>This is very simple. On the server, we just have to get the object out of the store, serialize it, and write it out. 
+</p>
+<pre><code>if ( request.method === 'GET' ) {
+    // exact id lookup.
+    if ( id in store ) {
+        response.writeHead(200, {'content-type': 'text/json' });
+        response.write( JSON.stringify(store[id]) );
+        response.end('\n');
+    } else {
+        response.writeHead(404, {'content-type': 'text/plain' });
+        response.write('no data for ' + id);
+        response.end('\n');
+    }
+}
+</code></pre><p>Note that I'm using the mime type <code>text/json</code>. The official MIME type is <code>application/json</code>, but I've had trouble with frameworks treating that as unencoded binary data. You should probably use the standard, though, unless you have a good reason.
+</p>
+<p>jQuery supports JSON data right out of the box, so there's barely anything for us to do on the client:
+</p>
+<pre><code>function get(id, callback) {
+    $.ajax('http://127.0.0.1:8181/' + id + '/', {
+        type: 'GET',
+        dataType: 'json',
+        success: function(data) { if ( callback ) callback(data); },
+        error  : function()     { if ( callback ) callback(null); }
+    });
+}
+</code></pre>
+<h2>Conclusion</h2>
+<p>It's easy to send JSON from the client to the server, and even easier to get it from the server to the client. There are no no mismatched data types, no parsing or serialization algorithms, just two environments that speak the same language communicating in a minimal (but not trivial) subset of that language. Can you see why I'm so excited about this stuff?
+</p>
+
+
+
+</div>
+<p>
+  <span class="signature">- Oran Looney</span>
+  <span class="signature-date">March 9th 2011</span>
+</p>
+  <p class="thank-you">
+    Thanks for reading.  Please subscribe to the <a href="/feeds/blog/">RSS feed</a> and remember that
+    future readers will thank you for leaving your comments and criticisms.
+    <a href="/feeds/blog/" title="Subscribe to RSS Feed" class="big-rss-link">Subscribe to RSS Feed</a>
+  </p>
+<p class="article-tags">
+    
+</p>
+
+
+      </div>
+      
+  
+  <div class="content-page comments" style="border-top: none">
+    <a name="comments"></a>
+    
+	  <h1>Comments (12)</h1>
+      <div>
+        
+          <div class="comment">
+    <div class="comment-date">October 19th 2013</div>
+	<h4><span class="comment-username">seanmchugh</span> said: </h4>
+	<p>you saved me a day and/or compromising on what i wanted.</p>
+</div>
+
+        
+          <div class="comment">
+    <div class="comment-date">April 2nd 2013</div>
+	<h4><span class="comment-username">NodeNoob</span> said: </h4>
+	<p>This helps ALOT!! THX!</p>
+</div>
+
+        
+          <div class="comment">
+    <div class="comment-date">September 11th 2012</div>
+	<h4><span class="comment-username">Yej</span> said: </h4>
+	<p>Interesting, I&#39;ll give it a try.  It was IE7 s refusal to suimbt my call to getJSON that initially brought me here.  I&#39;ve done more testing and determined that it always works as long as:1. The  data&#39; argument isn&#39;t too long.  Somewhere around 2048 is the limit for IE get requests, including the base URL.2. I call $.ajaxSetup({ cache: false }); before I send the getJSON request.All well and good unless you have a lot of data to send, which I do.  So I&#39;m going to give your approach a try, thanks!</p>
+</div>
+
+        
+          <div class="comment">
+    <div class="comment-date">June 1st 2012</div>
+	<h4><span class="comment-username">Pat</span> said: </h4>
+	<p>about OPTIONS, try
+http.createServer(function (req, res) {
+  res.writeHead(200,
+	{
+	  &#39;Content-Type&#39;: &#39;application/json&#39;,
+	  &#39;Access-Control-Allow-Origin&#39;:&#39;*&#39;
+    }
+  );
+ ...
+}).listen(1337, &#39;127.0.0.1&#39;);</p>
+</div>
+
+        
+          <div class="comment">
+    <div class="comment-date">March 15th 2012</div>
+	<h4><span class="comment-username">donkikong</span> said: </h4>
+	<p>Those asking about OPTIONS should have a look at this article on the same origin policy: http://en.wikipedia.org/wiki/Same_origin_policy
+
+In short: you cannot make an asynchronous request outside of the domain that you are requesting from, so if you&#39;re trying to test from a local file, this will fail.
+Try using JSONP with a callback.</p>
+</div>
+
+        
+          <div class="comment">
+    <div class="comment-date">February 27th 2012</div>
+	<h4><span class="comment-username">Dobes</span> said: </h4>
+	<p>OPTIONS is related to a new cross-domain features being added to modern browsers.
+
+https://developer.mozilla.org/en/http_access_control
+
+</p>
+</div>
+
+        
+          <div class="comment">
+    <div class="comment-date">February 16th 2012</div>
+	<h4><span class="comment-username">jquerier</span> said: </h4>
+	<p>Sending OPTIONS instead of POST seems to be a jQuery/Firefox/cross-domain bug. I can&#39;t help you beyond that since I can&#39;t reproduce it myself.  
+
+http://stackoverflow.com/questions/1099787/jquery-ajax-post-sending-options-as-request-method-in-firefox
+
+</p>
+</div>
+
+        
+          <div class="comment">
+    <div class="comment-date">January 19th 2012</div>
+	<h4><span class="comment-username">Khurram Rahe</span> said: </h4>
+	<p>Hi, I also got the same problem, why in the nodejs, when i&#39;m sending the post to the server, request.method is returning &quot;OPTIONS&quot; instead of &quot;POST&quot; . Feeling very confusing</p>
+</div>
+
+        
+          <div class="comment">
+    <div class="comment-date">December 23rd 2011</div>
+	<h4><span class="comment-username">Rob</span> said: </h4>
+	<p>Hi there
+
+I am running into a crossdomain issue when communicating through POST on the above method, is there something obvious I am missing?
+
+- Mobile app communicating using POST on an Ajax call, sending data across to the server and expecting a callback.
+
+- Server has node setup with a app.post(&#39;/blah&#39;)  and that does a res.send... 
+
+This works fine if the call is made off the same server but when it&#39;s outside the domain that fails. Any ideas? 
+
+Thanks!</p>
+</div>
+
+        
+          <div class="comment">
+    <div class="comment-date">December 22nd 2011</div>
+	<h4><span class="comment-username">node.bs</span> said: </h4>
+	<p>i&#39;m not convinced about this entire paradigm..  i beleive in JSON as the transport structure, and i believe in JS / jQuery on the client side.. however, i&#39;m pretty sure i can see this technology being used as a very light chat / real time applicatoin HELPER. Most of the data is static, some of the &quot;DATA&quot; needs to be refreshed often, and only then does it make sense to pump it out with node.js. I think IISNode port may have some practical applications.. and maybe i&#39;m wrong, i&#39;ve just seen a lot of these things come and go.. however, i&#39;d say from the OS community.. this is something to keep them trying</p>
+</div>
+
+        
+          <div class="comment">
+    <div class="comment-date">December 16th 2011</div>
+	<h4><span class="comment-username">Mcloud</span> said: </h4>
+	<p>Hi, 
+I got problem, why in the nodejs, when i&#39;m sending the post to  the server, request.method is returning &quot;OPTIONS&quot; instead of &quot;POST&quot;
+
+thank you for your help</p>
+</div>
+
+        
+          <div class="comment">
+    <div class="comment-date">March 28th 2011</div>
+	<h4><span class="comment-username">Vidar</span> said: </h4>
+	<p>I&#39;m excited too, this is the future! Thanks for the writeup.</p>
+</div>
+
+        
+      </div>
+    
+    <h1>Leave a Comment</h1>
+    
+<form method="post" action="/json-round-trip/leave-comment/" class="leave-comment-form">
+  <div style='display:none'><input type='hidden' name='csrfmiddlewaretoken' value='7c54419eea61d947291c188320a452fc' /></div>
+  <div>
+    Your Name: <br>
+    
+    <input id="id_user_name" type="text" name="user_name" maxlength="12" />
+  </div>
+  <div>
+    Comment: <br>
+    
+    <textarea id="id_content" rows="10" cols="40" name="content"></textarea>
+  </div>
+  <div>
+    Enter this phrase: <br>
+    
+    <img src="/static/site/images/captcha.png" alt="captcha">
+    <input id="id_captcha" type="text" name="captcha" maxlength="20" /> 
+  </div>
+  <div>
+    <input class="submit-button" type="submit" value="Leave Comment">
+  </div>
+</form>
+
+  </div>
+  
+
+	
+  </div>
+
+
+
+  <script src="http://www.google-analytics.com/urchin.js" type="text/javascript"></script>
+  <script type="text/javascript"> _uacct = "UA-2535855-1"; urchinTracker(); </script>
+
+</body>
+</html>

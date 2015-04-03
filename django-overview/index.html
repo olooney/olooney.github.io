@@ -1,0 +1,244 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang="en-us" dir="ltr">
+<head>
+<!-- meta -->
+<meta http-equiv="content-type" content="text/html; charset=utf-8">
+<meta name="author" content="Oran Looney">
+<meta name="robots" content="INDEX,FOLLOW">
+<meta name="description" content="Oran quitely programming away and sharing a few of the lessons learned">
+<meta name="keywords" content="Programming,Code,Coding,Software,Software Development,Web,Web Development,Python,JavaScript,C++">
+<meta name="verify-v1" content="GmOM2OF0gDOQiM8uS0yKm1ZA0gUI8Hqk4BamNHp7iCg=">
+<meta name="viewport" content="width=800,initial-scale=0.6">
+<link rel="alternate" type="application/rss+xml" href="/feeds/blog/" title="OranLooney.com RSS Blog Feed">
+
+<title>OranLooney - Django at 30,000 feet</title>
+
+<!-- style -->
+<link rel="stylesheet" type="text/css" href="/static/site/css/yui-reset-min.css">
+<link rel="stylesheet" type="text/css" href="/static/site/css/main.css">
+<link rel="stylesheet" type="text/css" media="print" href="/static/site/css/print.css">
+<!--[if lt IE 7.]>
+	<link rel="stylesheet" type="text/css" href="/static/site/css/icons_gif.css">
+<![endif]-->
+
+
+
+</head>
+
+
+<body>
+
+  <div id="banner">
+	<a href="/">OranLooney.com</a>
+	<h6>quietly programming away</h6>
+  </div>
+  <div class="box" id="sidebar">
+	
+		<form id="quick-search" method="get" action="/search/">
+			<div>
+				<input type="hidden" name="alltags">
+				<input type="text" name="keyword" class="keyword-field">
+				<button type="submit" class="search-submit-button">Search</button>
+		  	</div>
+		  </form>
+	
+
+    <ul class="menu">
+      
+        <li class="menu_home"><a href="/">Home</a></li>
+      
+
+      
+		<li class="menu_rss_feed"><a href="/feeds/blog/" title="subscribe to the RSS feed">RSS Feed</a></li>
+        <li class="menu_tags"><a href="/tags/" title="search articles by tag">Tags</a></li>
+        <li class="menu_index"><a href="/archive" title="search articles chronologically">Archive</a></li>
+        <li class="menu_break"></li>
+        <li class="menu_bookshelf" title="my books on librarything.com"><a href="http://www.librarything.com/catalog.php?view=olooney&amp;offset=0&amp;shelf_rows=10&amp;previousOffset=0&amp;shelf=shelf">Bookshelf</a></li>
+        <li class="menu_sig" title="my endorsement of Agile"><a href="http://agilemanifesto.org/sign/display.cgi?ms=000000203">Manifesto</a></li>
+
+        <li class="menu_about_site" title="about the site itself"><a href="/colophon/">Colophon</a></li>
+        <li class="menu_about_me"><a href="/author/" title="about the author">Author</a></li> 
+      
+      
+      
+      
+          <li class="menu_break"></li>
+        
+          <li class="menu_login"><a href="/admin/">Login</a></li> 
+        
+      
+    </ul>
+  </div>
+  <div id="main-wrapper">
+	
+      
+      <div class="content-page">
+        
+  <a href="/django-overview/" class="title">Django at 30,000 feet</a>
+
+  
+    <a href="http://www.flickr.com/photos/tensafefrogs/111062/">
+      <img alt="colorful lead photo" src="/static/media/images/lead/111062_a58f1d2f7c_.jpg">
+    </a>
+  
+
+<div>
+  
+<blockquote><p>Note: this essay is quite dated.  I'm working on a re-write; in the meantime I'd recommend looking elsewhere for an overview of <a href="http://www.djangoproject.com">Django</a>.<br>-Oran
+</p>
+</blockquote><p>Ok, Mr. Framework, let's cut to the chase: are you going to solve my problems or not?
+</p>
+<p>Far too many 'solutions' are more trouble than they're worth.  Maybe I'm getting cynical in my old age (I'm 25) but my attitude is that if I don't see you solving the real problems that I know I'm going to run into, then forget it.  The C programming language is a good example: if C wasn't pushing frames onto the stack and mapping variable names to memory locations for me, <em>I'd have to be doing all that myself, in assembly.</em>  C solves a huge number of the problems that arise when write machine code, and all you need to learn is a few simple rules, not a giant framework.
+</p>
+<p>But we're here to talk about <a href="http://www.djangoproject.com">Django</a>, aren't we?  Well then, let me state for the record:
+</p>
+<blockquote><p>Django solves my problems.
+</p>
+</blockquote><p>Before I talk about how, a caveat: my problems are probably not your problems.  I have no web development experience, I'm working on my first site, but I never-the-less have a surprisingly good grasp of CSS and HTML (we use embedded HTML reports and controls in the application I work on) and I'm pretty good with <a href="http://python.org/">Python</a>.  Plus, this site is an exercise in simplicity, nothing like a production system.  So, this is not a recommendation for <a href="http://www.djangoproject.com">Django</a>; just my high level impression of it.  Still, it might be of some help to you in choosing the framework that's right for you.
+</p>
+<p>Here's what <a href="http://www.djangoproject.com">Django</a> looks like in my head:
+</p>
+<p><img src="/static/images/django-diagram.png" alt="Diagram showing the relationship between components."/>
+</p>
+
+<h2>URL resolution</h2>
+<p>Django solves this problem by allowing you to map regular expressions to views. It's pretty cool; you can use the regular expression &quot;named group&quot; syntax to pull out pieces you're interested in and pass them to the view.  You can match only the first part of the URL and delegate the rest to some other URL handler. And lastly, you can provide an additional dictionary of parameters to the view, enabling significant re-use of views.
+</p>
+<pre><code>(r'^', include('site.mainapp.urls')),
+(r'^static/(?P&lt;path&gt;.*)$', 'django.views.static.serve',
+    {'document_root': 'home\media'})
+</code></pre>
+<h2>HTTP Protocol</h2>
+<p>Django defines two classes, <code>HttpRequest</code> and <code>HttpResponse</code>, to handle the HTTP protocol. <code>HttpRequest</code> neatly exposes (but does not hide the difference between) GET and POST data.  an <code>HttpResponse</code> object accepts an HTML string and builds the header for you; an optional <code>mimetype</code> argument lets you return any kind of content.  <br>
+</p>
+<p>In <a href="http://www.djangoproject.com">Django</a>, each request goes to a <em>function</em> that takes an <code>HttpRequest</code> object and returns an <code>HttpResponse</code> object.  I like this; mathematically speaking, a page view is a function, so it's nice to see it implemented as one.  (Functions in <a href="http://python.org/">Python</a> can be decorated and curried, which makes them a legitimate alternative to classes in many cases.)
+</p>
+
+<h2>Sessions and Authentication</h2>
+<p>Django stores a session id as a cookie, and stores the session state to the database.  The middleware looks up the session state and provides a dictionary-like <code>Session</code> object in the <code>HttpRequest</code>. You can update the <code>Session</code> object, and changes are persistant.  Quite familiar and intuitive, really.  <br>
+</p>
+<p>The authentication functions builds on <code>Session</code> and maintains a table of users, permissions, and if they're logged in.  The current user is provided in the <code>HttpRequest.</code>  Any view can be decorated with <code>login_required</code>, which checks if the current user is logged in and redirects to a login screen if not.
+</p>
+<p>I had approximately zero trouble setting up authentication sessions for my site, so from my point of view it's a &quot;solved problem.&quot;  <br>
+</p>
+
+<h2>Model</h2>
+<p>The database (several are supported) is exposed through <code>Model</code>s and <code>Field</code>s.
+</p>
+<p>The <code>Field</code> classes, like <code>DateTimeField</code> and <code>TextField</code>, are used as properties of <code>Models</code>.  <a href="http://www.djangoproject.com">Django</a> uses introspection to automatically generate <code>CREATE TABLE</code> queries for the <code>Fields</code>in the <code>Model</code>, but altering tables with existing data has to be done by hand.  <br>
+</p>
+<p><code>Models</code> have a cute little API for selecting sets of objects from the database based on simple criteria. It's particularly interesting because it plays well with templates: even though templates have a very simple syntax, you can use this API inside templates without any trouble.  It's definitely an '80/20' solution though; for complex queries you'll need to use SQL.  <br>
+</p>
+<p>If you're thinking of going with <a href="http://www.djangoproject.com">Django</a>, I suggest you examine the 'M' of <a href="http://en.wikipedia.org/wiki/Model-view-controller">MVC</a> very carefully.  While it's true you can swap in your own solution, that would mean giving up an awful lot of out-of-the-box functionality.
+</p>
+<p>One thing I like is the complete set of ERD relationships between <code>Models</code>.  One-to-one, symmetric, and other &quot;special case&quot; relationships are taken care of.
+</p>
+
+<h2>Templates and Filters</h2>
+<p>Django provides a templating system that can be used to separate the design from the code.
+   There are two nice features of <a href="http://www.djangoproject.com">Django</a>'s
+   templating system: 
+</p>
+<ul>
+ <li>
+     You can define filters in the template and pass the value through
+     the filter before including it.  They supply useful filters like escaping HTML characters and truncating to a short length, or even expanding alternative markup languages like <a href="http://daringfireball.net/projects/markdown/">Markdown</a>. 
+ </li>
+
+ <li>
+     Templates can inherit from other templates,
+     and the child only needs to define the <code>blocks</code> it wishes to handle differently.
+ </li>
+</ul>
+<p>These features are not unique, but are cleanly implemented.
+</p>
+<p>Templates don't have a complete language; but it does support looping and conditionals. You should carefully consider other templating solutions; there are plenty to choose from.
+   Unfortunately, <a href="http://www.djangoproject.com">Django</a>'s templating system <em>is</em> coupled to the generic views, so you'll have to write your own views if you
+   want to go with an alternative templating system.  Unlike for the database API, this isn't a deal breaker; I believe you could use <a href="http://www.djangoproject.com">Django</a> efficiently with another templating system.
+</p>
+
+<h2>Mental Model</h2>
+<p>Web development is fundamentally simple, and you already have a good mental model of what's happening: GETs, POSTs, cookies, mime types, and so on.  My impression is that instead of trying to hide details you already understand, <a href="http://www.djangoproject.com">Django</a> builds on that mental model and simply supplies the tools that you'd have to write yourself if you were working at a lower level.  <br>
+</p>
+<p>Consider a class like DateTimeField: it can display, store, and parse dates.  If you were working with CGI, you'd probably end up writing a similar class yourself.
+</p>
+<p>That's mostly what I like about <a href="http://www.djangoproject.com">Django</a>; it seems to follow the mental map of web development that I already have, providing neat solutions every step of the way.  Your mileage may vary, of course.
+</p>
+
+
+
+</div>
+<p>
+  <span class="signature">- Oran Looney</span>
+  <span class="signature-date">April 23rd 2007</span>
+</p>
+  <p class="thank-you">
+    Thanks for reading.  Please subscribe to the <a href="/feeds/blog/">RSS feed</a> and remember that
+    future readers will thank you for leaving your comments and criticisms.
+    <a href="/feeds/blog/" title="Subscribe to RSS Feed" class="big-rss-link">Subscribe to RSS Feed</a>
+  </p>
+<p class="article-tags">
+     
+        <a href="/tag/python/">Python</a> 
+     
+        <a href="/tag/web/">Web</a> 
+    
+</p>
+
+
+      </div>
+      
+  
+  <div class="content-page comments" style="border-top: none">
+    <a name="comments"></a>
+    
+	  <h1>Comments (1)</h1>
+      <div>
+        
+          <div class="comment">
+    <div class="comment-date">September 11th 2012</div>
+	<h4><span class="comment-username">Wendell</span> said: </h4>
+	<p>HiI have been asked to modify a site built on php-frame, and scceifipally to add several new pages.  when I create a new tpl_mynewtemplate.html (based on altering the structure of an existing one), I get an error   essentially saying that it isn\&#39;t allowed.   Is there a table in the DB that tracks what templates are allowed???  I haven\&#39;t been given the creds to the database .  I haven\&#39;t been able to find any docs or even an overview of how php-frame works other than the commenting in the code.  If I delete the comment right after the doctype declaration I can bypass the security and write plain html but that isn\&#39;t ideal .Thanks for any help you can offer!michael</p>
+</div>
+
+        
+      </div>
+    
+    <h1>Leave a Comment</h1>
+    
+<form method="post" action="/django-overview/leave-comment/" class="leave-comment-form">
+  <div style='display:none'><input type='hidden' name='csrfmiddlewaretoken' value='7c54419eea61d947291c188320a452fc' /></div>
+  <div>
+    Your Name: <br>
+    
+    <input id="id_user_name" type="text" name="user_name" maxlength="12" />
+  </div>
+  <div>
+    Comment: <br>
+    
+    <textarea id="id_content" rows="10" cols="40" name="content"></textarea>
+  </div>
+  <div>
+    Enter this phrase: <br>
+    
+    <img src="/static/site/images/captcha.png" alt="captcha">
+    <input id="id_captcha" type="text" name="captcha" maxlength="20" /> 
+  </div>
+  <div>
+    <input class="submit-button" type="submit" value="Leave Comment">
+  </div>
+</form>
+
+  </div>
+  
+
+	
+  </div>
+
+
+
+  <script src="http://www.google-analytics.com/urchin.js" type="text/javascript"></script>
+  <script type="text/javascript"> _uacct = "UA-2535855-1"; urchinTracker(); </script>
+
+</body>
+</html>

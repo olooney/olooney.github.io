@@ -1,0 +1,412 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang="en-us" dir="ltr">
+<head>
+<!-- meta -->
+<meta http-equiv="content-type" content="text/html; charset=utf-8">
+<meta name="author" content="Oran Looney">
+<meta name="robots" content="INDEX,FOLLOW">
+<meta name="description" content="Oran quitely programming away and sharing a few of the lessons learned">
+<meta name="keywords" content="Programming,Code,Coding,Software,Software Development,Web,Web Development,Python,JavaScript,C++">
+<meta name="verify-v1" content="GmOM2OF0gDOQiM8uS0yKm1ZA0gUI8Hqk4BamNHp7iCg=">
+<meta name="viewport" content="width=800,initial-scale=0.6">
+<link rel="alternate" type="application/rss+xml" href="/feeds/blog/" title="OranLooney.com RSS Blog Feed">
+
+<title>OranLooney - Clone() In JavaScript</title>
+
+<!-- style -->
+<link rel="stylesheet" type="text/css" href="/static/site/css/yui-reset-min.css">
+<link rel="stylesheet" type="text/css" href="/static/site/css/main.css">
+<link rel="stylesheet" type="text/css" media="print" href="/static/site/css/print.css">
+<!--[if lt IE 7.]>
+	<link rel="stylesheet" type="text/css" href="/static/site/css/icons_gif.css">
+<![endif]-->
+
+
+
+</head>
+
+
+<body>
+
+  <div id="banner">
+	<a href="/">OranLooney.com</a>
+	<h6>quietly programming away</h6>
+  </div>
+  <div class="box" id="sidebar">
+	
+		<form id="quick-search" method="get" action="/search/">
+			<div>
+				<input type="hidden" name="alltags">
+				<input type="text" name="keyword" class="keyword-field">
+				<button type="submit" class="search-submit-button">Search</button>
+		  	</div>
+		  </form>
+	
+
+    <ul class="menu">
+      
+        <li class="menu_home"><a href="/">Home</a></li>
+      
+
+      
+		<li class="menu_rss_feed"><a href="/feeds/blog/" title="subscribe to the RSS feed">RSS Feed</a></li>
+        <li class="menu_tags"><a href="/tags/" title="search articles by tag">Tags</a></li>
+        <li class="menu_index"><a href="/archive" title="search articles chronologically">Archive</a></li>
+        <li class="menu_break"></li>
+        <li class="menu_bookshelf" title="my books on librarything.com"><a href="http://www.librarything.com/catalog.php?view=olooney&amp;offset=0&amp;shelf_rows=10&amp;previousOffset=0&amp;shelf=shelf">Bookshelf</a></li>
+        <li class="menu_sig" title="my endorsement of Agile"><a href="http://agilemanifesto.org/sign/display.cgi?ms=000000203">Manifesto</a></li>
+
+        <li class="menu_about_site" title="about the site itself"><a href="/colophon/">Colophon</a></li>
+        <li class="menu_about_me"><a href="/author/" title="about the author">Author</a></li> 
+      
+      
+      
+      
+          <li class="menu_break"></li>
+        
+          <li class="menu_login"><a href="/admin/">Login</a></li> 
+        
+      
+    </ul>
+  </div>
+  <div id="main-wrapper">
+	
+      
+      <div class="content-page">
+        
+  <a href="/functional-javascript/" class="title">Clone() In JavaScript</a>
+
+  
+    <a href="http://www.flickr.com/photos/pasukaru76/4186289374/">
+      <img alt="colorful lead photo" src="/static/media/images/lead/4186289374_dc28c60cf4.jpg">
+    </a>
+  
+
+<div>
+  
+<blockquote><p>My <a href="/deep-copy-javascript/">other essay</a> provides source code and documentation for shallow copy, deep copy, and clone functions.  If you came here searching for &quot;javascript clone,&quot; it's probably what you want.  This is more of an background piece on cloning in prototype-based languages.
+</p>
+</blockquote><p>  I recently did a google search for &quot;javascript clone&quot;, and noticed there's a lot of confusion about <em>cloning</em> vs. <em>copying</em> out there. Every function called <code>clone()</code> I found was in fact either a shallow or deep copy.  All well and good but not actually a &quot;clone,&quot; really.  I blame Java for this; the copy method on Java's Object is called <code>clone()</code>.  But notice how they describe it in <a href="http://java.sun.com/j2se/1.3/docs/api/java/lang/Object.html">their documentation</a>:
+</p>
+<pre><code>    clone()
+        Creates and returns a copy of this object.
+</code></pre><p>  When the first word that comes to mind to describe a method (&quot;copy&quot;) is different than the method's name, something has gone wrong.  I would expect <code>clone()</code> to mean what it means in other prototype-based languages like <a href="http://en.wikipedia.org/wiki/Self_programming_language">SELF</a>, <a href="http://en.wikipedia.org/wiki/NewtonScript">NewtonScript</a> and <a href="http://www.iolanguage.com/about/">Io</a>: a function that returns a new object which dynamically looks to the original for defaults.  Unlike those languages, there is no native <code>clone()</code> function in JavaScript, but because JavaScript is still a prototype-based langauge it's possible to replicate that behavior exactly, elegantly, and easily.  In fact, on some platforms, this feature is exposed directly: <a href="https://developer.mozilla.org/en/Differential_inheritance_in_JavaScript">read about differential inheritance in JavaScript</a>.  Unfortunately, this non-standard extension isn't available on all platforms, so let's roll up our sleeves and get to work.  <br>
+</p>
+<p>The <a href="/static/functional_javascript/owl_util.js">source code</a> <em>also</em> includes a quite thorough shallow <code>copy()</code> function that handles native types and objects, and if you accept the Java definition of <code>clone()</code> that's probably what you were looking for.  However, the &quot;real&quot; <code>clone()</code> is far more interesting, and it may very well be what you <em>should</em> be using, so read on.
+</p>
+<p>Here is the <a href="/static/functional_javascript/owl_util.js">source code</a> for <code>clone()</code> and <code>copy()</code>.  It is also included on this page so you can play around with it in <a href="http://www.getfirebug.com/">Firebug</a>.
+</p>
+
+<h2>The Inheritance Relationship</h2>
+<p>You already know that JavaScript objects are collections of key-value pairs; variously called maps or hash tables.  But that isn't the whole story, because core primitives like Date and String have an actual value somewhere deep inside them, and Objects have a somewhat magical relationship with their constructors and prototypes.  A JavaScript object really is a collection of key-value pairs <em>plus</em> some special internal data.
+</p>
+<p><img src="/static/functional_javascript/structure.png" alt="structure.png"/>
+</p>
+<p>One of those data is the <code>prototype</code>: an internal reference to the Object it was spawned from.  The <code>prototype</code> basically supplies default properties: when you look up a key in a given Object, JavaScript first looks for it in the Object itself, but if it doesn't find it, it then looks for the property in the <code>prototype</code>, and then in the <code>prototype</code>'s <code>prototype</code>, and so on until it either finds the key or run into the root Object.  So, an Object and its prototypes form a chain.
+</p>
+<p>This is very similar to &quot;inheritance&quot; in other object-oriented programming languages, but note the key distinction: we're only talking about objects (instances), not classes.  In class-based languages, an &quot;object&quot; is an &quot;instance&quot; of a &quot;class&quot;, and a class can &quot;inherit from&quot; (or &quot;extend&quot; or &quot;sub-class&quot;) another class.  In prototype-based languages, we inherit from other objects, not classes.
+</p>
+<p>In college, I was taught class-based object-oriented programming exclusively, with the suggestion that it alone was Right.  However, there are a number of theoretical and practical reasons to consider prototype-based inheritance. Let's start with Hofstadter's discussion of how ideas relate to each other in &quot;Classes and Instances&quot; from <a href="http://www.amazon.com/Godel-Escher-Bach-Eternal-Golden/dp/0465026567/ref=pd_bbs_sr_1?ie=UTF8&amp;s=books&amp;qid=1201145402&amp;sr=1-1"> Godel, Escher, Bach: An Eternal Golden Braid</a>:
+</p>
+<pre>
+   It might seem at first sight that a given symbol would inherently
+   be either a symbol for a class or a symbol for an instance - but
+   that in an oversimplification.  Actually most symbols may play
+   either role, depending on the context of their activation.  For
+   example, look at the list below:
+     (1) a publication
+       (2) a newspaper
+         (3) The San Francisco Chronicle
+           (4) the May 18th edition of the Chronicle
+             (5) my copy of the May 18th edition of the Chronicle
+               (6) my copy as it was a few days later[...]
+</pre>
+
+<p>He then goes on to talk about the &quot;The Prototype Principle,&quot; and &quot;The Splitting-off of Instances from Classes,&quot; making the point that anything can be considered specific or abstract, from some point of view.  This isn't computer science specifically (although Hofstadter is an AI researcher) but a philosophical attempt to understand how concepts really interact.
+</p>
+<p>The way I see it, the reasons class-based languages are more common is ease-of-implementation and performance in static languages.  In a static language like C++, class information is (mostly) used at compile time and is expressed in generated machine code, while an object is just a sequential block of memory.  Concepts like scope and class don't really exist at runtime; they are only implicit in the generated machine code.  So we're not going to get away with treating an object as a class in a static language.  Dynamic languages, like JavaScript, are a different story: here, scope  and inheritance are already runtime concepts, so we have more flexibility.  Since we don't have to worry about generating machine code, we are free to pursue inheritance models that may more closely resemble the human thought process.
+</p>
+<p>Which isn't to say that prototype-based inheritance necessarily comes with a performance cost.  <a href="http://en.wikipedia.org/wiki/NewtonScript">NewtonScript</a> actually used prototype-based inheritance as a feature to reduce memory usage, on a system where RAM was the major limiting factor.  You see, with prototype-based inheritance, you only need to store the values that are actually specific to that object; everything else can be held in a shared prototype.  Compare this to C++, where every object reserves memory for its own members and those of its parent classes; sub-classes just keep getting bigger.  Instead of thinking of it as a cost, we can think of it as a trade-of: in exchange for a more compact memory footprint with more sharing and less duplication, we do more work to access a particular piece of memory, searching up the chain of prototypes.  <br>
+</p>
+
+<h2>Clone and You</h2>
+<p>All we need to take away from all this ivory-tower stuff is that there may not be a clean line between &quot;classes&quot; and &quot;instances;&quot; and in fact examples pop up quite often of wanting to extend or locally modify an existing object.  The &quot;scope chain&quot; between global and local variables in most languages is isomorphic to the prototype relationship.  When Oracle opens up a transaction for you, it's just like you're writing to a clone (which then gets applied to the original when you commit.)  [SVN's cheap copies] are another kind of clone.  It's really a very common and powerful idea.
+</p>
+<p>So here's what my <code>clone()</code> function can do for you: it can take any existing object and tear-off your own version of it... by creating an empty object whose <code>prototype</code> is the original. If the original gets modified, so will the clone, whereas changes to the clone never propogate back to the original.  It's a bit like laying a transparency over a piece of paper and drawing on it with a marker.
+</p>
+
+<h2>Clone() in JavaScript</h2>
+<p>Here's my original version of the <code>clone()</code> function in JavaScript, from <a href="/static/functional_javascript/owl_util.js">owl_util.js</a>
+</p>
+<pre><code>function clone(obj) {
+    // A clone of an object is an empty object 
+            // with a prototype reference to the original.
+
+    // a private constructor, used only by this one clone.
+            function Clone() { } 
+    Clone.prototype = obj;
+    var c = new Clone();
+            c.constructor = Clone;
+            return c;
+}
+</code></pre><p>Since JavaScript always hangs prototypes off of a constructor, I simply use a closure to create a private constructor for each clone; the constructor is thrown away after being used once.  In that sense, each clone is its own class.  This is correct, but it's not as efficient as it could be.  I'll show you a less clear but more efficient version below.
+</p>
+<p>The net result of this trick is that I can clone any Object, and the clone will have the prototype relationship with its original.
+</p>
+<pre><code>var original = { a:'A', b:'B' };
+var clone = owl.util.clone(original);
+// clone.a == 'A'
+// clone.b == 'B'
+clone.a = 'Apple';
+clone.a == 'Apple'
+// original.a == 'A'  // unchanged
+original.b = 'Banana'
+// clone.b == 'Banana'  // change shows through
+clone.c = 'Car'
+// original.c is undefined
+original.a = 'Abracadabra'
+// clone.a == 'Apple'  // clone's new value hides the original's
+delete clone.a
+// clone.a = 'Abracadabra'  // original value visible again
+// repeating &quot;delete clone.a&quot; won't delete the original's value.
+</code></pre>
+<h2>Tightening Our Belts</h2>
+<p>The above version of <code>clone()</code> uses more memory than necessary by creating a closure for each clone.  However, it turns out we can avoid this by reusing the same constructor function for all clones.  The basic idea comes from <a href="http://mochikit.com/">MochiKit</a>'s <code>clone()</code> utility, but their implementation is confusing because the function uses itself as the constructor.  This implementation is more readable:
+</p>
+<pre><code>function Clone() { }
+function clone(obj) {
+    Clone.prototype = obj;
+    return new Clone();
+}
+</code></pre><p>Here, <code>Clone()</code> is the reused constructor, and we switch its <code>prototype</code> to the source object just before spawning each clone.
+</p>
+<p>At first I wasn't sure this would work in all browsers, but the <a href="http://www.ecma-international.org/publications/standards/Ecma-262.htm">ECMA-262 JavaScript standard</a> clearly states in section 13.2.2 that the new object's internal <code>[[prototype]]</code> property is set to whatever the constructors <code>prototype</code> property is at time of construction.  That means this version of <code>clone()</code> should work in any compliant JavaScript engine.
+</p>
+
+<h2>Clone != Shallow Copy != Deep Copy</h2>
+<p>I hope I've convinced you that the cloning an object is a very different thing that making a copy, deep or shallow.  It means giving the clone the prototype or &quot;is-a&quot; relationship. My implementation probably isn't perfect, but I wanted to get it out there to remind people that in dynamic languages, cloning is a distinct and extremely interesting operation.
+</p>
+
+<h2>Also</h2>
+<p>Mad props to David Flanagan for <a href="http://www.amazon.com/JavaScript-Definitive-Guide-David-Flanagan/dp/0596101996">JavaScript: The Definitive Guide 5th Edition</a>, the best book on JavaScript I've ever seen and the source of much wisdom.
+</p>
+<script type="text/javascript" src="/static/functional_javascript/owl_util.js"></script>
+
+
+
+
+</div>
+<p>
+  <span class="signature">- Oran Looney</span>
+  <span class="signature-date">January 23rd 2008</span>
+</p>
+  <p class="thank-you">
+    Thanks for reading.  Please subscribe to the <a href="/feeds/blog/">RSS feed</a> and remember that
+    future readers will thank you for leaving your comments and criticisms.
+    <a href="/feeds/blog/" title="Subscribe to RSS Feed" class="big-rss-link">Subscribe to RSS Feed</a>
+  </p>
+<p class="article-tags">
+     
+        <a href="/tag/popular/">Popular</a> 
+     
+        <a href="/tag/coding-style/">Coding Style</a> 
+     
+        <a href="/tag/tutorial/">Tutorial</a> 
+     
+        <a href="/tag/web/">Web</a> 
+    
+</p>
+
+
+      </div>
+      
+  
+  <div class="content-page comments" style="border-top: none">
+    <a name="comments"></a>
+    
+	  <h1>Comments (15)</h1>
+      <div>
+        
+          <div class="comment">
+    <div class="comment-date">December 4th 2014</div>
+	<h4><span class="comment-username">Marc LY</span> said: </h4>
+	<p>Without any specific need, a clone must &quot;only&quot; be of same nature than its original : duck-typing in this case.
+That is : &quot;c = o.clone()&quot; must imply &quot;c is_a o&quot; being true.
+
+In general case, it is acceptable for a clone to &quot;reference&quot; original values. Since the efficiency is more important when cloning : a clone is only useful and needed for the &quot;skeleton&quot; it represents. Again, considering no special use of it.
+
+It is clear that if one wants a clone to be a &quot;reflection&quot; of its original, it is clearly a copy() that one wants.
+
+In general case however, it is bad practice to clone() an object and use that clone as is ; this is the case for a &quot;copy&quot; not a &quot;clone&quot;.</p>
+</div>
+
+        
+          <div class="comment">
+    <div class="comment-date">October 28th 2013</div>
+	<h4><span class="comment-username">Om Shankar</span> said: </h4>
+	<p>This is an opinionated understanding on yours. 
+
+There is no such requirement that a &quot;clone&quot; needs to follow, as there is no definition of a clone in JavaScript.
+
+A clone, may it be a JavaScript object or a real world human clone, is identical to its original counterpart only at the time of creation. Any change in the state or property should not be replicated.
+
+While I agree that they have same genetic information, and so, the original human thinking graph gets replicated at the clone. They can come up with the same idea same time.
+But the original human getting hurt, does not imply the clone getting hurt to and vice-versa.
+
+Changing the original object&#39;s property is changing the property on the clone too, which is doubtful for a clone definition.</p>
+</div>
+
+        
+          <div class="comment">
+    <div class="comment-date">August 5th 2013</div>
+	<h4><span class="comment-username">Nikola</span> said: </h4>
+	<p>http://stackoverflow.com/questions/728360/most-elegant-way-to-clone-a-javascript-object/17899651?noredirect=1#answer-17899651</p>
+</div>
+
+        
+          <div class="comment">
+    <div class="comment-date">July 1st 2013</div>
+	<h4><span class="comment-username">Nikki</span> said: </h4>
+	<p>I like this implementation because clones can overshadow prototype properties when needed only and can still receive updates from the &quot;original&quot;. Still cool in 2013.</p>
+</div>
+
+        
+          <div class="comment">
+    <div class="comment-date">March 14th 2013</div>
+	<h4><span class="comment-username">Tsvetomir</span> said: </h4>
+	<p>Great explanation, thanks!
+
+This is essentially what Object.create does, in browsers that support it. Right?
+
+https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Object/create</p>
+</div>
+
+        
+          <div class="comment">
+    <div class="comment-date">January 9th 2013</div>
+	<h4><span class="comment-username">Michael</span> said: </h4>
+	<p>Brilliant! Exactly what I was looking for, along with a very clear explanation. Thank you!</p>
+</div>
+
+        
+          <div class="comment">
+    <div class="comment-date">May 8th 2012</div>
+	<h4><span class="comment-username">Leonard R</span> said: </h4>
+	<p>Fantastic! A great page bringing together the philosophical problems associated with thinking about concepts like classes, categories and instances, and at the same time, a rigorous, clean, comprehensible account of the challenges of copying objects in Javascript, and, as if that wasn&#39;t enough, an explanation of prototype-based languages that made a poor amateur feel suddenly immeasurably wiser. Thank you. I couldn&#39;t be more grateful for this page!!!</p>
+</div>
+
+        
+          <div class="comment">
+    <div class="comment-date">June 21st 2011</div>
+	<h4><span class="comment-username">MarcusR</span> said: </h4>
+	<p>Really great article, loved the Bach &#39;An Eternal Golden Braid&#39; quote. In my work life I find far too many people are ignorant of the complexities and dualities that abound in computer science. I once tried to explain to the lead programmer at my place of work why there can be no clean distinction between classes and instances, it did not go well. lol</p>
+</div>
+
+        
+          <div class="comment">
+    <div class="comment-date">February 24th 2011</div>
+	<h4><span class="comment-username">Thomas Frank</span> said: </h4>
+	<p>Thanks, I didn&#39;t know you could switch the the prototype / resuse the constructor in that way... Useful.</p>
+</div>
+
+        
+          <div class="comment">
+    <div class="comment-date">January 21st 2011</div>
+	<h4><span class="comment-username">Sandesh</span> said: </h4>
+	<p>Hi , yes there lot of confusion about cloning vs. copying 
+thanks for such good article.</p>
+</div>
+
+        
+          <div class="comment">
+    <div class="comment-date">October 1st 2010</div>
+	<h4><span class="comment-username">duck008</span> said: </h4>
+	<p>This is a very good article. Good learning. Thank you for posting!</p>
+</div>
+
+        
+          <div class="comment">
+    <div class="comment-date">August 3rd 2010</div>
+	<h4><span class="comment-username">krish</span> said: </h4>
+	<p>&quot;hi guys,this good  description about the clone function in javascript.&quot;
+</p>
+</div>
+
+        
+          <div class="comment">
+    <div class="comment-date">October 28th 2009</div>
+	<h4><span class="comment-username">oranlooney</span> said: </h4>
+	<p>Hi WELLS,
+  owl.util.copy() makes a shallow copy, so in your example a.foo and b.foo are references to the same array.  You want what&#39;s called a deep copy.
+
+In many cases, a deep copy can be made by JSON serializing and deserializing the object.  For example, using http://json.org/json2.js, write var b = JSON.parse(JSON.stringify(a));</p>
+</div>
+
+        
+          <div class="comment">
+    <div class="comment-date">October 24th 2009</div>
+	<h4><span class="comment-username">WELLS</span> said: </h4>
+	<p>OK, I am confused. Consider..
+
+var a = {&#39;foo&#39;: []};
+
+var b = owl.util.copy(a);
+b[&#39;foo&#39;].push(2);
+
+console.log(a.foo);
+
+Yields [2]. Shouldn&#39;t it be empty?</p>
+</div>
+
+        
+          <div class="comment">
+    <div class="comment-date">August 11th 2009</div>
+	<h4><span class="comment-username">acton wang</span> said: </h4>
+	<p>hi,
+
+  this is a good article to describe the clone in javascript.
+
+acton</p>
+</div>
+
+        
+      </div>
+    
+    <h1>Leave a Comment</h1>
+    
+<form method="post" action="/functional-javascript/leave-comment/" class="leave-comment-form">
+  <div style='display:none'><input type='hidden' name='csrfmiddlewaretoken' value='7c54419eea61d947291c188320a452fc' /></div>
+  <div>
+    Your Name: <br>
+    
+    <input id="id_user_name" type="text" name="user_name" maxlength="12" />
+  </div>
+  <div>
+    Comment: <br>
+    
+    <textarea id="id_content" rows="10" cols="40" name="content"></textarea>
+  </div>
+  <div>
+    Enter this phrase: <br>
+    
+    <img src="/static/site/images/captcha.png" alt="captcha">
+    <input id="id_captcha" type="text" name="captcha" maxlength="20" /> 
+  </div>
+  <div>
+    <input class="submit-button" type="submit" value="Leave Comment">
+  </div>
+</form>
+
+  </div>
+  
+
+	
+  </div>
+
+
+
+  <script src="http://www.google-analytics.com/urchin.js" type="text/javascript"></script>
+  <script type="text/javascript"> _uacct = "UA-2535855-1"; urchinTracker(); </script>
+
+</body>
+</html>

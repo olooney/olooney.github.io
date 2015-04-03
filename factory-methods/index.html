@@ -1,0 +1,310 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang="en-us" dir="ltr">
+<head>
+<!-- meta -->
+<meta http-equiv="content-type" content="text/html; charset=utf-8">
+<meta name="author" content="Oran Looney">
+<meta name="robots" content="INDEX,FOLLOW">
+<meta name="description" content="Oran quitely programming away and sharing a few of the lessons learned">
+<meta name="keywords" content="Programming,Code,Coding,Software,Software Development,Web,Web Development,Python,JavaScript,C++">
+<meta name="verify-v1" content="GmOM2OF0gDOQiM8uS0yKm1ZA0gUI8Hqk4BamNHp7iCg=">
+<meta name="viewport" content="width=800,initial-scale=0.6">
+<link rel="alternate" type="application/rss+xml" href="/feeds/blog/" title="OranLooney.com RSS Blog Feed">
+
+<title>OranLooney - Factory Methods</title>
+
+<!-- style -->
+<link rel="stylesheet" type="text/css" href="/static/site/css/yui-reset-min.css">
+<link rel="stylesheet" type="text/css" href="/static/site/css/main.css">
+<link rel="stylesheet" type="text/css" media="print" href="/static/site/css/print.css">
+<!--[if lt IE 7.]>
+	<link rel="stylesheet" type="text/css" href="/static/site/css/icons_gif.css">
+<![endif]-->
+
+
+
+</head>
+
+
+<body>
+
+  <div id="banner">
+	<a href="/">OranLooney.com</a>
+	<h6>quietly programming away</h6>
+  </div>
+  <div class="box" id="sidebar">
+	
+		<form id="quick-search" method="get" action="/search/">
+			<div>
+				<input type="hidden" name="alltags">
+				<input type="text" name="keyword" class="keyword-field">
+				<button type="submit" class="search-submit-button">Search</button>
+		  	</div>
+		  </form>
+	
+
+    <ul class="menu">
+      
+        <li class="menu_home"><a href="/">Home</a></li>
+      
+
+      
+		<li class="menu_rss_feed"><a href="/feeds/blog/" title="subscribe to the RSS feed">RSS Feed</a></li>
+        <li class="menu_tags"><a href="/tags/" title="search articles by tag">Tags</a></li>
+        <li class="menu_index"><a href="/archive" title="search articles chronologically">Archive</a></li>
+        <li class="menu_break"></li>
+        <li class="menu_bookshelf" title="my books on librarything.com"><a href="http://www.librarything.com/catalog.php?view=olooney&amp;offset=0&amp;shelf_rows=10&amp;previousOffset=0&amp;shelf=shelf">Bookshelf</a></li>
+        <li class="menu_sig" title="my endorsement of Agile"><a href="http://agilemanifesto.org/sign/display.cgi?ms=000000203">Manifesto</a></li>
+
+        <li class="menu_about_site" title="about the site itself"><a href="/colophon/">Colophon</a></li>
+        <li class="menu_about_me"><a href="/author/" title="about the author">Author</a></li> 
+      
+      
+      
+      
+          <li class="menu_break"></li>
+        
+          <li class="menu_login"><a href="/admin/">Login</a></li> 
+        
+      
+    </ul>
+  </div>
+  <div id="main-wrapper">
+	
+      
+      <div class="content-page">
+        
+  <a href="/factory-methods/" class="title">Factory Methods</a>
+
+  
+    <a href="http://www.flickr.com/photos/mugley/310950299/">
+      <img alt="colorful lead photo" src="/static/media/images/lead/310950299_728537856c_o.jpg">
+    </a>
+  
+
+<div>
+  
+<p>Ah, object creation.  Why must you be so problematic?  Is it the way you inject dependencies on global classes into the most innocent of code?  Or the way you tie us down to concrete implementations instead of beautifully abstract interfaces?
+</p>
+<p>Object construction is too large a topic for one essay, so let's focus on one common case: constructing objects private to a class.  Here, the object is constructed and used internally by one class and its subclasses.  For example, consider a pop-up Window with a single 'Ok' Button on it.  Here's the most 'obvious' way to construct the button (in psuedo-code):
+</p>
+<pre><code>PopUp extends Window:
+    # PopUp is the constructor
+    method PopUp():
+        this.okButton = new Button('Ok')
+        this.okButton.onClick( this.close )
+        # do a bunch of other setup
+        ...
+</code></pre><p>Here we construct the button in the constructor.  This is reasonable... as long you never want anyone to extend or modify the class.  They could override the constructor to use a different button, but there's no way to prevent the construction of the original button.  (In some languages, sub-classes don't technically <em>have</em> to call into the superclass constructor, but in practice it's almost always necessary.)  This violates the <a href="http://en.wikipedia.org/wiki/Open/closed_principle">open/closed principle</a> and common sense; not everyone is going to want to use our specific Button implementation.
+</p>
+
+<h2>Getting Construction out of the Constructor</h2>
+<p>That's easy enough to fix, though: just move that part of the constructor to a separate method.  That will enable that one aspect of the constructor to be overridden separately.
+</p>
+<pre><code>PopUp extends Window:
+    method PopUp():
+        this.initOkButton()
+        # do a bunch of other setup
+        ...
+
+    method initOkButton():
+        this.okButton = new Button('Ok')
+        this.okButton.onClick( this.close )
+</code></pre><p>It also improves the style, since we've split an atomic unit of work off into a single method.
+</p>
+<blockquote><p>Functions should be short and sweet, and do just one thing.
+   - <a href="http://lxr.linux.no/linux+v2.6.27/Documentation/CodingStyle#L346">Linux Coding Style</a>
+</p>
+</blockquote>
+<h2>Using a Factory Method</h2>
+<p>That was a good first step, but it's far from perfect.  Take a look at the signature of the <code>initOkButton()</code> method; it accepts no parameters, and returns nothing.  There's no mention of <code>Button</code> at all!  Instead, the method is expected to install the button into a known member as a side effect.  That's harder to document, and isn't enforced in any way.  In C++ and Java it also requires the <code>okButton</code> member to be either protected or public when it really should be private.  We can fix all these problems by writing the method so that it returns the newly constructed button:
+</p>
+<pre><code>PopUp extends Window:
+    method PopUp():
+        this.okButton = this.newOkButton()
+        this.okButton.onClick(this.close)
+        # do a bunch of other setup
+        ...
+
+    method newOkButton() returns Button:
+        return new Button('Ok')
+</code></pre><p>This is called the <a href="http://en.wikipedia.org/wiki/Factory_method_pattern">Factory Method</a> pattern.  Notice how hard it is to mess up: you have to return a Button, so you pretty much have to create one.  Also, the <code>okButton</code> member can be private if it needs to be; the factory method doesn't access it directly. I've also moved some of the setup (registering the click listener) out of the factory method.  That's because every ok button will need that listener registered, and shared behavior should be moved to the base class.  If that step was left in the factory method, it would be just one more thing for the implementor of the subclass to mess up.  In another situation, I might have granted subclasses more freedom and responsibility by placing the setup code in the factory method.
+</p>
+<p>You can see the <a href="http://en.wikipedia.org/wiki/Factory_method_pattern">Factory Method</a> pattern as a special case of the <a href="http://en.wikipedia.org/wiki/Template_method_pattern">Template Method</a> pattern: <code>newOkButton()</code> defines how to create the ok button, but the base class decided if and when to call it.  <br>
+</p>
+<p>I like to give factory methods the &quot;new&quot; prefix since they're used exactly like a constructor with the <code>new</code> operator.  The verb &quot;create&quot; is another common prefix for factory methods, as seen in the W3C DOM standard, Java's Abstract Window Toolkit, etc.
+</p>
+<p>Notice that this use of the <a href="http://en.wikipedia.org/wiki/Factory_method_pattern">Factory Method</a> pattern is extremely simple; there is no dynamic switching between different implementation classes, for example.  That's ok; subclasses may want to provide more complex implementations:
+</p>
+<pre><code>SuperPopUp extends PopUp:
+    method newOkButton() returns Button:
+        if (this.buttonIsSuperToo):
+            ok = new SuperButton('Ok')
+        else:
+            ok = new Button('Ok')
+
+        # make the button's hover behavior snazzy
+        ok.onMouseOver(this.highlight)
+        ok.onMouseOut(ok.unhighlight)
+
+        return ok
+</code></pre><p>In C++, subclasses can override private methods even though they cannot call them.  Java makes the opposite design decision and does not allow private methods to be overridden.  In Java, factory methods should be protected, as you would not want this implementation detail to be part of the public interface.  In C++, you have a legitimate choice between private and protected.
+</p>
+
+<h2>Getting Lazy: Delaying Construction</h2>
+<p>We've made a lot of progress by moving object construction to its own method.  However, we still are using a member to store the object, and therefore need to initialize that member in the constructor to gaurentee that it's always defined.  However, this isn't always the best approach.  Real-world window classes, for example, often have a seperate method like <code>show()</code> or <code>render()</code> that is responsible for making the window visible.  We don't actually need to construct the OK button until the window is rendered.  In other examples, the factory method may never be called, or it may be unclear exactly when it will be first called.
+</p>
+<p>We can solve these problems by pairing the factory method with an protected &quot;getter&quot; method that constructs the object as needed.
+</p>
+<pre><code>PopUp extends Window:
+    private Button okButton = null
+
+    method PopUp():
+        # do a bunch of other setup
+        ...
+
+    protected method getOkButton() returns Button:
+        if ( this.okButton == null ):
+            this.okButton = this.newOkButton()
+        return this.okButton
+
+    method newOkButton() returns Button:
+        return new Button('Ok')
+
+    method show():
+        ok = this.okButton()
+        ok.onClick(this.close)
+
+        # other rendering code
+        ...
+</code></pre><p>Here, the only method that should ever access the <code>okButton</code> member is <code>getOkButton()</code>, so that member should be private.  <code>getOkButton()</code> is then the only way to access the button, so it should be protected, not private, so subclasses can access the button.  In the example, the button is not created until the first time it is needed, at which time we let the <code>newOkButton()</code> factory provide us with the correct button.
+</p>
+<p>We could of course just provide a method like <code>getOkButton()</code> and ask subclasses to duplicate the caching behavior it provides, but common behavior belongs in the base class, and at the end of the day, it's much harder to mess up overriding the <code>newOkButton()</code> method.  Remember, the getter method may be called multiple times throughout the rest of the class, and its important that it return a reference to the same object each time.  For example, if we register the click listener on one button but rendered another, then clicking it would do nothing.  Implementing the caching behavior in the base class as getter method enforces this behavior.
+</p>
+<p>If you've paired a factory method with a getter, then the factory method should typically be private in C++.  Only the base class getter should ever call it.
+</p>
+
+<h2>Multiple Construction</h2>
+<p>In the examples so far, we've only used the factory to construct a single object.  But its natural, easy, and beneficial to write factories to support multiple object creation.  For example, suppose we want our PopUp to have any number of buttons on it.  We just write a more general button factory:
+</p>
+<pre><code>method newButton(text):
+    return new Button(text)
+</code></pre><p>And this method could be overridden in the SuperPopUp like so:
+</p>
+<pre><code>method newButton(text):
+    if (this.buttonIsSuperToo):
+        ok = new SuperButton(text)
+    else:
+        ok = new Button(text)
+
+    # make the button's hover behavior snazzy
+    ok.onMouseOver(this.highlight)
+    ok.onMouseOut(ok.unhighlight)
+
+    return ok
+</code></pre><p>In this case, using the factory method guarantees that all the buttons are the same kind.  Or, we can use the arguments to decide which Button implementation to use:
+</p>
+<pre><code>method newButton(text):
+    if (text.length &gt; 10):
+        return new WrappingButton(text)
+    else:
+        return new Button(text)
+</code></pre><p>Note that any time we write a factory method, we're leaving it up to the base class as to how many times it gets called.  So, even using this generic factory, we can still use a getter to lazily create the OK button specifically:
+</p>
+<pre><code>method getOkButton():
+    if ( this.okButton == null ):
+        this.okButton = this.newButton('Ok')
+    return 'Ok'
+</code></pre><p>So there's no reason to write specific rather than generic factory methods.  There's no limit to how generic a factory method can be made.  For example, you can pass in arguments that are only meaningful for particular implementation, and let the factory method decide what to use for each construction:
+</p>
+<pre><code>method newButton(text, wrappingLength):
+    if (text.length &gt; 10):
+        return new WrappingButton(text, wrappingLength)
+    else:
+        return new Button(text)
+</code></pre>
+<h2>Recap</h2>
+<p>Direct object creation is always a risk to the re-usability of a class.  Someone, somewhere, will need to use a different implementation (of the same interface) then the one you chose.  Adhere to the <a href="http://en.wikipedia.org/wiki/Open/closed_principle">open/closed principle</a> and allow extensions to change which implementations are used, by always constructing objects in separate factory methods. It goes without saying that you will need to access the object through an abstract interface throughout the rest of the code for this to work.  In some cases you can encapsulate object creation even farther, delaying it until necessary with a lazy getter method.  In all cases, you should try to write generic factory methods that can be called zero, one, or several times.  Factory methods for constructing private members should generally be protected, not public, although in C++ in is sometimes useful to make them private.
+</p>
+
+
+
+</div>
+<p>
+  <span class="signature">- Oran Looney</span>
+  <span class="signature-date">October 12th 2008</span>
+</p>
+  <p class="thank-you">
+    Thanks for reading.  Please subscribe to the <a href="/feeds/blog/">RSS feed</a> and remember that
+    future readers will thank you for leaving your comments and criticisms.
+    <a href="/feeds/blog/" title="Subscribe to RSS Feed" class="big-rss-link">Subscribe to RSS Feed</a>
+  </p>
+<p class="article-tags">
+     
+        <a href="/tag/coding-style/">Coding Style</a> 
+     
+        <a href="/tag/engineering/">Engineering</a> 
+     
+        <a href="/tag/java/">Java</a> 
+     
+        <a href="/tag/c/">C++</a> 
+    
+</p>
+
+
+      </div>
+      
+  
+  <div class="content-page comments" style="border-top: none">
+    <a name="comments"></a>
+    
+	  <h1>Comments (1)</h1>
+      <div>
+        
+          <div class="comment">
+    <div class="comment-date">September 11th 2012</div>
+	<h4><span class="comment-username">Ramses</span> said: </h4>
+	<p>Great stuff, you hleped me out so much!</p>
+</div>
+
+        
+      </div>
+    
+    <h1>Leave a Comment</h1>
+    
+<form method="post" action="/factory-methods/leave-comment/" class="leave-comment-form">
+  <div style='display:none'><input type='hidden' name='csrfmiddlewaretoken' value='7c54419eea61d947291c188320a452fc' /></div>
+  <div>
+    Your Name: <br>
+    
+    <input id="id_user_name" type="text" name="user_name" maxlength="12" />
+  </div>
+  <div>
+    Comment: <br>
+    
+    <textarea id="id_content" rows="10" cols="40" name="content"></textarea>
+  </div>
+  <div>
+    Enter this phrase: <br>
+    
+    <img src="/static/site/images/captcha.png" alt="captcha">
+    <input id="id_captcha" type="text" name="captcha" maxlength="20" /> 
+  </div>
+  <div>
+    <input class="submit-button" type="submit" value="Leave Comment">
+  </div>
+</form>
+
+  </div>
+  
+
+	
+  </div>
+
+
+
+  <script src="http://www.google-analytics.com/urchin.js" type="text/javascript"></script>
+  <script type="text/javascript"> _uacct = "UA-2535855-1"; urchinTracker(); </script>
+
+</body>
+</html>

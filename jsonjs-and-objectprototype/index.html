@@ -1,0 +1,233 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang="en-us" dir="ltr">
+<head>
+<!-- meta -->
+<meta http-equiv="content-type" content="text/html; charset=utf-8">
+<meta name="author" content="Oran Looney">
+<meta name="robots" content="INDEX,FOLLOW">
+<meta name="description" content="Oran quitely programming away and sharing a few of the lessons learned">
+<meta name="keywords" content="Programming,Code,Coding,Software,Software Development,Web,Web Development,Python,JavaScript,C++">
+<meta name="verify-v1" content="GmOM2OF0gDOQiM8uS0yKm1ZA0gUI8Hqk4BamNHp7iCg=">
+<meta name="viewport" content="width=800,initial-scale=0.6">
+<link rel="alternate" type="application/rss+xml" href="/feeds/blog/" title="OranLooney.com RSS Blog Feed">
+
+<title>OranLooney - JSON Rex</title>
+
+<!-- style -->
+<link rel="stylesheet" type="text/css" href="/static/site/css/yui-reset-min.css">
+<link rel="stylesheet" type="text/css" href="/static/site/css/main.css">
+<link rel="stylesheet" type="text/css" media="print" href="/static/site/css/print.css">
+<!--[if lt IE 7.]>
+	<link rel="stylesheet" type="text/css" href="/static/site/css/icons_gif.css">
+<![endif]-->
+
+
+
+</head>
+
+
+<body>
+
+  <div id="banner">
+	<a href="/">OranLooney.com</a>
+	<h6>quietly programming away</h6>
+  </div>
+  <div class="box" id="sidebar">
+	
+		<form id="quick-search" method="get" action="/search/">
+			<div>
+				<input type="hidden" name="alltags">
+				<input type="text" name="keyword" class="keyword-field">
+				<button type="submit" class="search-submit-button">Search</button>
+		  	</div>
+		  </form>
+	
+
+    <ul class="menu">
+      
+        <li class="menu_home"><a href="/">Home</a></li>
+      
+
+      
+		<li class="menu_rss_feed"><a href="/feeds/blog/" title="subscribe to the RSS feed">RSS Feed</a></li>
+        <li class="menu_tags"><a href="/tags/" title="search articles by tag">Tags</a></li>
+        <li class="menu_index"><a href="/archive" title="search articles chronologically">Archive</a></li>
+        <li class="menu_break"></li>
+        <li class="menu_bookshelf" title="my books on librarything.com"><a href="http://www.librarything.com/catalog.php?view=olooney&amp;offset=0&amp;shelf_rows=10&amp;previousOffset=0&amp;shelf=shelf">Bookshelf</a></li>
+        <li class="menu_sig" title="my endorsement of Agile"><a href="http://agilemanifesto.org/sign/display.cgi?ms=000000203">Manifesto</a></li>
+
+        <li class="menu_about_site" title="about the site itself"><a href="/colophon/">Colophon</a></li>
+        <li class="menu_about_me"><a href="/author/" title="about the author">Author</a></li> 
+      
+      
+      
+      
+          <li class="menu_break"></li>
+        
+          <li class="menu_login"><a href="/admin/">Login</a></li> 
+        
+      
+    </ul>
+  </div>
+  <div id="main-wrapper">
+	
+      
+      <div class="content-page">
+        
+  <a href="/jsonjs-and-objectprototype/" class="title">JSON Rex</a>
+
+  
+    <a href="http://www.flickr.com/photos/sonofgroucho/2833285965/">
+      <img alt="colorful lead photo" src="/static/media/images/lead/2833285965_36d87fa01e.jpg">
+    </a>
+  
+
+<div>
+  
+<p>Aristotle writes on tragedy:
+</p>
+<blockquote><p>The protagonist should be renowned and prosperous, so his change of fortune can be from good to bad. This change “should come about as the result, not of vice, but of some great error or frailty in a character.”
+   - <a href="http://www.cnr.edu/home/bmcmanus/poetics.html">Aristotle, Poetics</a>
+</p>
+</blockquote><p>If this is so, then the tale of json.js is a <em>tragic</em> tale.  But it is also a tale of redemption.
+</p>
+
+<h2>Setting the Stage</h2>
+<p>JavaScript Object Notation (JSON) is a text format for describing simple data structures composed of arrays, maps, strings, and numbers.  I say &quot;simple&quot; because JSON has no way of representing duplicate objects or cyclic references.  It can only encode &quot;tree-shaped&quot; objects.  <br>
+</p>
+<p>In JSON's native JavaScript, a JSON in the code is an expression that evaluates to an object. If the JSON is inside a string then it can be turned into an object with the <code>eval()</code> function.  Consequently, JSON is the sea-monkey of web-development: pass a JSON string up to the client, Just Add Water (<code>eval()</code> it) and you get an Instant Object.  This is a very easy way to pass structured data from server to client.
+</p>
+<p>It isn't perfect, though.  First of all, <code>eval()</code> doesn't just evaluate objects, it executes arbitrary code.  This can hide bugs by quietly accepting invalid JSON strings &mdash; for example, <code>eval(&quot;&quot;)</code> won't throw an exception, even though the empty string is not a valid JSON string.
+</p>
+<p>The other, more serious problem is that JavaScript doesn't (or didn't; <a href="#redemption">see below</a>) provide a way to serialize an object to a JSON string.  This makes it hard to pass JSON down to the server.
+</p>
+
+<h2>Renown and Prosperity</h2>
+<p>Both of these problems were solved by a small library called <code>json.js.</code> By simply including this script on a page, you could use methods on the core JavaScript types to evaluate JSON strings:
+</p>
+<pre><code>var positionJson = ' {&quot;top&quot;:40, &quot;left&quot;:60 } ';
+var positionObject = positionJson.parseJSON();
+</code></pre><p>and serialize objects:
+</p>
+<pre><code>var contactObject = {name:&quot;Oran Looney&quot;,
+                     phoneNumbers: [ &quot;123-456-7890&quot;, &quot;321-654-0987&quot; ]
+                    };
+var contactJson = contactObject.toJSONString();
+</code></pre><p>json.js took advantage of the fact that JavaScript allows you to dynamically extend core types like Array, Object, and String by adding the polymorphic <code>toJSONString()</code> method to the prototype of each core type.  It's an elegant design, with a concise and easy-to-remember API.
+</p>
+<p>And json.js did indeed achieve renown: for a long time it was the JavaScript implementation listed on <a href="http://json.org/">json.org</a>, <em>the</em> evangelical website devoted to spreading the gospel of JSON.  <br>
+</p>
+
+<h2>Error and Fraility</h2>
+<blockquote><p> They say this fruit be like unto the world
+    So sweet. Or like, say I, the heart of man
+    So red without and yet within, unclue'd,
+    We find the worm, the rot, the flaw.
+    However glows his bloom the bite
+    Proves many a man be rotten at the core.
+    -Terry Pratchett
+</p>
+</blockquote><p>JavaScript exposes prototype objects for all core classes, and adding methods to a prototype is a good way to add functionality to them.  With one exception: <a href="http://erik.eae.net/archives/2005/06/06/22.13.54">Object.prototype is verboten</a>.  The reason is simple: it breaks the JavaScript <code>for...in</code> loop.  You would expect
+</p>
+<pre><code>for (attribute in {}) alert(attribute);
+</code></pre><p>to execute quietly, because the empty object <code>{}</code> has no attributes.  But with json.js, you see
+</p>
+<div style="text-align:center;">
+<img src="/static/alert-toJSONString.PNG" alt="JavaScript Alert with a message of 'toJSONString'." />
+</div>
+
+<p>In fact, toJSONString will show up in every Object you iterate over using <code>for..in</code>, because json.js installed it in the global Object prototype.  You can't use <code>for...in</code> unless you handle this awkward special case (using <code>hasOwnProperty()</code>), and you generally can't trust third-party libraries to do this.
+</p>
+
+<h2>Fall</h2>
+<p>It's possible to argue that modifying the Object prototype is legal and that it's the responsibility of the programmer to understand and correct for this, but it still isn't good style to make more work for other people.  The fact is, it's cleaner to just leave Object.prototype alone.
+</p>
+<p>It wasn't long before before developers were finding this out first hand, typically after a long debugging session.  Third-party libraries began providing their own JSON parsers and serializers.  The <a href="http://www.json.org/js.html">JavaScript page at json.org</a> now offers an alternative library, <a href="http://www.json.org/json2.js">json2.js</a>, which does not touch the Object.prototype.  No one should use json.js anymore, although it's still available on <a href="http://www.json.org/json.js">an orphan page at json.org</a>. (Some of its problems and drama have been documented in the comments).
+</p>
+<p><a name="redemption"></a>
+</p>
+
+<h2>Redemption</h2>
+<blockquote><p>Science is organized common sense where many a beautiful theory was killed by an ugly fact.
+   - Thomas Huxley
+</p>
+</blockquote><p>Sometimes a good design run aground on implementation details.  You might be encouraged to know that <code>json.js</code> is getting a second chance: it's been adopted as the reference implementation for JSON parsing and serialization in JavaScript 2.0.  The <code>toJSONString()</code> method will be adopted into core JavaScript.  (It will also be possible to mark object properties as non-enumerable, hiding them from <code>for...in</code> and preventing similar future problems.)  Once 2.0 reaches the mainstream, we'll be able to express ourselves just as the original json.js envisioned.
+</p>
+
+
+
+</div>
+<p>
+  <span class="signature">- Oran Looney</span>
+  <span class="signature-date">November 27th 2007</span>
+</p>
+  <p class="thank-you">
+    Thanks for reading.  Please subscribe to the <a href="/feeds/blog/">RSS feed</a> and remember that
+    future readers will thank you for leaving your comments and criticisms.
+    <a href="/feeds/blog/" title="Subscribe to RSS Feed" class="big-rss-link">Subscribe to RSS Feed</a>
+  </p>
+<p class="article-tags">
+     
+        <a href="/tag/coding-style/">Coding Style</a> 
+     
+        <a href="/tag/web/">Web</a> 
+    
+</p>
+
+
+      </div>
+      
+  
+  <div class="content-page comments" style="border-top: none">
+    <a name="comments"></a>
+    
+	  <h1>Comments (1)</h1>
+      <div>
+        
+          <div class="comment">
+    <div class="comment-date">September 11th 2012</div>
+	<h4><span class="comment-username">Jorh</span> said: </h4>
+	<p>That is very fascinating, You&#39;re an oervly skilled blogger. I have joined your rss feed and sit up for in quest of more of your excellent post. Additionally, I have shared your website in my social networks</p>
+</div>
+
+        
+      </div>
+    
+    <h1>Leave a Comment</h1>
+    
+<form method="post" action="/jsonjs-and-objectprototype/leave-comment/" class="leave-comment-form">
+  <div style='display:none'><input type='hidden' name='csrfmiddlewaretoken' value='7c54419eea61d947291c188320a452fc' /></div>
+  <div>
+    Your Name: <br>
+    
+    <input id="id_user_name" type="text" name="user_name" maxlength="12" />
+  </div>
+  <div>
+    Comment: <br>
+    
+    <textarea id="id_content" rows="10" cols="40" name="content"></textarea>
+  </div>
+  <div>
+    Enter this phrase: <br>
+    
+    <img src="/static/site/images/captcha.png" alt="captcha">
+    <input id="id_captcha" type="text" name="captcha" maxlength="20" /> 
+  </div>
+  <div>
+    <input class="submit-button" type="submit" value="Leave Comment">
+  </div>
+</form>
+
+  </div>
+  
+
+	
+  </div>
+
+
+
+  <script src="http://www.google-analytics.com/urchin.js" type="text/javascript"></script>
+  <script type="text/javascript"> _uacct = "UA-2535855-1"; urchinTracker(); </script>
+
+</body>
+</html>

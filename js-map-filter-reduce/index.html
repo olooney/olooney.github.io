@@ -1,0 +1,163 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang="en-us" dir="ltr">
+<head>
+<!-- meta -->
+<meta http-equiv="content-type" content="text/html; charset=utf-8">
+<meta name="author" content="Oran Looney">
+<meta name="robots" content="INDEX,FOLLOW">
+<meta name="description" content="Oran quitely programming away and sharing a few of the lessons learned">
+<meta name="keywords" content="Programming,Code,Coding,Software,Software Development,Web,Web Development,Python,JavaScript,C++">
+<meta name="verify-v1" content="GmOM2OF0gDOQiM8uS0yKm1ZA0gUI8Hqk4BamNHp7iCg=">
+<meta name="viewport" content="width=800,initial-scale=0.6">
+<link rel="alternate" type="application/rss+xml" href="/feeds/blog/" title="OranLooney.com RSS Blog Feed">
+
+<title>OranLooney - JavaScript Map Filter Reduce</title>
+
+<!-- style -->
+<link rel="stylesheet" type="text/css" href="/static/site/css/yui-reset-min.css">
+<link rel="stylesheet" type="text/css" href="/static/site/css/main.css">
+<link rel="stylesheet" type="text/css" media="print" href="/static/site/css/print.css">
+<!--[if lt IE 7.]>
+	<link rel="stylesheet" type="text/css" href="/static/site/css/icons_gif.css">
+<![endif]-->
+
+
+
+</head>
+
+
+<body>
+
+  <div id="banner">
+	<a href="/">OranLooney.com</a>
+	<h6>quietly programming away</h6>
+  </div>
+  <div class="box" id="sidebar">
+	
+		<form id="quick-search" method="get" action="/search/">
+			<div>
+				<input type="hidden" name="alltags">
+				<input type="text" name="keyword" class="keyword-field">
+				<button type="submit" class="search-submit-button">Search</button>
+		  	</div>
+		  </form>
+	
+
+    <ul class="menu">
+      
+        <li class="menu_home"><a href="/">Home</a></li>
+      
+
+      
+		<li class="menu_rss_feed"><a href="/feeds/blog/" title="subscribe to the RSS feed">RSS Feed</a></li>
+        <li class="menu_tags"><a href="/tags/" title="search articles by tag">Tags</a></li>
+        <li class="menu_index"><a href="/archive" title="search articles chronologically">Archive</a></li>
+        <li class="menu_break"></li>
+        <li class="menu_bookshelf" title="my books on librarything.com"><a href="http://www.librarything.com/catalog.php?view=olooney&amp;offset=0&amp;shelf_rows=10&amp;previousOffset=0&amp;shelf=shelf">Bookshelf</a></li>
+        <li class="menu_sig" title="my endorsement of Agile"><a href="http://agilemanifesto.org/sign/display.cgi?ms=000000203">Manifesto</a></li>
+
+        <li class="menu_about_site" title="about the site itself"><a href="/colophon/">Colophon</a></li>
+        <li class="menu_about_me"><a href="/author/" title="about the author">Author</a></li> 
+      
+      
+      
+      
+          <li class="menu_break"></li>
+        
+          <li class="menu_login"><a href="/admin/">Login</a></li> 
+        
+      
+    </ul>
+  </div>
+  <div id="main-wrapper">
+	
+      
+      <div class="content-page">
+        
+  <a href="/js-map-filter-reduce/" class="title">JavaScript Map Filter Reduce</a>
+
+  
+    <a href="http://www.flickr.com/photos/jurvetson/2490285058/">
+      <img alt="colorful lead photo" src="/static/media/images/lead/seashell.jpg">
+    </a>
+  
+
+<div>
+  
+<p>Hey! Do you want to use the standard JavaScript array algorithms such as <code>map()</code>, <code>filter()</code>, and yes, even <code>reduce()</code> (left <em>and</em> right) in all browsers, not just the modern ones? Do you hate reading licenses to figure out if you can include a library in your project? Do you mistrust all code, including your own, until you've seen it pass an exhaustive suite of tests?  Do you like standards? Then boy do I have the library for you!
+</p>
+<ul>
+ <li>
+     <a href="https://github.com/olooney/attache-array-js">attache-array-js</a>
+ </li>
+</ul>
+<p>The idea is simple: implement a compatability layer for <em>all</em> the array algorithms specified in the ECMA-262 5th edition standard: <code>indexOf()</code>, <code>lastIndexOf()</code>, <code>every()</code>, <code>some()</code>, <code>forEach()</code>, <code>filter()</code>, <code>map()</code>, <code>reduce()</code>, and <code>reduceRight()</code>.  None of these are implemented in IE6, 7, or 8 so you can't use <em>any</em> of them on the web unless you use a library.  MDC provides <a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Array/reduce">copy-and-paste examples of these functions</a>, but doesn't provide any unit tests or a deployable library.  So, I implemented my own versions, following the standard closely, wrote a full suite of tests, put them all into one convenient, minified <code>.js</code> file and released it in the public domain (or MIT license, for countries were &quot;public domain&quot; is meaningless.) That means you can it these wherever and however you like, worry-free. 
+</p>
+<p>And you <em>should</em> be using them! You see, while each of these algorithms is a convenience by itself, they also work extraordinarily well together. Informally speaking, they form an orthonormal basis for all array algorithms.  By chaining map, filter, and reduce calls, you're able to clearly, safely, and correctly manipulate arrays. More importantly, thinking about arrays in this way is very powerful and very easy: even very complex problems can be quickly solved if you have these algorithms and your fingertips.
+</p>
+<blockquote><p>A programming language serves two related purposes: it provides a vehicle for the programmer to specify actions to be executed, and it provides a set of concepts for the programmer to use when thinking about what can be done. -Bjarne Stroustrup
+</p>
+</blockquote><p>Now if only JavaScript had equivalent algorithms for associative arrays...
+</p>
+
+
+
+</div>
+<p>
+  <span class="signature">- Oran Looney</span>
+  <span class="signature-date">March 2nd 2011</span>
+</p>
+  <p class="thank-you">
+    Thanks for reading.  Please subscribe to the <a href="/feeds/blog/">RSS feed</a> and remember that
+    future readers will thank you for leaving your comments and criticisms.
+    <a href="/feeds/blog/" title="Subscribe to RSS Feed" class="big-rss-link">Subscribe to RSS Feed</a>
+  </p>
+<p class="article-tags">
+    
+</p>
+
+
+      </div>
+      
+  
+  <div class="content-page comments" style="border-top: none">
+    <a name="comments"></a>
+    
+    <h1>Leave a Comment</h1>
+    
+<form method="post" action="/js-map-filter-reduce/leave-comment/" class="leave-comment-form">
+  <div style='display:none'><input type='hidden' name='csrfmiddlewaretoken' value='7c54419eea61d947291c188320a452fc' /></div>
+  <div>
+    Your Name: <br>
+    
+    <input id="id_user_name" type="text" name="user_name" maxlength="12" />
+  </div>
+  <div>
+    Comment: <br>
+    
+    <textarea id="id_content" rows="10" cols="40" name="content"></textarea>
+  </div>
+  <div>
+    Enter this phrase: <br>
+    
+    <img src="/static/site/images/captcha.png" alt="captcha">
+    <input id="id_captcha" type="text" name="captcha" maxlength="20" /> 
+  </div>
+  <div>
+    <input class="submit-button" type="submit" value="Leave Comment">
+  </div>
+</form>
+
+  </div>
+  
+
+	
+  </div>
+
+
+
+  <script src="http://www.google-analytics.com/urchin.js" type="text/javascript"></script>
+  <script type="text/javascript"> _uacct = "UA-2535855-1"; urchinTracker(); </script>
+
+</body>
+</html>

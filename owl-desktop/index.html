@@ -1,0 +1,233 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang="en-us" dir="ltr">
+<head>
+<!-- meta -->
+<meta http-equiv="content-type" content="text/html; charset=utf-8">
+<meta name="author" content="Oran Looney">
+<meta name="robots" content="INDEX,FOLLOW">
+<meta name="description" content="Oran quitely programming away and sharing a few of the lessons learned">
+<meta name="keywords" content="Programming,Code,Coding,Software,Software Development,Web,Web Development,Python,JavaScript,C++">
+<meta name="verify-v1" content="GmOM2OF0gDOQiM8uS0yKm1ZA0gUI8Hqk4BamNHp7iCg=">
+<meta name="viewport" content="width=800,initial-scale=0.6">
+<link rel="alternate" type="application/rss+xml" href="/feeds/blog/" title="OranLooney.com RSS Blog Feed">
+
+<title>OranLooney - OWL Desktop With ExtJS</title>
+
+<!-- style -->
+<link rel="stylesheet" type="text/css" href="/static/site/css/yui-reset-min.css">
+<link rel="stylesheet" type="text/css" href="/static/site/css/main.css">
+<link rel="stylesheet" type="text/css" media="print" href="/static/site/css/print.css">
+<!--[if lt IE 7.]>
+	<link rel="stylesheet" type="text/css" href="/static/site/css/icons_gif.css">
+<![endif]-->
+
+
+
+</head>
+
+
+<body>
+
+  <div id="banner">
+	<a href="/">OranLooney.com</a>
+	<h6>quietly programming away</h6>
+  </div>
+  <div class="box" id="sidebar">
+	
+		<form id="quick-search" method="get" action="/search/">
+			<div>
+				<input type="hidden" name="alltags">
+				<input type="text" name="keyword" class="keyword-field">
+				<button type="submit" class="search-submit-button">Search</button>
+		  	</div>
+		  </form>
+	
+
+    <ul class="menu">
+      
+        <li class="menu_home"><a href="/">Home</a></li>
+      
+
+      
+		<li class="menu_rss_feed"><a href="/feeds/blog/" title="subscribe to the RSS feed">RSS Feed</a></li>
+        <li class="menu_tags"><a href="/tags/" title="search articles by tag">Tags</a></li>
+        <li class="menu_index"><a href="/archive" title="search articles chronologically">Archive</a></li>
+        <li class="menu_break"></li>
+        <li class="menu_bookshelf" title="my books on librarything.com"><a href="http://www.librarything.com/catalog.php?view=olooney&amp;offset=0&amp;shelf_rows=10&amp;previousOffset=0&amp;shelf=shelf">Bookshelf</a></li>
+        <li class="menu_sig" title="my endorsement of Agile"><a href="http://agilemanifesto.org/sign/display.cgi?ms=000000203">Manifesto</a></li>
+
+        <li class="menu_about_site" title="about the site itself"><a href="/colophon/">Colophon</a></li>
+        <li class="menu_about_me"><a href="/author/" title="about the author">Author</a></li> 
+      
+      
+      
+      
+          <li class="menu_break"></li>
+        
+          <li class="menu_login"><a href="/admin/">Login</a></li> 
+        
+      
+    </ul>
+  </div>
+  <div id="main-wrapper">
+	
+      
+      <div class="content-page">
+        
+  <a href="/owl-desktop/" class="title">OWL Desktop With ExtJS</a>
+
+  
+    <img alt="colorful lead photo" src="/static/media/images/lead/owl_desktop.png">
+  
+
+<div>
+  
+<p>About a year ago, I started an ambitious project to push the boundaries of what could be done with the <a href="http://extjs.com/">ExtJS</a> JavaScript framework.  <a href="http://extjs.com/">ExtJS</a> had a &quot;desktop&quot; example to showcase their widgets, but it didn't <em>do</em> anything.  I asked the question, could you make this <em>work</em>?  Could you build a framework to bring traditional windowing OS concepts to the web?  I started working on it in my own time, and soon had my answer: &quot;yes&quot;.
+</p>
+<p>To make it work, I built an <a href="http://en.wikipedia.org/wiki/Model-view-controller">MVC</a> file-system, an application registry, a window manager, alerts and notifications, and a few simple applications inside the framework.  The result is a fully-functional desktop environment.  Try it yourself:
+</p>
+<ul>
+ <li>
+     <a href="http://oranlooney.com/static/desktop/desktop.html">OWL Desktop</a>
+ </li>
+</ul>
+<p>Go and play around with it: it's largely self-documenting.  You'll find sample text files describing how things work and hints will appear automatically; there's even a built-in source code viewer.
+</p>
+<p>It's not perfect. I learned a huge amount by exploring these ideas, I never put it through professional quality control.  That's why it's sat on my hard-drive for a year; I didn't want to show it until it was &quot;done,&quot; but couldn't really find any time to work on it.  But I finally just said, &quot;there are a lot of great ideas here, other's could learn from it, I'm just going to put it out there, perfectionism be damned.&quot; 
+</p>
+<p>The OWL Desktop project does not have an open source license yet; I have decided to reserve all rights for the time being.  Partly because I know it's not quite finished, and partly because it's not really useful for anything beyond an idea incubator.  I encourage you to read and understand the code, judge for yourself how useful each idea is, and to take that knowledge with you to your own projects rather than copying any code directly.
+</p>
+<p>If you've had a chance to go and look at and are interested in how it works, I'm going to briefly go into some the biggest lesions learned from the project.
+</p>
+
+<h2>MVC File System</h2>
+<p>I wrote my own File and Directory classes to serve as models (the M of <a href="http://en.wikipedia.org/wiki/Model-view-controller">MVC</a>) and gave them a good event model so that the folder window views (the V) could always show a synchronized, up-to-date view of what's really going on.  The controller (the C) is the FileManagerApp, equivalent to Windows Explorer or <a href="http://en.wikipedia.org/wiki/Nautilus_%28file_manager%29">Nautilus</a>.  It's basically an ordinary application.  The file system is strict subset of the Unix file system: The rules for when you can view, edit, delete, rename, or move a file follow UNIX exactly, resulting in a familiar, time-tested, and intuitive system.  However, there are no groups and only one privilege bit: public or private, so it's a simplified but faithful model of UNIX.
+</p>
+
+<h2>Drag and Drop</h2>
+<img src="http://oranlooney.com/static/desktop/drag_and_drop.png">
+
+<p>Implementing drag-n-drop between windows was kind of a pain, but absolutely necessary to get that &quot;native desktop&quot; feel.  When windows overlap, and you drag a file into the intersection, <em>both</em> windows get notified of the drop.  It took me a while to figure out what was going on and come up with a solution. I queued up drop events without processing them right away, and then had a deferred handler go back and determine which drop was on top and ignoring all the others.  I had to dig pretty deeply into <a href="http://extjs.com/">ExtJS</a>'s drag-n-drop library but in the end I learned a tremendous amount and got a pretty good solution.
+</p>
+
+<h2>Window Manager</h2>
+<p>Windows can be minimized or maximized.  Every window gets an entry on the Taskbar that can be used to minimize or restore a window, or bring one to the front.  All of this is possible because of the AppWindowMgr, a registry of windows.  The Taskbar and AppWindowMgr have an <a href="http://en.wikipedia.org/wiki/Model-view-controller">MVC</a> relationship: the AppWindowMgr has events that the taskbar binds to in order to stay in sync, and each AppWindow notifies the AppWindowMgr when it's created or destroyed.
+</p>
+
+<h2>Application Manager</h2>
+<p>Applications can be &quot;plugged-into&quot; the framework, by loading a separate <code>.js</code> file which registers the application with the AppMgr (a registry of applications.)  This gets it an entry on the Start button.  You can also register an application to be the handler for any number of file extensions: for example, the TextEdit app handles the &quot;.txt&quot; extension and the HtmlEdit app handles the &quot;.html&quot; extension.  By using Dependency Inversion consistently, I've completely eliminated any dependency of the framework on individual applications, allowing any number of &quot;apps&quot; to be registered, even at runtime, longer after the initial page load.
+</p>
+
+<h2>Notifications</h2>
+<p>I introduced logging and notification utilities to serve as a Single Point of Logging as well as to provide a neat little prepackaged UI for showing them.  Not only do these look cool, but they're recorded and available in the centralized SystemManager app.  These are important services for a framework to provide; otherwise, everyone does it themselves in their own way, log files are fragmented, and the user experience is inconsistent.
+</p>
+
+<h2>Unit Tests</h2>
+<img src="http://oranlooney.com/static/desktop/unittest.png">
+
+<p>I'm a big advocate of unit testing, and for this project I wrote a complete JavaScript port of Kent Beck's unit testing framework.  My implementation is more closely related to his <a href="http://python.org/">Python</a> unittest module than JUnit, because that's what I'm most familiar with.  All essential features are there, though: separate TestCase, TestResult, and TestSuite classes, several test loaders, and a test runner, all de-coupled from one another.  The test runner is the only piece that depends on the OWL Desktop framework, by design.  To use this unittest framework in another project, all I'd have to write is a another test runner.  It even includes a &quot;MetaTest:&quot; a unit test suite that serves to test the unittest framework itself, exercising all the various asserts and so on.
+</p>
+
+<h2>Utilities</h2>
+<p>Also included, in the top-level <code>owl</code> namespace, are some really powerful utilities: a <a href="http://oranlooney.com/functional-javascript/">clone()</a> function, a powerful array search/slice utility, an extensible comparison operator called <code>same()</code> (inspired by the <a href="http://mochi.github.com/mochikit/">MochiKit</a> comparison framework) and a namespace utility.
+</p>
+<p>The last one, the namespace utility, is probably the most widely useful of them all.  I can't even imagine starting a large JS project now without a similar utility.  It's a small thing, to be sure, but is needed again and again.  You can see throughout the source code how it's used to cleanly give each <code>.js</code> file its own namespace.
+</p>
+
+<h2>Thoughts</h2>
+<p>This project was the second time I designed a large JavaScript project from the ground up (the first being for my day job.)  Where I'd turned right before, I now turned left, experimenting without pressure.  The results were fantastic.  This kind of &quot;blue sky&quot; project is opens up new horizons for you.  Keep in mind, this is all pre-HTML5.  There's no CSS3 here.  But you'd be hard pressed to find a site that looks anything like this.  To a web developer, this is very exciting, because it means we're definitely on the right road: there are vistas and mountain peaks that we haven't even <em>begun</em> to explore. There's so much open space to build into!  And now that web standards are moving forward again... well, all I can say is it's going to be an exciting ride.
+</p>
+
+
+
+</div>
+<p>
+  <span class="signature">- Oran Looney</span>
+  <span class="signature-date">October 30th 2010</span>
+</p>
+  <p class="thank-you">
+    Thanks for reading.  Please subscribe to the <a href="/feeds/blog/">RSS feed</a> and remember that
+    future readers will thank you for leaving your comments and criticisms.
+    <a href="/feeds/blog/" title="Subscribe to RSS Feed" class="big-rss-link">Subscribe to RSS Feed</a>
+  </p>
+<p class="article-tags">
+     
+        <a href="/tag/web/">Web</a> 
+    
+</p>
+
+
+      </div>
+      
+  
+  <div class="content-page comments" style="border-top: none">
+    <a name="comments"></a>
+    
+	  <h1>Comments (3)</h1>
+      <div>
+        
+          <div class="comment">
+    <div class="comment-date">July 3rd 2014</div>
+	<h4><span class="comment-username">stu</span> said: </h4>
+	<p>Hello, is this code available for download?
+
+Thanks</p>
+</div>
+
+        
+          <div class="comment">
+    <div class="comment-date">April 1st 2014</div>
+	<h4><span class="comment-username">Ren</span> said: </h4>
+	<p>very cool code!
+I&#39;m wondering is it open source or can i share it?
+</p>
+</div>
+
+        
+          <div class="comment">
+    <div class="comment-date">February 24th 2011</div>
+	<h4><span class="comment-username">Thomas Frank</span> said: </h4>
+	<p>Cool!</p>
+</div>
+
+        
+      </div>
+    
+    <h1>Leave a Comment</h1>
+    
+<form method="post" action="/owl-desktop/leave-comment/" class="leave-comment-form">
+  <div style='display:none'><input type='hidden' name='csrfmiddlewaretoken' value='7c54419eea61d947291c188320a452fc' /></div>
+  <div>
+    Your Name: <br>
+    
+    <input id="id_user_name" type="text" name="user_name" maxlength="12" />
+  </div>
+  <div>
+    Comment: <br>
+    
+    <textarea id="id_content" rows="10" cols="40" name="content"></textarea>
+  </div>
+  <div>
+    Enter this phrase: <br>
+    
+    <img src="/static/site/images/captcha.png" alt="captcha">
+    <input id="id_captcha" type="text" name="captcha" maxlength="20" /> 
+  </div>
+  <div>
+    <input class="submit-button" type="submit" value="Leave Comment">
+  </div>
+</form>
+
+  </div>
+  
+
+	
+  </div>
+
+
+
+  <script src="http://www.google-analytics.com/urchin.js" type="text/javascript"></script>
+  <script type="text/javascript"> _uacct = "UA-2535855-1"; urchinTracker(); </script>
+
+</body>
+</html>

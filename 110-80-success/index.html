@@ -1,0 +1,184 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang="en-us" dir="ltr">
+<head>
+<!-- meta -->
+<meta http-equiv="content-type" content="text/html; charset=utf-8">
+<meta name="author" content="Oran Looney">
+<meta name="robots" content="INDEX,FOLLOW">
+<meta name="description" content="Oran quitely programming away and sharing a few of the lessons learned">
+<meta name="keywords" content="Programming,Code,Coding,Software,Software Development,Web,Web Development,Python,JavaScript,C++">
+<meta name="verify-v1" content="GmOM2OF0gDOQiM8uS0yKm1ZA0gUI8Hqk4BamNHp7iCg=">
+<meta name="viewport" content="width=800,initial-scale=0.6">
+<link rel="alternate" type="application/rss+xml" href="/feeds/blog/" title="OranLooney.com RSS Blog Feed">
+
+<title>OranLooney - 110% of 80% = Success!</title>
+
+<!-- style -->
+<link rel="stylesheet" type="text/css" href="/static/site/css/yui-reset-min.css">
+<link rel="stylesheet" type="text/css" href="/static/site/css/main.css">
+<link rel="stylesheet" type="text/css" media="print" href="/static/site/css/print.css">
+<!--[if lt IE 7.]>
+	<link rel="stylesheet" type="text/css" href="/static/site/css/icons_gif.css">
+<![endif]-->
+
+
+
+</head>
+
+
+<body>
+
+  <div id="banner">
+	<a href="/">OranLooney.com</a>
+	<h6>quietly programming away</h6>
+  </div>
+  <div class="box" id="sidebar">
+	
+		<form id="quick-search" method="get" action="/search/">
+			<div>
+				<input type="hidden" name="alltags">
+				<input type="text" name="keyword" class="keyword-field">
+				<button type="submit" class="search-submit-button">Search</button>
+		  	</div>
+		  </form>
+	
+
+    <ul class="menu">
+      
+        <li class="menu_home"><a href="/">Home</a></li>
+      
+
+      
+		<li class="menu_rss_feed"><a href="/feeds/blog/" title="subscribe to the RSS feed">RSS Feed</a></li>
+        <li class="menu_tags"><a href="/tags/" title="search articles by tag">Tags</a></li>
+        <li class="menu_index"><a href="/archive" title="search articles chronologically">Archive</a></li>
+        <li class="menu_break"></li>
+        <li class="menu_bookshelf" title="my books on librarything.com"><a href="http://www.librarything.com/catalog.php?view=olooney&amp;offset=0&amp;shelf_rows=10&amp;previousOffset=0&amp;shelf=shelf">Bookshelf</a></li>
+        <li class="menu_sig" title="my endorsement of Agile"><a href="http://agilemanifesto.org/sign/display.cgi?ms=000000203">Manifesto</a></li>
+
+        <li class="menu_about_site" title="about the site itself"><a href="/colophon/">Colophon</a></li>
+        <li class="menu_about_me"><a href="/author/" title="about the author">Author</a></li> 
+      
+      
+      
+      
+          <li class="menu_break"></li>
+        
+          <li class="menu_login"><a href="/admin/">Login</a></li> 
+        
+      
+    </ul>
+  </div>
+  <div id="main-wrapper">
+	
+      
+      <div class="content-page">
+        
+  <a href="/110-80-success/" class="title">110% of 80% = Success!</a>
+
+  
+    <a href="http://www.flickr.com/photos/dominiekterheide/3078589099/">
+      <img alt="colorful lead photo" src="/static/media/images/lead/3078589099_23e0f2af89.jpg">
+    </a>
+  
+
+<div>
+  
+<p>There's a neat little formula for you... on the surface, it makes even less sense than a coach exhorting his players to give &quot;110%.&quot;  It's actually my compact way of expressing two of the lessons I've learned working directly with end-users to come up with a software design.  <br>
+</p>
+
+<h2>Offer 80%</h2>
+<p>80% solutions are solutions that fit Pareto's 80/20 rule.  You only solve 80% of the problem, but you do it with just 20% of the effort.  Now most customers would be pretty mad if you only gave them 80% of what you promised them.  <em>Especially</em> if you followed up by telling them, &quot;Well, it only cost me a fraction of what it would to do it all.  Look how much money I made!&quot;  Suggesting 80% solutions is done during design, when the spec is still up in the air.
+</p>
+<p>  An early project I worked on was part of an in-house tracking system.  Each record represented a real-world software product that we'd delivered to a customer.  They wanted to present the user with a series of yes/no questions about how the product was configured and which parts of its functionality were actively being used.  Now, these questions had logic dependencies; if you asked &quot;Did you like ice cream?&quot; and got a &quot;No&quot;, you didn't need to ask &quot;Which flavor?&quot;  They wanted to only ask meaningful questions.
+     <br>
+     Now, a simple, fixed list of questions would have been trivial: a single table in the database, bound to a control already provided by the application framework.  I pointed out that this would be far less work than implementing to spec.  We reviewed the design and decided that the user would be likely to make mistakes that would interfere with reporting (the primary business need of the project) so in this case we decided to implement the full solution as a custom control.  <br>
+</p>
+<p>Even though they went with the full package, I would have been remiss if I hadn't pointed out that there was a cheap, easy alternative.  Even slight deviations from the standard solution can set us up for large amounts of custom work. (Other 80% solutions were accepted and helped keep the project with the scope of an internal project.)
+</p>
+<p>This is not compromise; we're providing value to the customer each time we point out an 80% solution.  The customer is basically working in the dark; they have some vision of what the product should do and how much value it has, but no idea how much it costs.  That means there will be plenty of these <a href="http://en.wikipedia.org/wiki/Arbitrage">arbitrage opportunities</a> to find.
+</p>
+
+<h2>Giving 110%</h2>
+<p>I also like 110% solutions — when you give the customer extra cool stuff for free.
+</p>
+<p> On the same project, a user would first be presented with a list of records.  They could select one and open another form to update all the fields of the record.  However, some of these updates were far more common than others; in particular, updating the delivery status of the product is extremely common.  So I gave the user a context menu so they could update the status by simply right clicking on a record in the list.  (It was pronounced cool.)
+</p>
+<p>No one had asked for this feature; it wasn't in the spec.  But that's simply because they didn't think of it.  Adding a right-click context menu is trivial, from the developer's perspective.  110% solutions are about giving the customer what they want, but don't know to ask for.
+</p>
+
+<h2>Optimize</h2>
+<p>Every design is a cost-benefit analysis on some level.  Since we know the cost and they know the benefit, working together is essential.  I think this makes it more fun — working with a good design is a lot more rewarding than conforming to an <em>inflexible, arbitrary</em> spec.
+</p>
+<p>In fact, a system designer or architect turns a specification into a design in a similar way, as far as I can tell.  The difference seems to be that the designer loads as much information as possible about the users requirements into one brain that then knows both the cost and the benefit.  The design shouldn't even require conscious thought at that point; the designer will simply kick off subconscious threads that search the solution space for cost-benefit local maxima.
+</p>
+<p>(At least, that's how I feel when designing systems where I understood both sides of the equations.  All those little threads reporting back, providing surprisingly complete development paths in an instant.  They must have been working on it in the background for a while. Your subjective experience may differ.)
+</p>
+<p>Even if there's a good architect around, we can always add value by pointing out 80% or 110% solutions when we see them.  Our knowledge is valuable — we should share it!
+</p>
+
+
+
+</div>
+<p>
+  <span class="signature">- Oran Looney</span>
+  <span class="signature-date">May 24th 2007</span>
+</p>
+  <p class="thank-you">
+    Thanks for reading.  Please subscribe to the <a href="/feeds/blog/">RSS feed</a> and remember that
+    future readers will thank you for leaving your comments and criticisms.
+    <a href="/feeds/blog/" title="Subscribe to RSS Feed" class="big-rss-link">Subscribe to RSS Feed</a>
+  </p>
+<p class="article-tags">
+     
+        <a href="/tag/problem-solving/">Problem Solving</a> 
+     
+        <a href="/tag/engineering/">Engineering</a> 
+    
+</p>
+
+
+      </div>
+      
+  
+  <div class="content-page comments" style="border-top: none">
+    <a name="comments"></a>
+    
+    <h1>Leave a Comment</h1>
+    
+<form method="post" action="/110-80-success/leave-comment/" class="leave-comment-form">
+  <div style='display:none'><input type='hidden' name='csrfmiddlewaretoken' value='7c54419eea61d947291c188320a452fc' /></div>
+  <div>
+    Your Name: <br>
+    
+    <input id="id_user_name" type="text" name="user_name" maxlength="12" />
+  </div>
+  <div>
+    Comment: <br>
+    
+    <textarea id="id_content" rows="10" cols="40" name="content"></textarea>
+  </div>
+  <div>
+    Enter this phrase: <br>
+    
+    <img src="/static/site/images/captcha.png" alt="captcha">
+    <input id="id_captcha" type="text" name="captcha" maxlength="20" /> 
+  </div>
+  <div>
+    <input class="submit-button" type="submit" value="Leave Comment">
+  </div>
+</form>
+
+  </div>
+  
+
+	
+  </div>
+
+
+
+  <script src="http://www.google-analytics.com/urchin.js" type="text/javascript"></script>
+  <script type="text/javascript"> _uacct = "UA-2535855-1"; urchinTracker(); </script>
+
+</body>
+</html>

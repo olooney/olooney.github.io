@@ -1,0 +1,503 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang="en-us" dir="ltr">
+<head>
+<!-- meta -->
+<meta http-equiv="content-type" content="text/html; charset=utf-8">
+<meta name="author" content="Oran Looney">
+<meta name="robots" content="INDEX,FOLLOW">
+<meta name="description" content="Oran quitely programming away and sharing a few of the lessons learned">
+<meta name="keywords" content="Programming,Code,Coding,Software,Software Development,Web,Web Development,Python,JavaScript,C++">
+<meta name="verify-v1" content="GmOM2OF0gDOQiM8uS0yKm1ZA0gUI8Hqk4BamNHp7iCg=">
+<meta name="viewport" content="width=800,initial-scale=0.6">
+<link rel="alternate" type="application/rss+xml" href="/feeds/blog/" title="OranLooney.com RSS Blog Feed">
+
+<title>OranLooney - Function Scope in JavaScript</title>
+
+<!-- style -->
+<link rel="stylesheet" type="text/css" href="/static/site/css/yui-reset-min.css">
+<link rel="stylesheet" type="text/css" href="/static/site/css/main.css">
+<link rel="stylesheet" type="text/css" media="print" href="/static/site/css/print.css">
+<!--[if lt IE 7.]>
+	<link rel="stylesheet" type="text/css" href="/static/site/css/icons_gif.css">
+<![endif]-->
+
+
+
+</head>
+
+
+<body>
+
+  <div id="banner">
+	<a href="/">OranLooney.com</a>
+	<h6>quietly programming away</h6>
+  </div>
+  <div class="box" id="sidebar">
+	
+		<form id="quick-search" method="get" action="/search/">
+			<div>
+				<input type="hidden" name="alltags">
+				<input type="text" name="keyword" class="keyword-field">
+				<button type="submit" class="search-submit-button">Search</button>
+		  	</div>
+		  </form>
+	
+
+    <ul class="menu">
+      
+        <li class="menu_home"><a href="/">Home</a></li>
+      
+
+      
+		<li class="menu_rss_feed"><a href="/feeds/blog/" title="subscribe to the RSS feed">RSS Feed</a></li>
+        <li class="menu_tags"><a href="/tags/" title="search articles by tag">Tags</a></li>
+        <li class="menu_index"><a href="/archive" title="search articles chronologically">Archive</a></li>
+        <li class="menu_break"></li>
+        <li class="menu_bookshelf" title="my books on librarything.com"><a href="http://www.librarything.com/catalog.php?view=olooney&amp;offset=0&amp;shelf_rows=10&amp;previousOffset=0&amp;shelf=shelf">Bookshelf</a></li>
+        <li class="menu_sig" title="my endorsement of Agile"><a href="http://agilemanifesto.org/sign/display.cgi?ms=000000203">Manifesto</a></li>
+
+        <li class="menu_about_site" title="about the site itself"><a href="/colophon/">Colophon</a></li>
+        <li class="menu_about_me"><a href="/author/" title="about the author">Author</a></li> 
+      
+      
+      
+      
+          <li class="menu_break"></li>
+        
+          <li class="menu_login"><a href="/admin/">Login</a></li> 
+        
+      
+    </ul>
+  </div>
+  <div id="main-wrapper">
+	
+      
+      <div class="content-page">
+        
+  <a href="/function-scope-javascript/" class="title">Function Scope in JavaScript</a>
+
+  
+    <a href="http://www.flickr.com/photos/altemark/273968506/">
+      <img alt="colorful lead photo" src="/static/media/images/lead/273968506_101232aafd.jpg">
+    </a>
+  
+
+<div>
+  
+<p>JavaScript's <code>this</code> keyword doesn't have to be confusing.  This tutorial will help you use it correctly and effectively.  <br>
+</p>
+<p>JavaScript is designed to support true object-oriented programing without the use of classes.  That means the familiar OOP features are available, but are sometimes implemented in a novel way.  One such feature is method invocation and the associated <code>this</code> keyword.  This is  a common stumbling block for beginners, because JavaScript provides some helpful magic that hides what's really going on.  However, this obstacle is easily overcome by a quick peek under the hood, which is why we're here.  Once we've done the theory, we'll cover the top 5 issues and idioms you Need To Know.  <br>
+</p>
+
+<h2>What is a &quot;scope,&quot; anyway?</h2>
+<p>When a JavaScript function is called, it is executed within a &quot;scope.&quot;  The scope is just some Object or type.  The <code>this</code> keyword provides a reference to the scope.  Whenever we call a function with a scope, we say that we &quot;bind&quot; the function to the scope.  Don't be misled by the terminology; binding is temporary and only applies to a single execution.
+</p>
+<p>Think of scope as a special hidden argument that is always passed into a function as <code>this.</code>  In fact, JavaScript provides a way to do exactly that: the <code>.call()</code> method of Function.  To see <code>.call()</code> in action, let's write a function that simply tells us what <code>this</code> and the first argument is:
+</p>
+<pre><code>function expose(x) {
+    alert( this );
+    alert( x );
+}
+</code></pre><p>If we simply call <code>expose()</code> as a regular function:
+</p>
+<pre><code>expose( 'something' );
+</code></pre><p>We see that <code>this</code> is <code>undefined</code> or the <code>Window</code>.  If we instead use the <code>.call()</code> method of <code>expose()</code>:
+</p>
+<pre><code>expose.call( 'scope', 'something' );
+</code></pre><p>Then we see that <code>this</code> is now &quot;scope&quot;.  So <code>.call()</code> shows us what's &quot;really&quot; going on (passing in <code>this</code> as special argument), while the normal function call syntax &quot;hides&quot; the <code>this</code> argument.  <br>
+</p>
+
+<h2>Dot parentheses is magic</h2>
+<p>If <code>.call()</code> was the only way to bind a function to a scope then it would be pretty useless.  In fact, there's another, more common way for binding to occur: the &quot;dot parentheses&quot; syntax.  It looks like this:
+</p>
+<pre><code>
+var s = "one,two,three";
+var s2 = s<strong>.</strong>split<strong>(</strong>','<strong>)</strong>;
+</code></pre>
+
+<p>That syntax says exactly the same thing as:
+</p>
+<pre><code>var s = &quot;something&quot;;
+var f = s.split;  // get a reference to the function
+var s2 = f.call( s, ',' );  // invoke f with s as the scope
+</code></pre><p>What's going on here?  When you use a &quot;.&quot; dot to look up the attribute of an object, that object will be used as the scope if you then immediately call the attribute as a function.  If there are multiple dots, then the rightmost object is used:
+</p>
+<pre><code>
+var obj = { 
+    name: 'outer',
+    inner: { name: 'inner' }
+};
+obj.inner.<strong>name</strong>.toUpperCase();
+</code></pre>
+
+<p>If you don't <em>immediately</em> call the function, then the binding is lost:
+</p>
+<pre><code>var s = &quot;one,two,three&quot;;
+var split = s.split;
+alert( split(',') );  // this is undefined or the Window object.
+</code></pre><p>And you'll get the default binding, which is <code>undefined</code> or the global <code>Window</code> object.
+</p>
+<p>You don't have to use a dot; the equivalent square bracket syntax binds the same way.  <br>
+</p>
+<p>&quot;Dot parentheses&quot; is by far the most common way to bind a function to a scope &mdash; the <code>this</code> keyword and the concept of scope exists solely to enable this syntax.  By design, it looks and behaves like the method invocation syntaxes of other popular languages.
+</p>
+
+<h2><code>new</code> is magical, too</h2>
+<p>Another way to define the scope of a function call is to put the <code>new</code> operator in front of the call:
+</p>
+<pre><code>function returnThis() { return this; }
+var x = returnThis();  // x is the global window
+var obj = new returnThis();  // obj is a new, empty Object.
+</code></pre><p>This creates a new, fresh object and passes it is as <code>this</code>.  The <code>new</code> operator has a couple of other interesting effects:
+</p>
+<ul>
+ <li>
+     the object it creates inherits from the function's prototype
+ </li>
+
+ <li>
+     the return value of the expression will be the new Object (unless the function returns a value.)
+ </li>
+</ul>
+<p>For now though, just be aware that prefacing a function with the <code>new</code> operator is another way do define <code>this</code>.
+</p>
+
+<h2>Writing methods</h2>
+<p>In JavaScript, a method is simply a function that's set as the attribute of an object and written to make use of <code>this</code>.  You can assume that the method with be called with &quot;dot parentheses&quot; and bound to the base object, or that the caller will use <code>.call()</code> to achieve the same thing.  Likewise, when you invoke a method, you are responsible for binding it to the correct scope.
+</p>
+<p>Simulating classes in JavaScript is outside the scope of this tutorial, so I'll use a super-simple example to show what user-defined methods look like:
+</p>
+<pre><code>
+var counter = {
+    count: 0,
+    total: 0
+};
+counter.collect <strong>= function</strong>(x) {
+    this.count++;
+    this.total += x;
+    <strong>return this;</strong>
+};
+counter.getAverage = function(x) {
+    return this.total / this.count;
+};
+</code></pre>
+
+<p>  This object accepts a series of data-points through the <code>collect()</code> method, and provides an average via the <code>getAverage()</code> method.  Note:
+</p>
+<ul>
+ <li>
+     We can do anything we want to the object via <code>this</code>: we can access, set, delete, or mutate any attribute.
+ </li>
+
+ <li>
+     We can't use the <code>function f(x,y)</code> syntax when defining methods; instead, assign an attribute of the object to an anonymous function, as shown.
+ </li>
+
+ <li>
+     if you don't have anything else to return, return <code>this</code> from methods.  This enables method chaining (see below) which is very convenient.  <br>
+ </li>
+</ul>
+<p>The <code>counter</code> object can be used like so:
+</p>
+<pre><code>
+counter.collect(1);  // "dot parentheses"
+counter.collect.call(counter, 2); // .call() method
+counter.collect(3).collect(4).collect(5);  //method chaining
+alert( counter.getAverage() );
+</code></pre>
+
+<p>Note that method chaining is only possible with <code>collect()</code> because that method return a reference to <code>this</code>, which we can then invoke another method on.
+</p>
+
+<h2>Use a closure to permanently bind to a scope</h2>
+<p>When we call a method, we are responsible for binding that method to its scope.  That requires us to actually have a reference to the scope, which can get lost if we start passing functions around.  Suppose we try to count clicks on an element this way:
+</p>
+<pre><code>
+var clickCounter = {
+    count: 0,
+    increment: function() {
+        this.count++;
+    }
+};
+
+el.addEventListener( 'click', increment );  //<strong>wrong!</strong>
+</code></pre>
+
+<p><code>increment()</code> gets called when a click occurs, but it doesn't get bound to the correct scope.  We need to use a closure to force the binding:
+</p>
+<pre><code>
+function incrementClickCounter() {
+    clickCounter.increment();
+}
+el.addEventListener( 'click', incrementClickCounter );
+</code></pre>
+
+<p>Or equivalently but more concisely:
+</p>
+<pre><code>
+el.addEventListener('click', <strong>function() {</strong> clickCounter.increment(); <strong>}</strong>);
+</code></pre>
+
+
+<h2>Accept an optional scope for callbacks</h2>
+<p>Using a closure is the only general way to pass a method as a function.  However, it's a common idiom for functions that accept a callback to also accept an optional scope argument. The function then promises to invoke the callback with <code>.call(scope)</code>.
+</p>
+<p>For functions that support this idiom, you can simply pass the scope in:
+</p>
+<pre><code>
+var listeners = [];
+var scopes = [];
+function addListener( listener, scope ) {
+    listeners.push( listener );
+    scopes.push( scope );
+}
+function fireListeners() {
+    for( var i=0; i &lt; listeners.length; i++ ) {
+        listeners[i].call( scope );
+    }
+}
+addListener( clickCounter.increment, clickCounter );
+</code></pre>
+
+<p>If the scope isn't passed in, it defaults to <code>undefined</code> and everything works fine for normal functions &mdash; the scope is optional.  When you write functions that accept callback function references, you can make things a little easier for your clients by using this idiom.  <br>
+</p>
+
+<h2>Create an alias for <code>this</code> when using nested functions</h2>
+<p><code>this</code> is a keyword, not a variable.  It only refers to the scope of the closest enclosing function, which can be confusing when dealing with nested functions:
+</p>
+<pre><code>
+page.buildGetTitle = function() {
+    function getTitle() {
+        return <strong>this</strong>.application + ' - ' + <strong>this</strong>.name;
+    }
+    return getTitle;
+}
+</code></pre>
+
+<p>This code won't work, because <code>this</code> refers to the scope of <code>getTitle()</code>, not <code>page</code> as intended.  Instead, simply give <code>this</code> a local alias at the beginning of the function and use that instead:
+</p>
+<pre><code>
+page.buildGetTitle = function() {
+    <strong>var</strong> page = this;
+    function getTitle() {
+        return <strong>page</strong>.application + ' - ' + <strong>page</strong>.name;
+    }
+    return getTitle;
+}
+</code></pre>
+
+<p>Be doubly sure to <code>var</code> the alias variable.  Something horrible will happen if you don't: the code will work.  It won't break until later, when you have multiple <code>getTitle()</code> functions floating around.  And it won't always be obvious that it's broken, either.  Avoid such insidious bugs by always double-checking that your closures are not accidentally refering to global variables.
+</p>
+<p>I've found that it can be very confusing to sometimes use <code>this</code> and sometimes use the alias.  I recommend only using the alias if it's defined.
+</p>
+
+<h2>Use <code>.apply()</code> to write generic wrappers</h2>
+<p><code>.apply()</code> is a Function method similar to <code>.call()</code> but more flexible.  <code>.call()</code> accepts any number of arguments and passes them all through to the function starting with the second one.  <code>.apply()</code> accepts exactly two arguments: the scope and an array of arguments:
+</p>
+<pre><code>
+var slice = "".slice;
+var test = slice.call( "testing", 0, 4 );
+// is equivalent to
+var test = slice.apply( "testing", <strong>[</strong>0, 4<strong>]</strong> );
+</code></pre>
+
+<p><code>.call()</code> is preferable, unless you don't know how many arguments you want to pass in.  <br>
+</p>
+<p>The second argument of apply can be the <code>arguments</code> collection instead of an Array, since <code>arguments</code> is an Array-like object.  If we also pass <code>this</code> in as the first argument then the bind the function to the same scope, too.  <code>.apply(this, arguments)</code> says, &quot;call this functions with the same scope and arguments that were passed into me.&quot;  <br>
+</p>
+<p>Lets see how that can be useful. <code>trivialWrapper()</code> accepts a function and returns another function that does exactly the same thing:
+</p>
+<pre><code>
+function trivialWrapper( func ) {
+    return function() {
+        return func.apply( this, arguments );
+    }
+}
+</code></pre>
+
+<p>Do you see why the returned function has identical behavior to the original, for all possible functions, arguments, and bindings?
+</p>
+<p>Now that we can preserve 100% of the behavior of a function, we have a starting point for adding behavior to arbitrary functions.  Here are some examples to get you thinking about the possibilities:
+</p>
+<pre><code>
+// alert when entering and exiting the function
+function debugWrapper( func ) {
+    return function() {
+        alert( 'debug called with: ' + arguments );
+        var ret = func.call( this, arguments );
+        alert( 'debug returned: ' + ret );
+        return ret;
+    }
+}
+
+// give a function the no-throw guarantee by returning null on error
+function noThrowWrapper( func ) {
+    return function() {
+        try {
+            return func.apply( this, arguments );
+        catch(e) {
+            return null;
+        }
+    }
+}
+
+// invert the logic of a predicate
+// (a predicate is any function returning a boolean)
+function notWrapper( predicate ) {
+    return function() {
+        return !func.apply( this, arguments );
+    }
+}
+</code></pre>
+
+<p>This can be a powerful dynamic programming technique; google &quot;aspect-oriented programming&quot; and &quot;decorators&quot; to learn more.
+</p>
+
+<h2>Check your JavaScript framework for convenience functions</h2>
+<p>In this day and age, you're probably using a JavaScript library such as <a href="http://developer.yahoo.com/yui/">YUI</a>, <a href="http://extjs.com/">ExtJS</a>, or <a href="http://www.prototypejs.org/">PrototypeJS</a>.  Most libraries provide functions to help with the issues I've discussed here.  Don't get me wrong; you still need to have know everything I've discussed here by heart to write JavaScript at a high level.  However, once you understand it, you may come to appreciate the utilities provided by your library.
+</p>
+<p>For example, <a href="http://www.prototypejs.org/">PrototypeJS</a> has an <a href="http://www.prototypejs.org/api/function#method-bind">useful little method for binding functions to scopes</a> which is somewhat more concise than the closure technique I showed you above.
+</p>
+
+<h2>Remember:</h2>
+<ul>
+ <li>
+     Scope is a hidden argument passed into functions as <code>this</code>
+ </li>
+
+ <li>
+     Dot parentheses is magic
+ </li>
+
+ <li>
+     Methods are just object attributes of type function
+ </li>
+
+ <li>
+     Use a closure to permanently bind to a scope
+ </li>
+
+ <li>
+     Accept an optional scope for callbacks
+ </li>
+
+ <li>
+     Create an alias for <code>this</code> when using nested functions
+ </li>
+
+ <li>
+     Use <code>.apply()</code> to write generic wrappers
+ </li>
+</ul>
+
+
+
+</div>
+<p>
+  <span class="signature">- Oran Looney</span>
+  <span class="signature-date">May 21st 2008</span>
+</p>
+  <p class="thank-you">
+    Thanks for reading.  Please subscribe to the <a href="/feeds/blog/">RSS feed</a> and remember that
+    future readers will thank you for leaving your comments and criticisms.
+    <a href="/feeds/blog/" title="Subscribe to RSS Feed" class="big-rss-link">Subscribe to RSS Feed</a>
+  </p>
+<p class="article-tags">
+     
+        <a href="/tag/coding-style/">Coding Style</a> 
+     
+        <a href="/tag/tutorial/">Tutorial</a> 
+     
+        <a href="/tag/web/">Web</a> 
+    
+</p>
+
+
+      </div>
+      
+  
+  <div class="content-page comments" style="border-top: none">
+    <a name="comments"></a>
+    
+	  <h1>Comments (5)</h1>
+      <div>
+        
+          <div class="comment">
+    <div class="comment-date">November 5th 2012</div>
+	<h4><span class="comment-username">Jaime</span> said: </h4>
+	<p>Wonderfully written!  Very clear and helped me understand the concept in JS.
+
+This page also helped:
+
+http://www.programmerinterview.com/index.php/javascript/javascript-function-scope/</p>
+</div>
+
+        
+          <div class="comment">
+    <div class="comment-date">October 26th 2012</div>
+	<h4><span class="comment-username">In awe</span> said: </h4>
+	<p>I&#39;ve never read an article that so clearly defines the essence of &#39;this&#39; .  I heartly applaud you for your work, but I can&#39;t even express how much you&#39;ve help me... Thank You.</p>
+</div>
+
+        
+          <div class="comment">
+    <div class="comment-date">September 11th 2012</div>
+	<h4><span class="comment-username">Parmelia</span> said: </h4>
+	<p>You&#39;ve really helped me understand the isseus. Thanks.</p>
+</div>
+
+        
+          <div class="comment">
+    <div class="comment-date">August 3rd 2010</div>
+	<h4><span class="comment-username">Ed</span> said: </h4>
+	<p>Nice write up. Cheers!</p>
+</div>
+
+        
+          <div class="comment">
+    <div class="comment-date">September 22nd 2009</div>
+	<h4><span class="comment-username">Michael</span> said: </h4>
+	<p>Brilliantly written: clear, correct analysis. Thanks for this.</p>
+</div>
+
+        
+      </div>
+    
+    <h1>Leave a Comment</h1>
+    
+<form method="post" action="/function-scope-javascript/leave-comment/" class="leave-comment-form">
+  <div style='display:none'><input type='hidden' name='csrfmiddlewaretoken' value='7c54419eea61d947291c188320a452fc' /></div>
+  <div>
+    Your Name: <br>
+    
+    <input id="id_user_name" type="text" name="user_name" maxlength="12" />
+  </div>
+  <div>
+    Comment: <br>
+    
+    <textarea id="id_content" rows="10" cols="40" name="content"></textarea>
+  </div>
+  <div>
+    Enter this phrase: <br>
+    
+    <img src="/static/site/images/captcha.png" alt="captcha">
+    <input id="id_captcha" type="text" name="captcha" maxlength="20" /> 
+  </div>
+  <div>
+    <input class="submit-button" type="submit" value="Leave Comment">
+  </div>
+</form>
+
+  </div>
+  
+
+	
+  </div>
+
+
+
+  <script src="http://www.google-analytics.com/urchin.js" type="text/javascript"></script>
+  <script type="text/javascript"> _uacct = "UA-2535855-1"; urchinTracker(); </script>
+
+</body>
+</html>

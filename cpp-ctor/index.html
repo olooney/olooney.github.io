@@ -1,0 +1,406 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang="en-us" dir="ltr">
+<head>
+<!-- meta -->
+<meta http-equiv="content-type" content="text/html; charset=utf-8">
+<meta name="author" content="Oran Looney">
+<meta name="robots" content="INDEX,FOLLOW">
+<meta name="description" content="Oran quitely programming away and sharing a few of the lessons learned">
+<meta name="keywords" content="Programming,Code,Coding,Software,Software Development,Web,Web Development,Python,JavaScript,C++">
+<meta name="verify-v1" content="GmOM2OF0gDOQiM8uS0yKm1ZA0gUI8Hqk4BamNHp7iCg=">
+<meta name="viewport" content="width=800,initial-scale=0.6">
+<link rel="alternate" type="application/rss+xml" href="/feeds/blog/" title="OranLooney.com RSS Blog Feed">
+
+<title>OranLooney - C++ Constructors</title>
+
+<!-- style -->
+<link rel="stylesheet" type="text/css" href="/static/site/css/yui-reset-min.css">
+<link rel="stylesheet" type="text/css" href="/static/site/css/main.css">
+<link rel="stylesheet" type="text/css" media="print" href="/static/site/css/print.css">
+<!--[if lt IE 7.]>
+	<link rel="stylesheet" type="text/css" href="/static/site/css/icons_gif.css">
+<![endif]-->
+
+
+
+</head>
+
+
+<body>
+
+  <div id="banner">
+	<a href="/">OranLooney.com</a>
+	<h6>quietly programming away</h6>
+  </div>
+  <div class="box" id="sidebar">
+	
+		<form id="quick-search" method="get" action="/search/">
+			<div>
+				<input type="hidden" name="alltags">
+				<input type="text" name="keyword" class="keyword-field">
+				<button type="submit" class="search-submit-button">Search</button>
+		  	</div>
+		  </form>
+	
+
+    <ul class="menu">
+      
+        <li class="menu_home"><a href="/">Home</a></li>
+      
+
+      
+		<li class="menu_rss_feed"><a href="/feeds/blog/" title="subscribe to the RSS feed">RSS Feed</a></li>
+        <li class="menu_tags"><a href="/tags/" title="search articles by tag">Tags</a></li>
+        <li class="menu_index"><a href="/archive" title="search articles chronologically">Archive</a></li>
+        <li class="menu_break"></li>
+        <li class="menu_bookshelf" title="my books on librarything.com"><a href="http://www.librarything.com/catalog.php?view=olooney&amp;offset=0&amp;shelf_rows=10&amp;previousOffset=0&amp;shelf=shelf">Bookshelf</a></li>
+        <li class="menu_sig" title="my endorsement of Agile"><a href="http://agilemanifesto.org/sign/display.cgi?ms=000000203">Manifesto</a></li>
+
+        <li class="menu_about_site" title="about the site itself"><a href="/colophon/">Colophon</a></li>
+        <li class="menu_about_me"><a href="/author/" title="about the author">Author</a></li> 
+      
+      
+      
+      
+          <li class="menu_break"></li>
+        
+          <li class="menu_login"><a href="/admin/">Login</a></li> 
+        
+      
+    </ul>
+  </div>
+  <div id="main-wrapper">
+	
+      
+      <div class="content-page">
+        
+  <a href="/cpp-ctor/" class="title">C++ Constructors</a>
+
+  
+    <a href="http://www.flickr.com/photos/gullevek/155604654/">
+      <img alt="colorful lead photo" src="/static/media/images/lead/construction.jpg">
+    </a>
+  
+
+<div>
+  
+<p>The purpose of this article is to give an example and explanation for
+   every variation and special case of C++ constructors, on one page, uncluttered
+   by <a href="http://www.parashift.com/c++-faq-lite/ctors.html">apologetics</a> or <a href="http://yosefk.com/c++fqa/ctors.html">criticism</a>. The fact is you need to know this 
+   stuff and it only takes a few minutes to &quot;get it,&quot; so why not just learn it?
+</p>
+
+<h2>Download</h2>
+<ul>
+ <li>
+     <a href="http://oranlooney.com/static/cpp/ctor.cpp">ctor.cpp</a>
+ </li>
+</ul>
+<p><code>ctor.cpp</code> a literate program which contains the full text of this article in 
+   the comments and also runs examples of the topics discussed in this article.  It
+   can be compiled and run like so:
+</p>
+<pre><code>g++ ctor.cpp -o ctor; ./ctor
+</code></pre>
+<h2>Sample Classes</h2>
+<p>Let's set up some classes that do output during construction and destruction so
+   show what's going on.  We'll be using these classes for all examples.
+</p>
+<pre><code>class A {
+    int id;
+public:
+    A(): id(0) {
+        std::cout &lt;&lt; &quot;default constructor called, id = &quot; &lt;&lt; id
+            &lt;&lt; std::endl;
+    }
+
+    A(int id): id(id) {
+        std::cout &lt;&lt; &quot;one argument constructor called, id = &quot; &lt;&lt; id 
+            &lt;&lt; std::endl;
+    }
+
+    A(int id, int unsaved): id(id) {
+        std::cout &lt;&lt; &quot;two argument constructor called, &quot; &lt;&lt;
+            &quot;id = &quot; &lt;&lt; id &lt;&lt; 
+            &quot;, unsaved = &quot; &lt;&lt; unsaved &lt;&lt; 
+            std::endl;
+    }
+
+    A(const A&amp; other): id(other.id) {
+        std::cout &lt;&lt; &quot;copy constructor called, id = &quot; &lt;&lt; id 
+            &lt;&lt; std::endl;
+    }
+
+    const A&amp; operator=(const A&amp; other) {
+        id = other.id;
+        std::cout &lt;&lt; &quot;assignment called, id = &quot; &lt;&lt; id 
+            &lt;&lt; std::endl;
+    }
+
+    bool operator==(const A&amp; other) {
+        std::cout &lt;&lt; &quot;comparing A(&quot; &lt;&lt; id &lt;&lt; &quot;) to A(&quot; &lt;&lt; other.id &lt;&lt; &quot;)&quot; 
+            &lt;&lt; std::endl;
+        return id == other.id;
+    }
+
+    ~A() {
+        std::cout &lt;&lt; &quot;destructor called, id = &quot; &lt;&lt; id 
+            &lt;&lt; std::endl;
+    }
+};
+
+class B: public A {};
+</code></pre><p>B is another, essentially identical class that we'll use for examples needing multiple classes.
+   The fact that B is a subclass of A is not used; that's just a trick to re-use the implementation.
+</p>
+<p>We'll also need a couple of functions so we can see what happens when we pass
+   by value or reference.
+</p>
+<pre><code>void passByValue(const A x) {
+    // ...
+}
+
+void passByReference(const A&amp; x ) {
+    // ...
+}
+</code></pre><p>Ok, that's the groundwork out of the way.  Let's see when and how A's various constructors are invoked.
+</p>
+
+<h2>Default Constructor</h2>
+<p>There's one thing you need to know about default constructors before we start: one
+   will be written for you if your class has no constructors whatsoever.  If
+   you provide any other constructor, then you'll have to supply a default
+   constructor yourself, assuming you want your class to still be default constructable.
+</p>
+<p>You do this like so:
+</p>
+<pre><code>class C {
+public:
+    C() {}
+};
+</code></pre><p>That will behave exactly like the default constructor the compiler writes for
+   you.  If you want to hide the implementation or avoid haing the default
+   constructor be implicitly inline, write this:
+</p>
+<pre><code>class D {
+public:
+    D();
+};
+D::D() {}
+</code></pre><p>Of course, you are free to write a non-trivial default constructor; this
+   merely illustrates how to mimic the automatically written one.
+</p>
+<p>Ok, now that's out of the way, let's do some examples.  <br>
+   This calls the default (sometimes called nullary) constructor:
+</p>
+<pre><code>A x;
+</code></pre><p>Note the lack of parentheses.
+</p>
+<p>But <em>this</em>:
+</p>
+<pre><code>A f();
+</code></pre><p>does <em>not</em> call the default constructor, or even define a
+   variable of type A at all.  In fact, it creates an unitialized function 
+   pointer to a nullary function and returning an object of type A.
+</p>
+<p>The rule is simple: to declare an object and initialize it with its default constructor, <em>don't</em> use parentheses.
+</p>
+
+<h2>Copy Constructor</h2>
+<p>A copy constructor accepts a single argument of the same type as the class, usually a const reference:
+</p>
+<pre><code>A(const A&amp; other);
+</code></pre><p>You can call it directly, like so:
+</p>
+<pre><code>A y = x;
+</code></pre><p>The copy constructor is also used to pass objects by value to functions:
+</p>
+<pre><code>passByValue(x);
+</code></pre><p>The copy constructor is special because it is called by C++ whenever it's necessary
+   to make a copy, such as passing arguments by value or returning a value.
+   Also, an implementation may optimize away calls to the copy constructor
+   when it is safe to do so.  So, this usually performs only a single copy:
+</p>
+<pre><code>A q = A(A(A(x)));
+</code></pre><p>These rules make sense for normal copy operations, but not for unusual copy semantics,
+   so it pays to implement a straight-forward, predictable copy constructor
+   and implement weird copies in a different method, say <code>clone()</code> or <code>deepCopy()</code>.
+</p>
+
+<h2>Other Unary Constructors</h2>
+<p>These next two are equivalent, and both invoke only the unary (1-argument) constructor:
+</p>
+<pre><code>A one = A(1);
+A two(2);
+</code></pre><p>There's nothing special about the int type, here.  This is a general,
+   alternative syntax for invoking a unary (1-argument) constructor.
+</p>
+<p>Like the two previous statements, this also invokes the unary constructor.
+</p>
+<pre><code>A three = 3;
+</code></pre><p>However, that's only true because that constructor wasn't marked <code>explicit</code>.  It it had been,
+   then it wouldn't have compiled: this is an <em>implicit</em> conversion between an int and A.
+</p>
+<p>There's another way to perform an implicit conversion: pass an int into a function (or
+   other operator) where an A is expected:
+</p>
+<pre><code>passByValue(4);
+passByReference(5);
+</code></pre><p>These creates a temporary object of type A, and this is what is <em>actually</em> passed to
+   the function.  Again, this only works for implicit unary constructors.  (An implicit
+   constructor is one declared without the <code>explicit</code> keyword.)
+</p>
+<p>This creates a inline, temporary object which is destroyed at the end of the statement.
+</p>
+<pre><code>A(4);
+</code></pre><p>you can use such temporary objects in expressions:
+</p>
+<pre><code>std::cout &lt;&lt; std::boolalpha &lt;&lt; (A(5) == A(6)) &lt;&lt; std::endl;
+</code></pre><p>but be aware that they are automatically <code>const</code>.
+</p>
+<p>To create a temporary object using the default constructor, you <em>must</em> use parentheses:
+</p>
+<pre><code>std::cout &lt;&lt; std::boolalpha &lt;&lt; (A() == A()) &lt;&lt; std::endl;
+</code></pre><p>Note this is exactly opposite of the non-temporary case show above, where you must 
+   <em>never</em> use parantheses.
+</p>
+<p>This creates a temporary object initialized with 6, assigns y to that temporary
+   object, then destroys the temporary.  Note that y was declared above.
+</p>
+<pre><code>y = A(7);
+</code></pre><p>This appears to construct a temporary, copy construct z from that temporary,
+   then destroy the temporary.  In fact, it's an alternate syntax for invoking
+   the A(int) constructor.  We'll need that fact in a second.
+</p>
+<pre><code>A z = A(8);
+</code></pre>
+<h2>If It Quacks Like a Function Declaration...</h2>
+<p>Be aware of this case:
+</p>
+<pre><code>A g( A() );
+</code></pre><p>This looks like it should default construct a temporary of type A, then copy construct g.  <br>
+   In fact, it declares a function pointer called g.
+</p>
+<p>The ambiguity is introduced because the declaration of g <em>could</em> be a function declaration
+   (although you have to squint to see it) and the standard says that anything that CAN be 
+   interpreted as a function declaration WILL be interpreted as a function declaration.
+</p>
+<p>We can avoid this using the alternate <code>A x = A()</code> syntax:
+</p>
+<pre><code>A w = A(B());
+</code></pre><p>This in fact default constructs a temporary B then copy constructs w from it.
+   It does NOT call the assignment operator.
+</p>
+
+<h2>Binary and Beyond</h2>
+<p>From higher arity, things are easier. Only the default and unary constructors have special cases.
+</p>
+<p>This calls the binary (2-argument) constructor.
+</p>
+<pre><code>A x2(9,1);
+</code></pre><p>This calls the binary constructor to create a temporary, which is immediately destroyed.
+</p>
+<pre><code>A(10,2);
+</code></pre><p>And so, on, with higher arity constructors having equally regular and consistent syntax.
+</p>
+
+
+
+</div>
+<p>
+  <span class="signature">- Oran Looney</span>
+  <span class="signature-date">October 28th 2010</span>
+</p>
+  <p class="thank-you">
+    Thanks for reading.  Please subscribe to the <a href="/feeds/blog/">RSS feed</a> and remember that
+    future readers will thank you for leaving your comments and criticisms.
+    <a href="/feeds/blog/" title="Subscribe to RSS Feed" class="big-rss-link">Subscribe to RSS Feed</a>
+  </p>
+<p class="article-tags">
+     
+        <a href="/tag/c/">C++</a> 
+     
+        <a href="/tag/tutorial/">Tutorial</a> 
+     
+        <a href="/tag/literate/">Literate Programming</a> 
+    
+</p>
+
+
+      </div>
+      
+  
+  <div class="content-page comments" style="border-top: none">
+    <a name="comments"></a>
+    
+	  <h1>Comments (4)</h1>
+      <div>
+        
+          <div class="comment">
+    <div class="comment-date">December 18th 2014</div>
+	<h4><span class="comment-username">lwcvmkajoo</span> said: </h4>
+	<p>mokkapsbomppofz, [url=http://www.fejzhkirux.com/]zwkmgxsxho[/url] </p>
+</div>
+
+        
+          <div class="comment">
+    <div class="comment-date">December 13th 2014</div>
+	<h4><span class="comment-username">helkmarshx</span> said: </h4>
+	<p>tjxkgpsbomppofz, http://www.riizwruidx.com/ xyugvztklp </p>
+</div>
+
+        
+          <div class="comment">
+    <div class="comment-date">December 10th 2014</div>
+	<h4><span class="comment-username">tyvxfqsqdl</span> said: </h4>
+	<p>ivfwtpsbomppofz, &lt;a href=&quot;http://www.otbgopggzs.com/&quot;&gt;npnxlstrmt&lt;/a&gt; </p>
+</div>
+
+        
+          <div class="comment">
+    <div class="comment-date">September 11th 2012</div>
+	<h4><span class="comment-username">Ahsan</span> said: </h4>
+	<p>Questions 1 and 2, it would be more meaningful to call &quot;Normal Constructor&quot; as &quot;Default Constructor&quot;, a corttnucsor with no arguments, or all arguments with default values.Constructor:It is called when an object is coming into existence.Copy Constructor:If an object is coming into existence from an existing object. For examplePoint p = pExisting;Point p(pExisting);void foo(Point p){}Point faa(void){   Point p;   ......   return p;}Assignment Operator:When an object is in existence, and want to change its state to as that of another object, (copy) assignment operator is called. Both the objects here to be already constructed.</p>
+</div>
+
+        
+      </div>
+    
+    <h1>Leave a Comment</h1>
+    
+<form method="post" action="/cpp-ctor/leave-comment/" class="leave-comment-form">
+  <div style='display:none'><input type='hidden' name='csrfmiddlewaretoken' value='7c54419eea61d947291c188320a452fc' /></div>
+  <div>
+    Your Name: <br>
+    
+    <input id="id_user_name" type="text" name="user_name" maxlength="12" />
+  </div>
+  <div>
+    Comment: <br>
+    
+    <textarea id="id_content" rows="10" cols="40" name="content"></textarea>
+  </div>
+  <div>
+    Enter this phrase: <br>
+    
+    <img src="/static/site/images/captcha.png" alt="captcha">
+    <input id="id_captcha" type="text" name="captcha" maxlength="20" /> 
+  </div>
+  <div>
+    <input class="submit-button" type="submit" value="Leave Comment">
+  </div>
+</form>
+
+  </div>
+  
+
+	
+  </div>
+
+
+
+  <script src="http://www.google-analytics.com/urchin.js" type="text/javascript"></script>
+  <script type="text/javascript"> _uacct = "UA-2535855-1"; urchinTracker(); </script>
+
+</body>
+</html>

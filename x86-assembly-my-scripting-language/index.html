@@ -1,0 +1,201 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang="en-us" dir="ltr">
+<head>
+<!-- meta -->
+<meta http-equiv="content-type" content="text/html; charset=utf-8">
+<meta name="author" content="Oran Looney">
+<meta name="robots" content="INDEX,FOLLOW">
+<meta name="description" content="Oran quitely programming away and sharing a few of the lessons learned">
+<meta name="keywords" content="Programming,Code,Coding,Software,Software Development,Web,Web Development,Python,JavaScript,C++">
+<meta name="verify-v1" content="GmOM2OF0gDOQiM8uS0yKm1ZA0gUI8Hqk4BamNHp7iCg=">
+<meta name="viewport" content="width=800,initial-scale=0.6">
+<link rel="alternate" type="application/rss+xml" href="/feeds/blog/" title="OranLooney.com RSS Blog Feed">
+
+<title>OranLooney - x86 Assembly is My Scripting Language!</title>
+
+<!-- style -->
+<link rel="stylesheet" type="text/css" href="/static/site/css/yui-reset-min.css">
+<link rel="stylesheet" type="text/css" href="/static/site/css/main.css">
+<link rel="stylesheet" type="text/css" media="print" href="/static/site/css/print.css">
+<!--[if lt IE 7.]>
+	<link rel="stylesheet" type="text/css" href="/static/site/css/icons_gif.css">
+<![endif]-->
+
+
+
+</head>
+
+
+<body>
+
+  <div id="banner">
+	<a href="/">OranLooney.com</a>
+	<h6>quietly programming away</h6>
+  </div>
+  <div class="box" id="sidebar">
+	
+		<form id="quick-search" method="get" action="/search/">
+			<div>
+				<input type="hidden" name="alltags">
+				<input type="text" name="keyword" class="keyword-field">
+				<button type="submit" class="search-submit-button">Search</button>
+		  	</div>
+		  </form>
+	
+
+    <ul class="menu">
+      
+        <li class="menu_home"><a href="/">Home</a></li>
+      
+
+      
+		<li class="menu_rss_feed"><a href="/feeds/blog/" title="subscribe to the RSS feed">RSS Feed</a></li>
+        <li class="menu_tags"><a href="/tags/" title="search articles by tag">Tags</a></li>
+        <li class="menu_index"><a href="/archive" title="search articles chronologically">Archive</a></li>
+        <li class="menu_break"></li>
+        <li class="menu_bookshelf" title="my books on librarything.com"><a href="http://www.librarything.com/catalog.php?view=olooney&amp;offset=0&amp;shelf_rows=10&amp;previousOffset=0&amp;shelf=shelf">Bookshelf</a></li>
+        <li class="menu_sig" title="my endorsement of Agile"><a href="http://agilemanifesto.org/sign/display.cgi?ms=000000203">Manifesto</a></li>
+
+        <li class="menu_about_site" title="about the site itself"><a href="/colophon/">Colophon</a></li>
+        <li class="menu_about_me"><a href="/author/" title="about the author">Author</a></li> 
+      
+      
+      
+      
+          <li class="menu_break"></li>
+        
+          <li class="menu_login"><a href="/admin/">Login</a></li> 
+        
+      
+    </ul>
+  </div>
+  <div id="main-wrapper">
+	
+      
+      <div class="content-page">
+        
+  <a href="/x86-assembly-my-scripting-language/" class="title">x86 Assembly is My Scripting Language!</a>
+
+  
+    <a href="http://www.flickr.com/photos/hinkelstone/2435823037/">
+      <img alt="colorful lead photo" src="/static/media/images/lead/2435823037_2f67cc65b1.jpg">
+    </a>
+  
+
+<div>
+  
+<p>Lots of people talk about the advantages of using supposedly &quot;high level&quot; languages for scripting.  Languages like <a href="http://python.org/">Python</a> and <a href="http://www.ruby-lang.org/en/">Ruby</a> supposedly handle all the icky details of &quot;type&quot; and &quot;memory management&quot; for us, while exposing &quot;easy-to-use&quot; data structures and exhaustive library functions.  But that ignores the real cost of these languages, which is that <em>you have to learn an entire language just to do simple things!</em>  <br>
+</p>
+<p>Now, I really don't see why I can't use the syntax and libraries of languages I already know for my scripting.  <a href="http://blog.davber.com/about/" title="davber">David Bergman</a> apparently doesn't either, because he created a <a href="http://code.google.com/p/cpsh/" title="cpsh">program that mimics a C++ interpreter.</a>
+</p>
+<p>Now, I think this is just about the coolest thing to ever come out of southern California, but it doesn't quite go <em>far</em> enough, because who has time to keep up with all this new fangled C++?  No I think the highest level of productivity can only be achieved by scripting directly in assembly, the language we all know best.  And <a href="http://code.google.com/p/cpsh/" title="cpsh">cpsh</a> let's me do that, indirectly:
+</p>
+<pre><code>#!/usr/bin/cpsh
+int i = 5;
+int o = 1;
+
+printf(&quot;i=%d\n&quot;,i);
+printf(&quot;o=%d\n&quot;,o);
+
+// swap two variables
+asm(&quot;movl %1, %%ebx;&quot;
+    &quot;push %%ebx;&quot;
+    &quot;movl %0, %%ebx;&quot;
+    &quot;movl %%ebx, %1;&quot;
+    &quot;pop %%ebx;&quot;
+    &quot;movl %%ebx, %0;&quot;
+    : &quot;=r&quot; ( o ) , &quot;=r&quot; (i)  // outputs
+    : &quot;0&quot; ( o ), &quot;1&quot; (i)     // inputs (same as outputs)
+    : &quot;%ebx&quot;      // not strictly required
+);
+
+printf(&quot;i=%d\n&quot;,i);
+printf(&quot;o=%d\n&quot;,o);
+</code></pre><p>just write a wrapper around your code, use the <code>asm()</code> command to drop into assembly, and have at it.  Here's it at work:
+</p>
+<pre><code>$ chmod +x asm.cpsh
+$ ./asm.cpsh
+i=5
+o=1
+i=1
+o=5
+</code></pre><p>By the way, if you immediately said to yourself, &quot;why doesn't he just write <code>xchg %0, %1;</code>,&quot; then this is <em>definitely</em> the scripting language for you.
+</p>
+
+
+
+</div>
+<p>
+  <span class="signature">- Oran Looney</span>
+  <span class="signature-date">May 4th 2007</span>
+</p>
+  <p class="thank-you">
+    Thanks for reading.  Please subscribe to the <a href="/feeds/blog/">RSS feed</a> and remember that
+    future readers will thank you for leaving your comments and criticisms.
+    <a href="/feeds/blog/" title="Subscribe to RSS Feed" class="big-rss-link">Subscribe to RSS Feed</a>
+  </p>
+<p class="article-tags">
+     
+        <a href="/tag/silly/">Silly</a> 
+     
+        <a href="/tag/c/">C++</a> 
+    
+</p>
+
+
+      </div>
+      
+  
+  <div class="content-page comments" style="border-top: none">
+    <a name="comments"></a>
+    
+	  <h1>Comments (1)</h1>
+      <div>
+        
+          <div class="comment">
+    <div class="comment-date">September 11th 2012</div>
+	<h4><span class="comment-username">Fatima</span> said: </h4>
+	<p>What sort of inputs and outtups do you mean?printf() scanf() sort of stuff, or like through I/O ports and memory-mapped IO?The latter two are incredibly easy. MSN me and I can explain more. The first one is very hard. Calling C functions isn&#39;t too much of a bitch, but interfacing with system calls is, as they (especially for Linux) suck, and change all the time. etc etc</p>
+</div>
+
+        
+      </div>
+    
+    <h1>Leave a Comment</h1>
+    
+<form method="post" action="/x86-assembly-my-scripting-language/leave-comment/" class="leave-comment-form">
+  <div style='display:none'><input type='hidden' name='csrfmiddlewaretoken' value='7c54419eea61d947291c188320a452fc' /></div>
+  <div>
+    Your Name: <br>
+    
+    <input id="id_user_name" type="text" name="user_name" maxlength="12" />
+  </div>
+  <div>
+    Comment: <br>
+    
+    <textarea id="id_content" rows="10" cols="40" name="content"></textarea>
+  </div>
+  <div>
+    Enter this phrase: <br>
+    
+    <img src="/static/site/images/captcha.png" alt="captcha">
+    <input id="id_captcha" type="text" name="captcha" maxlength="20" /> 
+  </div>
+  <div>
+    <input class="submit-button" type="submit" value="Leave Comment">
+  </div>
+</form>
+
+  </div>
+  
+
+	
+  </div>
+
+
+
+  <script src="http://www.google-analytics.com/urchin.js" type="text/javascript"></script>
+  <script type="text/javascript"> _uacct = "UA-2535855-1"; urchinTracker(); </script>
+
+</body>
+</html>

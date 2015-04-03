@@ -1,0 +1,251 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang="en-us" dir="ltr">
+<head>
+<!-- meta -->
+<meta http-equiv="content-type" content="text/html; charset=utf-8">
+<meta name="author" content="Oran Looney">
+<meta name="robots" content="INDEX,FOLLOW">
+<meta name="description" content="Oran quitely programming away and sharing a few of the lessons learned">
+<meta name="keywords" content="Programming,Code,Coding,Software,Software Development,Web,Web Development,Python,JavaScript,C++">
+<meta name="verify-v1" content="GmOM2OF0gDOQiM8uS0yKm1ZA0gUI8Hqk4BamNHp7iCg=">
+<meta name="viewport" content="width=800,initial-scale=0.6">
+<link rel="alternate" type="application/rss+xml" href="/feeds/blog/" title="OranLooney.com RSS Blog Feed">
+
+<title>OranLooney - A Nostalga Trip Down Java Lane</title>
+
+<!-- style -->
+<link rel="stylesheet" type="text/css" href="/static/site/css/yui-reset-min.css">
+<link rel="stylesheet" type="text/css" href="/static/site/css/main.css">
+<link rel="stylesheet" type="text/css" media="print" href="/static/site/css/print.css">
+<!--[if lt IE 7.]>
+	<link rel="stylesheet" type="text/css" href="/static/site/css/icons_gif.css">
+<![endif]-->
+
+
+
+</head>
+
+
+<body>
+
+  <div id="banner">
+	<a href="/">OranLooney.com</a>
+	<h6>quietly programming away</h6>
+  </div>
+  <div class="box" id="sidebar">
+	
+		<form id="quick-search" method="get" action="/search/">
+			<div>
+				<input type="hidden" name="alltags">
+				<input type="text" name="keyword" class="keyword-field">
+				<button type="submit" class="search-submit-button">Search</button>
+		  	</div>
+		  </form>
+	
+
+    <ul class="menu">
+      
+        <li class="menu_home"><a href="/">Home</a></li>
+      
+
+      
+		<li class="menu_rss_feed"><a href="/feeds/blog/" title="subscribe to the RSS feed">RSS Feed</a></li>
+        <li class="menu_tags"><a href="/tags/" title="search articles by tag">Tags</a></li>
+        <li class="menu_index"><a href="/archive" title="search articles chronologically">Archive</a></li>
+        <li class="menu_break"></li>
+        <li class="menu_bookshelf" title="my books on librarything.com"><a href="http://www.librarything.com/catalog.php?view=olooney&amp;offset=0&amp;shelf_rows=10&amp;previousOffset=0&amp;shelf=shelf">Bookshelf</a></li>
+        <li class="menu_sig" title="my endorsement of Agile"><a href="http://agilemanifesto.org/sign/display.cgi?ms=000000203">Manifesto</a></li>
+
+        <li class="menu_about_site" title="about the site itself"><a href="/colophon/">Colophon</a></li>
+        <li class="menu_about_me"><a href="/author/" title="about the author">Author</a></li> 
+      
+      
+      
+      
+          <li class="menu_break"></li>
+        
+          <li class="menu_login"><a href="/admin/">Login</a></li> 
+        
+      
+    </ul>
+  </div>
+  <div id="main-wrapper">
+	
+      
+      <div class="content-page">
+        
+  <a href="/nostalga-trip-down-java-lane/" class="title">A Nostalga Trip Down Java Lane</a>
+
+  
+    <a href="http://www.flickr.com/photos/extraketchup/459020985/">
+      <img alt="colorful lead photo" src="/static/media/images/lead/459020985_07d4f48b2f.jpg">
+    </a>
+  
+
+<div>
+  
+<p>When I was in college, I got a copy of NetBeans (a Java IDE) and did some Java projects to see what the language was about.  Recently, I found those projects burned onto a CD with a lot of my old files from college.  I'd like to think I've learned a thing or two about programming in the interval, so I thought it would be fun to take a look through my old code.  I've selected a couple and published them here — unchanged — along with notes on my present day reaction to my student code.
+</p>
+<p>Apparently (from the comments) I used to have a copy of 'Core Java 2.'  I wonder where it's gone to.  The Bounce project seems to be an exercise from that book, but the code style and comments look like mine.  The Solitaire game seems to be original though; that's the only reason I can find for my apparently blissful ignorance of certain basic concepts.
+</p>
+<p>Before I talk about the first project though, let me give you a taste of what you're missing from the others.  This snippet is from a simple drawing program:
+</p>
+<pre><code>switch(type){
+    case 1:g.drawRect(X,Y,w,h);break;
+    case 2:g.fillRect(X,Y,w,h);break;
+    case 3:g.drawOval(X,Y,w,h);break;
+    case 4:g.fillOval(X,Y,w,h);break;
+}
+</code></pre><p>I don't think I really &quot;got&quot; polymorphism yet. :)
+</p>
+
+<h2>Bounce</h2>
+<p>Bounce is an 'inelastic collision simulator,' which is a fancy way of saying 'completely useless toy.' Take a look at the <a href="/static/java/bounce/Bounce.html">source file</a> or download the <a href="/static/java/bounce/Bounce.jar">executable jar.</a>
+</p>
+<p><img src="/static/java/bounce/screenshot.GIF" alt="LooneySolitare! Screen Shot"/>
+</p>
+<p>Ooh, bouncing!
+</p>
+<p>Unlike the earlier projects, there are quite a few comments; I seem to have started documenting the <em>intention</em> behind my code.  Here are some comments I like:
+</p>
+<ul>
+ <li>
+     &quot;You ever kill a Ball just to watch it die?&quot;
+ </li>
+
+ <li>
+     Error Message: &quot;BallVector.run():Cycle of Life Broken!&quot;
+ </li>
+
+ <li>
+     &quot;call move, then sleep.  (A ball is a simple creature.)&quot;
+ </li>
+</ul>
+<p>The application is heavily - and pointlessly - multi-threaded.  Each Ball is on it's own thread.  I assume that's part of the recipe I was following.  The simulation isn't accurate; for one thing, it doesn't track angular momentum.  It shows a complete disregard for separation of concerns: &quot;<em>Of course</em> the physics simulation acts directly on the sprites location.  Of course we bounce directly off the 'walls' of the frame.  <em>How else</em> would I do it?&quot;
+</p>
+<p>I've noticed that Java makes it as easy as Visual Basic to embed business logic directly in the UI.  At least Java folks have mythic legends of <a href="http://en.wikipedia.org/wiki/Model-view-controller">MVC</a> to make them feel guilty about it.
+</p>
+
+<h2>GenericCard</h2>
+<p>Here's a solitaire game.  It seems to be fully functional, with a drag-and-drop interface coded directly on top of mouse events, but <em>god</em> it's ugly. There are several source files:
+</p>
+<ul>
+ <li>
+     <a href="/static/java/genericcard/CardFrame.html">CardFrame</a>
+ </li>
+
+ <li>
+     <a href="/static/java/genericcard/CardPanel.html">CardPanel</a>
+ </li>
+
+ <li>
+     <a href="/static/java/genericcard/CardPile.html">CardPile</a>
+ </li>
+
+ <li>
+     <a href="/static/java/genericcard/GenericCard.html">GenericCard</a>
+ </li>
+
+ <li>
+     <a href="/static/java/genericcard/PlayingCard.html">PlayingCard</a>
+ </li>
+</ul>
+<p>and <a href="/static/java/genericcard/GenericCard.jar">the executable jar file.</a>
+</p>
+<p><img src="/static/java/genericcard/screenshot.GIF" alt="LooneySolitare! Screen Shot"/>
+</p>
+<p>It's more object oriented than I expected from a beginner, but I still had a long way to go.  (Still do, I suppose.)  For example, there's no separation of concerns between a logic card or deck and the visible objects being displayed.
+</p>
+<p>I notice that I'd already started using the <code>// end block</code> idiom after the <code>}</code> of a long block, which is something I still do.  I'm using camelCase; I think I started doing that for these Java projects.  In general, this isn't particularly well commented.  The style's a little off too:
+</p>
+<pre><code>fileMenu=new JMenu(&quot;File&quot;);         menuBar.add(fileMenu);
+</code></pre><p>I guess I thought it would be clearer on one line?
+</p>
+<p>I sure went to a lot of trouble to avoid learning how to use images. God, those cards are <em>ugly</em>, aren't they?
+</p>
+<p>One thing that actually is pretty cool is that the scores are computed every 1/10th of a second on a separate thread. I think that's a reasonable design: although the Observer pattern would be cooler, the thread thing is easier, more orthogonal, and has negligible performance impact.  (In all fairness, I'm sure I'd never heard of the Observer pattern back then, although I suppose I could have deduced it from all those Listeners Java uses for UI events.)
+</p>
+
+<h2>Words of Wisdom</h2>
+<p>I don't really have any, except to suggest you go through your own student projects sometime.  It's fun.  You must see what was before you can see what is.  Hey, that actually sounded pretty wise!  Maybe I can land a gig writing lines for old men in movies.
+</p>
+
+
+
+</div>
+<p>
+  <span class="signature">- Oran Looney</span>
+  <span class="signature-date">June 5th 2007</span>
+</p>
+  <p class="thank-you">
+    Thanks for reading.  Please subscribe to the <a href="/feeds/blog/">RSS feed</a> and remember that
+    future readers will thank you for leaving your comments and criticisms.
+    <a href="/feeds/blog/" title="Subscribe to RSS Feed" class="big-rss-link">Subscribe to RSS Feed</a>
+  </p>
+<p class="article-tags">
+     
+        <a href="/tag/java/">Java</a> 
+     
+        <a href="/tag/silly/">Silly</a> 
+     
+        <a href="/tag/coding-style/">Coding Style</a> 
+    
+</p>
+
+
+      </div>
+      
+  
+  <div class="content-page comments" style="border-top: none">
+    <a name="comments"></a>
+    
+	  <h1>Comments (1)</h1>
+      <div>
+        
+          <div class="comment">
+    <div class="comment-date">September 11th 2012</div>
+	<h4><span class="comment-username">Keydrick</span> said: </h4>
+	<p>Articles like these put the consumer in the driver seat-very imoptnrat.</p>
+</div>
+
+        
+      </div>
+    
+    <h1>Leave a Comment</h1>
+    
+<form method="post" action="/nostalga-trip-down-java-lane/leave-comment/" class="leave-comment-form">
+  <div style='display:none'><input type='hidden' name='csrfmiddlewaretoken' value='7c54419eea61d947291c188320a452fc' /></div>
+  <div>
+    Your Name: <br>
+    
+    <input id="id_user_name" type="text" name="user_name" maxlength="12" />
+  </div>
+  <div>
+    Comment: <br>
+    
+    <textarea id="id_content" rows="10" cols="40" name="content"></textarea>
+  </div>
+  <div>
+    Enter this phrase: <br>
+    
+    <img src="/static/site/images/captcha.png" alt="captcha">
+    <input id="id_captcha" type="text" name="captcha" maxlength="20" /> 
+  </div>
+  <div>
+    <input class="submit-button" type="submit" value="Leave Comment">
+  </div>
+</form>
+
+  </div>
+  
+
+	
+  </div>
+
+
+
+  <script src="http://www.google-analytics.com/urchin.js" type="text/javascript"></script>
+  <script type="text/javascript"> _uacct = "UA-2535855-1"; urchinTracker(); </script>
+
+</body>
+</html>

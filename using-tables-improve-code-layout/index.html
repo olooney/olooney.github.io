@@ -1,0 +1,281 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang="en-us" dir="ltr">
+<head>
+<!-- meta -->
+<meta http-equiv="content-type" content="text/html; charset=utf-8">
+<meta name="author" content="Oran Looney">
+<meta name="robots" content="INDEX,FOLLOW">
+<meta name="description" content="Oran quitely programming away and sharing a few of the lessons learned">
+<meta name="keywords" content="Programming,Code,Coding,Software,Software Development,Web,Web Development,Python,JavaScript,C++">
+<meta name="verify-v1" content="GmOM2OF0gDOQiM8uS0yKm1ZA0gUI8Hqk4BamNHp7iCg=">
+<meta name="viewport" content="width=800,initial-scale=0.6">
+<link rel="alternate" type="application/rss+xml" href="/feeds/blog/" title="OranLooney.com RSS Blog Feed">
+
+<title>OranLooney - Using Tables to Improve Code Layout</title>
+
+<!-- style -->
+<link rel="stylesheet" type="text/css" href="/static/site/css/yui-reset-min.css">
+<link rel="stylesheet" type="text/css" href="/static/site/css/main.css">
+<link rel="stylesheet" type="text/css" media="print" href="/static/site/css/print.css">
+<!--[if lt IE 7.]>
+	<link rel="stylesheet" type="text/css" href="/static/site/css/icons_gif.css">
+<![endif]-->
+
+
+
+</head>
+
+
+<body>
+
+  <div id="banner">
+	<a href="/">OranLooney.com</a>
+	<h6>quietly programming away</h6>
+  </div>
+  <div class="box" id="sidebar">
+	
+		<form id="quick-search" method="get" action="/search/">
+			<div>
+				<input type="hidden" name="alltags">
+				<input type="text" name="keyword" class="keyword-field">
+				<button type="submit" class="search-submit-button">Search</button>
+		  	</div>
+		  </form>
+	
+
+    <ul class="menu">
+      
+        <li class="menu_home"><a href="/">Home</a></li>
+      
+
+      
+		<li class="menu_rss_feed"><a href="/feeds/blog/" title="subscribe to the RSS feed">RSS Feed</a></li>
+        <li class="menu_tags"><a href="/tags/" title="search articles by tag">Tags</a></li>
+        <li class="menu_index"><a href="/archive" title="search articles chronologically">Archive</a></li>
+        <li class="menu_break"></li>
+        <li class="menu_bookshelf" title="my books on librarything.com"><a href="http://www.librarything.com/catalog.php?view=olooney&amp;offset=0&amp;shelf_rows=10&amp;previousOffset=0&amp;shelf=shelf">Bookshelf</a></li>
+        <li class="menu_sig" title="my endorsement of Agile"><a href="http://agilemanifesto.org/sign/display.cgi?ms=000000203">Manifesto</a></li>
+
+        <li class="menu_about_site" title="about the site itself"><a href="/colophon/">Colophon</a></li>
+        <li class="menu_about_me"><a href="/author/" title="about the author">Author</a></li> 
+      
+      
+      
+      
+          <li class="menu_break"></li>
+        
+          <li class="menu_login"><a href="/admin/">Login</a></li> 
+        
+      
+    </ul>
+  </div>
+  <div id="main-wrapper">
+	
+      
+      <div class="content-page">
+        
+  <a href="/using-tables-improve-code-layout/" class="title">Using Tables to Improve Code Layout</a>
+
+  
+    <a href="http://www.flickr.com/photos/evilerin/3455093488/">
+      <img alt="colorful lead photo" src="/static/media/images/lead/3455093488_48fde06439.jpg">
+    </a>
+  
+
+<div>
+  
+<p>Code layout is a surprisingly subtle problem.  Or, maybe not so surprising if we remember that typesetting is its own profession, with hundreds of years of history behind it.  We simply haven't had very long to figure out what &quot;good code layout&quot; really is. <a href="http://en.wikipedia.org/wiki/Indent_style" title="Indent Style">Even something as simple as braces and indents is still widely discussed.</a>  <br>
+</p>
+<p>One reason the topic is so sensitive is because it's really an emotional problem: when layout isn't &quot;right,&quot; it's distracting and annoying.  It has an immediate visceral impact.
+</p>
+<p>There's one construct that has always irked me; even though I can't entirely explain why.  I call it &quot;nested parallel <code>if</code>s&quot;, a phrase I just made up.  Here's an example:
+</p>
+<pre><code>void prioritize(bool customer_is_big, bool bug_is_life_threating) {
+    if ( customer_is_big) {
+        if ( bug_is_life_threating ) {
+            // execute super high priority code
+        } else {
+            // execute medium priority code
+        }
+    } else {
+        if ( bug_is_life_threating ) {
+        // execute high priority code
+    } else {
+        // execute low priority code
+        }
+    }
+}
+</code></pre><p>The abstract scenario is that you have several <code>bool</code> or <code>enum</code> typed variables, and you need to execute different code for each combination.  For <code>n</code> Booleans, that means you have to handle <code>2^n</code> cases.  I'll be using the minimal scenario of two Booleans, four cases for my examples, but I'm sure you can imagine how ugly this would get with three or more Booleans splitting into eight or more cases.
+</p>
+<p>There are several things about this that bother me:
+</p>
+<ul>
+ <li>
+     The inner <code>if (bug_is_life_threating)</code> is duplicated.
+ </li>
+
+ <li>
+     the outer <code>else</code> clause is quite far away from the condition.  You have to carefully determine nesting depth and scroll up to figure out the exact scenario for which the code in the <code>else</code> block is executed.
+ </li>
+
+ <li>
+     The nesting order is arbitrary, yet it is baked into the structure of the code, so it's tedious to change the nesting order later.
+ </li>
+</ul>
+<p>All this is just post-hoc rationalization, of course.  In fact, I just find it hard to read.  Like I said, it's mostly visceral.
+</p>
+
+<h2>A weak solution</h2>
+<p>Now, the first thing I considered was to use a switch statement instead:
+</p>
+<pre><code>void prioritize(bool customer_is_big, bool bug_is_life_threating) {
+    switch(   int(customer_is_big) | ( int(customer_is_big) &lt;&lt;  1)   ) {
+      case 3:
+        // execute super high priority code
+        break;
+      case 2:
+        // execute medium priority code
+        break;
+      case 1:
+        // execute high priority code
+        break;
+      case 0:
+        // execute low priority code
+        break;
+    }
+}
+</code></pre><p>This removes the duplicate code and arbitrary nesting order, but has many other problems.  Most obviously, mapping the <code>case</code> numbers to the different cases is opaque and possibly error prone.  So let's try again.
+</p>
+
+<h2>A better solution</h2>
+<p>Now, doesn't this expression:
+</p>
+<pre><code>    int(customer_is_big) | ( int(customer_is_big) &lt;&lt;  1 )
+</code></pre><p>remind you of something?  It looks an awful lot like way the subscripts of a multi-dimensional array are resolved to addresses.  Perhaps that would be more obvious in this equivalent form:
+</p>
+<pre><code>    int(customer_is_big) + int(customer_is_big)*2
+</code></pre><p>Can we find a way to use multi-dimensional array subscripts to handle that icky bit of math for us?  That would give us an elegant notation for getting from the Booleans to the element of an array.  The answers is Yes; we can function pointers!  Function pointers are a classic way to dynamically select code.  The pieces are fitting together quite nicely.  Here's a summary of where we are now:
+</p>
+<blockquote><p>Use a multi-dimensional array of function pointers to dispatch directly to the appropriate function.
+</p>
+</blockquote><p>Let's give that a try:
+</p>
+<pre><code>void prioritize(bool customer_is_big, bool bug_is_life_threating) {
+    typedef void (*handlerFunction)();
+    handlerFunction handler[2][2] = { {
+        low_priority,
+        high_priority
+        }, {
+        medium_priority,
+        super_high_priority
+    } };
+    handler[int(customer_is_big)][int(bug_is_life_threating)]();
+}
+
+void low_priority() { /* execute low priority code */ }
+void medium_priority() { /* execute low priority code */ }
+void high_priority() { /* execute low priority code */ }
+void super_high_priority() { /* execute low priority code */ }
+</code></pre><p>Now, that has some very nice features.  the dispatch logic is entirely contained in the initialization of the function pointer array, and each case is handled in a separate function (enforcing good factoring).  The technique scales well to more cases; you simply add more dimensions the array.  It also handles enumerations with the same syntax, although you'll need to be know and use the underlying integer value of the <code>enum</code>, which could be a problem.
+</p>
+<p>The main quibble I have with this is that it's still not <em>entirely</em> clear which function maps to which case.  So, I suggest breaking the array initializer out over several lines, to form a kind of table:
+</p>
+<pre><code>void prioritize(bool customer_is_big, bool bug_is_life_threating) {
+    typedef void (*handlerFunction)();
+    handlerFunction handler[2][2] = { 
+      // MINOR BUG           LIFE THREATNING BUG 
+        {low_priority,       high_priority},          // SMALL CUSTOMER
+        {medium_priority,    super_high_priority}     // LARGE CUSTOMER
+    };
+    handler[int(customer_is_big)][int(bug_is_life_threating)]();
+}
+</code></pre><p>And that's my final answer.
+</p>
+
+<h2>Make code, not war</h2>
+<p>I think this is a pretty neat solution, because (A) we can define and format the dispatch table in a very natural and intuitive way, and (B) the dispatch itself happens in a single line of code.  Not one machine operation, because there'll be some work behind the scenes to resolve the array subscripts to an address, but it's still pretty fast.  Advantage (B) is C/C++ specific, but we could get advantage (A) in any modern language.
+</p>
+<p>Of course, not everyone's going to agree that this is a 'neat' solution.  I'll be some people would say that there wasn't any problem there to solve.  That's ok; like I said before, layout is a very emotional issue for programmers.  In my experience, the divide isn't between programmers who prefer one layout style over another, but between programmers who care about making their code readable and those that don't.  It doesn't take <em>much</em> work to lay your code out nicely, but it's non-zero.  So let me leave you with my Thought of the Day:
+</p>
+<blockquote><p>The most important aspect of readable code is thinking about code readability.
+</p>
+</blockquote>
+
+
+</div>
+<p>
+  <span class="signature">- Oran Looney</span>
+  <span class="signature-date">April 29th 2007</span>
+</p>
+  <p class="thank-you">
+    Thanks for reading.  Please subscribe to the <a href="/feeds/blog/">RSS feed</a> and remember that
+    future readers will thank you for leaving your comments and criticisms.
+    <a href="/feeds/blog/" title="Subscribe to RSS Feed" class="big-rss-link">Subscribe to RSS Feed</a>
+  </p>
+<p class="article-tags">
+     
+        <a href="/tag/problem-solving/">Problem Solving</a> 
+     
+        <a href="/tag/coding-style/">Coding Style</a> 
+     
+        <a href="/tag/c/">C++</a> 
+    
+</p>
+
+
+      </div>
+      
+  
+  <div class="content-page comments" style="border-top: none">
+    <a name="comments"></a>
+    
+	  <h1>Comments (1)</h1>
+      <div>
+        
+          <div class="comment">
+    <div class="comment-date">September 11th 2012</div>
+	<h4><span class="comment-username">Kay</span> said: </h4>
+	<p>Hi all,I would like to contribute my coenolidatsd.db. Of course I already installed the iOS-Update, so I can no longer extract it from the default backup location.Instead I would like to extract coenolidatsd.db&#39;s from my TimeMachine backups. I also think that this would be an easy way to still get db&#39;s even from people who already updated.I could imagine some kind of  Choose backup location -button or something similar. It would be great if someone could add this to the applet. I actually found the right line in the source, change it to a static TM location, but then failed to compile due to lack of experience with java  Thanks in advanceljr</p>
+</div>
+
+        
+      </div>
+    
+    <h1>Leave a Comment</h1>
+    
+<form method="post" action="/using-tables-improve-code-layout/leave-comment/" class="leave-comment-form">
+  <div style='display:none'><input type='hidden' name='csrfmiddlewaretoken' value='7c54419eea61d947291c188320a452fc' /></div>
+  <div>
+    Your Name: <br>
+    
+    <input id="id_user_name" type="text" name="user_name" maxlength="12" />
+  </div>
+  <div>
+    Comment: <br>
+    
+    <textarea id="id_content" rows="10" cols="40" name="content"></textarea>
+  </div>
+  <div>
+    Enter this phrase: <br>
+    
+    <img src="/static/site/images/captcha.png" alt="captcha">
+    <input id="id_captcha" type="text" name="captcha" maxlength="20" /> 
+  </div>
+  <div>
+    <input class="submit-button" type="submit" value="Leave Comment">
+  </div>
+</form>
+
+  </div>
+  
+
+	
+  </div>
+
+
+
+  <script src="http://www.google-analytics.com/urchin.js" type="text/javascript"></script>
+  <script type="text/javascript"> _uacct = "UA-2535855-1"; urchinTracker(); </script>
+
+</body>
+</html>

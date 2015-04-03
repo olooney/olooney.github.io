@@ -1,0 +1,313 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang="en-us" dir="ltr">
+<head>
+<!-- meta -->
+<meta http-equiv="content-type" content="text/html; charset=utf-8">
+<meta name="author" content="Oran Looney">
+<meta name="robots" content="INDEX,FOLLOW">
+<meta name="description" content="Oran quitely programming away and sharing a few of the lessons learned">
+<meta name="keywords" content="Programming,Code,Coding,Software,Software Development,Web,Web Development,Python,JavaScript,C++">
+<meta name="verify-v1" content="GmOM2OF0gDOQiM8uS0yKm1ZA0gUI8Hqk4BamNHp7iCg=">
+<meta name="viewport" content="width=800,initial-scale=0.6">
+<link rel="alternate" type="application/rss+xml" href="/feeds/blog/" title="OranLooney.com RSS Blog Feed">
+
+<title>OranLooney - JavaScript Pluralization</title>
+
+<!-- style -->
+<link rel="stylesheet" type="text/css" href="/static/site/css/yui-reset-min.css">
+<link rel="stylesheet" type="text/css" href="/static/site/css/main.css">
+<link rel="stylesheet" type="text/css" media="print" href="/static/site/css/print.css">
+<!--[if lt IE 7.]>
+	<link rel="stylesheet" type="text/css" href="/static/site/css/icons_gif.css">
+<![endif]-->
+
+
+
+</head>
+
+
+<body>
+
+  <div id="banner">
+	<a href="/">OranLooney.com</a>
+	<h6>quietly programming away</h6>
+  </div>
+  <div class="box" id="sidebar">
+	
+		<form id="quick-search" method="get" action="/search/">
+			<div>
+				<input type="hidden" name="alltags">
+				<input type="text" name="keyword" class="keyword-field">
+				<button type="submit" class="search-submit-button">Search</button>
+		  	</div>
+		  </form>
+	
+
+    <ul class="menu">
+      
+        <li class="menu_home"><a href="/">Home</a></li>
+      
+
+      
+		<li class="menu_rss_feed"><a href="/feeds/blog/" title="subscribe to the RSS feed">RSS Feed</a></li>
+        <li class="menu_tags"><a href="/tags/" title="search articles by tag">Tags</a></li>
+        <li class="menu_index"><a href="/archive" title="search articles chronologically">Archive</a></li>
+        <li class="menu_break"></li>
+        <li class="menu_bookshelf" title="my books on librarything.com"><a href="http://www.librarything.com/catalog.php?view=olooney&amp;offset=0&amp;shelf_rows=10&amp;previousOffset=0&amp;shelf=shelf">Bookshelf</a></li>
+        <li class="menu_sig" title="my endorsement of Agile"><a href="http://agilemanifesto.org/sign/display.cgi?ms=000000203">Manifesto</a></li>
+
+        <li class="menu_about_site" title="about the site itself"><a href="/colophon/">Colophon</a></li>
+        <li class="menu_about_me"><a href="/author/" title="about the author">Author</a></li> 
+      
+      
+      
+      
+          <li class="menu_break"></li>
+        
+          <li class="menu_login"><a href="/admin/">Login</a></li> 
+        
+      
+    </ul>
+  </div>
+  <div id="main-wrapper">
+	
+      
+      <div class="content-page">
+        
+  <a href="/js-plural/" class="title">JavaScript Pluralization</a>
+
+  
+    <a href="http://www.flickr.com/photos/jule_berlin/839245545/">
+      <img alt="colorful lead photo" src="/static/media/images/lead/839245545_d89144d012.jpg">
+    </a>
+  
+
+<div>
+  
+<p>Programatically pluralizing English words is tricky.  There are lots of special cases and rules, and exceptions to those rules.  Many have tried before, and many will try after, but English will remain organic and intractable.  Nevertheless, I think this attempt is valuable for a couple of reasons:
+</p>
+<ul>
+ <li>
+     It's in JavaScript, where there are few good inflectors.
+ </li>
+
+ <li>
+     It's better researched than the others I've looked at.
+ </li>
+
+ <li>
+     It comes with a unit test suite documenting the edge cases.
+ </li>
+
+ <li>
+     It's extensible.
+ </li>
+
+ <li>
+     It has an LGPL license, so you can use it anywhere.
+ </li>
+</ul>
+
+<h2>Download</h2>
+<ul>
+ <li>
+     <a href="http://oranlooney.com/static/inflect/pluralize.js">pluralize.js</a>
+ </li>
+
+ <li>
+     <a href="http://oranlooney.com/static/inflect/pluralize.zip">pluralize.zip</a> (includes license and tests)
+ </li>
+</ul>
+<p>Or &quot;try before you buy&quot; (not that there's anything to buy) on this live test page:
+</p>
+<ul>
+ <li>
+     <a href="http://oranlooney.com/static/inflect/test_plurals.html">Test Plurals</a>
+ </li>
+</ul>
+
+<h2>Documentation</h2>
+<p>The library provides one function: <code>pluralize()</code>.  Here's it's signature in psuedo-code:
+</p>
+<pre><code>String pluralize(String noun, optional Integer Count, optional String plural);
+</code></pre><p>It exists in the <code>owl</code> namespace, and you usually use it like so:
+</p>
+<pre><code>owl.pluralize(&quot;baby&quot;); // returns &quot;babies&quot;
+</code></pre><p>If you're not sure if you want to pluralize or not, you can also pass in a count.  If the count is one, the singular form will be returned, otherwise the plural is returned.
+</p>
+<pre><code>function deleteMessage(n) { 
+    return &quot;deleted &quot; + n + &quot; &quot; + owl.pluralize(&quot;record&quot;, n);
+}
+deleteMessage(0); // &quot;deleted 0 records&quot;
+deleteMessage(1); // &quot;deleted 1 record&quot;
+deleteMessage(42); // &quot;deleted 42 records&quot;
+</code></pre><p>The library detects and preserves the case of the word passed in:
+</p>
+<pre><code>owl.pluralize(&quot;alumnus&quot;) == &quot;alumni&quot;;
+owl.pluralize(&quot;Alumnus&quot;) == &quot;Alumni&quot;;
+</code></pre><p>However, all-uppercase worlds get a lowercase &quot;s&quot;, because this is correct for initials:
+</p>
+<pre><code>owl.pluralize(&quot;IBM&quot;) == &quot;IBMs&quot;
+</code></pre><p>Basically, it assumes that you're using normal English casing rules.  If you're trying to build an all-uppercase message, you should use <code>toUpperCase()</code> <em>after</em> <code>pluralize()</code>.
+</p>
+<p>Sometimes, it also uses casing as a hint.  The nationalities and languages ending in &quot;ese&quot; (such as &quot;Chinese&quot;) should always be capitalized, so the function uses case as a hint:
+</p>
+<pre><code>owl.pluralize(&quot;chinese&quot;) == &quot;chineses&quot;;
+// this is wrong, but so was the input. GIGO.
+
+owl.pluralize(&quot;Chinese&quot;) == &quot;Chinese&quot;;
+</code></pre><p>Not every word will be correctly pluralized by default, of course.  The first is simply to pass the plural into <code>pluralize()</code> as the third argument.  Obviously, this is only useful if you're also using the count feature.
+</p>
+<pre><code>owl.pluralize(&quot;emacs&quot;, 1, &quot;emacsen&quot;); // &quot;emacs&quot;
+owl.pluralize(&quot;emacs&quot;, 42, &quot;emacsen&quot;); // &quot;emacsen&quot;
+</code></pre><p>Following the open/closed principle, the library provides a way to extend it's behavior without modifying the code.  You can define your own custom plurals.
+</p>
+<pre><code>owl.pluralize(&quot;emacs) == &quot;emacses&quot;; // lacks geek cred.
+owl.pluralize.define(&quot;emacs&quot;, &quot;emacsen&quot;);
+owl.pluralize(&quot;emacs) == &quot;emacsen&quot;; // now it's geek-awesome.
+</code></pre><p>From then on, that word will aways be pluralized the as defined.  There's no way to undefine a plural.
+</p>
+
+<h2>Octopuses and Dwarfs</h2>
+<p>A couple of choices made by the library are the targets of popular misconception and urban myth and require justification.
+</p>
+<p>The first is &quot;octopus:&quot;
+</p>
+<pre><code>owl.pluralize(&quot;octopus&quot;) == &quot;octopuses&quot;;
+</code></pre><p>No, not &quot;octopi.&quot;  This young lady explains it rather well:
+   <object width="480" height="385"><param name="movie" value="http://www.youtube.com/v/wFyY2mK8pxk&amp;hl=en_US&amp;fs=1"></param><param name="allowFullScreen" value="true"></param><param name="allowscriptaccess" value="always"></param><embed src="http://www.youtube.com/v/wFyY2mK8pxk&amp;hl=en_US&amp;fs=1" type="application/x-shockwave-flash" allowscriptaccess="always" allowfullscreen="true" width="480" height="385"></embed></object>
+</p>
+<p>What's true of &quot;octopus&quot; is true for many other words ending in &quot;us&quot; that do not come from Latin originally.  That means I can't add a general rule, and since the anglicized plural of octopus in particular is preferred to fake Latin, there's no reason to add a special case either.
+</p>
+<p>A rather more sensitive example is &quot;dwarf.&quot;  Dwarfs are people having the medical condition of dwarfism.  Dwarves are fantasy creatures that live under mountains... at least according to Tolkien.  The Disney movie, on the other hand, is called &quot;Snow White and the Seven Dwarfs.&quot;  So this library takes the high road and uses &quot;dwarfs.&quot;  <br>
+</p>
+<p>Edge cases like this forced me to define a philosophy of pluralization.  This library attempts to maximize the likelihood of &quot;acceptable&quot; plurals.  This means it uses regular, anglicized plurals whenever possible.  If the anglicized plural is common and acceptable, no special case is added, i.e. &quot;octopuses.&quot;  Only when the anglicized plural is considered wrong, ugly, or ignorant does it use an irregular form, i.e. &quot;criterion&quot; is pluralized as &quot;criteria.&quot;  The idea is minimize the chance of a <em>really</em> bad plural showing up in your content.
+</p>
+<p>And of course, if you're building a website about the sea life of Middle Earth, go ahead and register &quot;octopi&quot; and &quot;dwarves&quot; as custom plurals.
+</p>
+
+<h2>Prior Art</h2>
+<p>This library is largely based on Damian Conway's <a href="http://www.csse.monash.edu.au/~damian/papers/HTML/Plurals.html">pluralization algorithm</a>.  However, I only handle nouns, including pronouns.  I don't handle verbs, adjectives, or phrases.  I've also added a large number special cases beyond the tables he provides.  I've also used anglicized plurals in most places, and used classical plurals only for well-known examples such as &quot;alumni&quot;.
+</p>
+<p>I looked at the <a href="http://www.ruby-lang.org/en/">Ruby</a> on Rail's <a href="http://api.rubyonrails.org/classes/ActiveSupport/Inflector.html#M000706">Inflector</a> first, but didn't get much from it.  It's a surprisingly sophomoric effort considering how central it is to the framework (Rails, by default, maps singular model class names to plural table names using the inflector.)  Damian's algorithm, even implemented half-way like I did, is much better.
+</p>
+
+
+
+</div>
+<p>
+  <span class="signature">- Oran Looney</span>
+  <span class="signature-date">July 31st 2010</span>
+</p>
+  <p class="thank-you">
+    Thanks for reading.  Please subscribe to the <a href="/feeds/blog/">RSS feed</a> and remember that
+    future readers will thank you for leaving your comments and criticisms.
+    <a href="/feeds/blog/" title="Subscribe to RSS Feed" class="big-rss-link">Subscribe to RSS Feed</a>
+  </p>
+<p class="article-tags">
+    
+</p>
+
+
+      </div>
+      
+  
+  <div class="content-page comments" style="border-top: none">
+    <a name="comments"></a>
+    
+	  <h1>Comments (7)</h1>
+      <div>
+        
+          <div class="comment">
+    <div class="comment-date">December 7th 2014</div>
+	<h4><span class="comment-username">Nate-Wilkins</span> said: </h4>
+	<p>Great work! Seems like their are a few cases that need some work but still awesome. Maybe open sourcing the project in it&#39;s own repository (github/bit bucket) would help fix the minor bugs.</p>
+</div>
+
+        
+          <div class="comment">
+    <div class="comment-date">July 28th 2014</div>
+	<h4><span class="comment-username">Jim</span> said: </h4>
+	<p>Hi Oran, I think there&#39;s a small mistake in the algorithm. For example, the plural of &#39;Country&#39; is &#39;Countrys&#39; but the plural of &#39;country&#39; is countries&#39;.
+
+On lines 175-176 in the suffix rule check, I&#39;ve replaced &#39;word&#39; with &#39;lowerWord&#39; and run capitalizeSame on the result, and it now gives the expected result &#39;Countries&#39;.</p>
+</div>
+
+        
+          <div class="comment">
+    <div class="comment-date">February 21st 2014</div>
+	<h4><span class="comment-username">miro</span> said: </h4>
+	<p>one asparagus = many asparagus
+
+right now it gives asparaguses</p>
+</div>
+
+        
+          <div class="comment">
+    <div class="comment-date">July 7th 2013</div>
+	<h4><span class="comment-username">theofilus</span> said: </h4>
+	<p>if an already pluralised word is entered as input, it produces a fake word like &quot;people --&gt; peoples&quot;</p>
+</div>
+
+        
+          <div class="comment">
+    <div class="comment-date">December 14th 2012</div>
+	<h4><span class="comment-username">Ralph</span> said: </h4>
+	<p>Other exceptions: fix, suffix, mix, blouse</p>
+</div>
+
+        
+          <div class="comment">
+    <div class="comment-date">September 12th 2012</div>
+	<h4><span class="comment-username">Neelu</span> said: </h4>
+	<p>I dont believe Ive read ainthyng like this before. So great to find somebody with some original thoughts on this subject. thank for starting this up. This internet site is something that is needed on the web, someone with a little originality. Good job for bringing something new towards the internet!</p>
+</div>
+
+        
+          <div class="comment">
+    <div class="comment-date">August 27th 2012</div>
+	<h4><span class="comment-username">ss</span> said: </h4>
+	<p>In case you read this, I think you should know that I&#39;m pretty sure that the plural of &quot;thief&quot; is &quot;thieves&quot;.</p>
+</div>
+
+        
+      </div>
+    
+    <h1>Leave a Comment</h1>
+    
+<form method="post" action="/js-plural/leave-comment/" class="leave-comment-form">
+  <div style='display:none'><input type='hidden' name='csrfmiddlewaretoken' value='7c54419eea61d947291c188320a452fc' /></div>
+  <div>
+    Your Name: <br>
+    
+    <input id="id_user_name" type="text" name="user_name" maxlength="12" />
+  </div>
+  <div>
+    Comment: <br>
+    
+    <textarea id="id_content" rows="10" cols="40" name="content"></textarea>
+  </div>
+  <div>
+    Enter this phrase: <br>
+    
+    <img src="/static/site/images/captcha.png" alt="captcha">
+    <input id="id_captcha" type="text" name="captcha" maxlength="20" /> 
+  </div>
+  <div>
+    <input class="submit-button" type="submit" value="Leave Comment">
+  </div>
+</form>
+
+  </div>
+  
+
+	
+  </div>
+
+
+
+  <script src="http://www.google-analytics.com/urchin.js" type="text/javascript"></script>
+  <script type="text/javascript"> _uacct = "UA-2535855-1"; urchinTracker(); </script>
+
+</body>
+</html>

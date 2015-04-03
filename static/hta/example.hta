@@ -1,0 +1,100 @@
+<html>
+  <head>
+    <title>Example of a JavaScript HTML Application</title>
+    <HTA:APPLICATION 
+        ID="owlExampleHta" 
+        APPLICATIONNAME="OWLEXAMPLEHTA"
+        SCROLL="no"
+        SINGLEINSTANCE="yes"
+        maximizeButton="no"
+        minimizeButton="no"
+        border="thick"
+    >
+    <style type="text/css">
+    <!--
+      body {
+        font-family: verdana;
+        font-size: 12px;}
+      a {
+        text-decoration: none;}
+      a:hover {
+        background: #ccccee;
+        text-decoration: none;}
+      div.group {
+        text-align: center;
+        padding: 10px;
+        margin: 10px;
+        border: 1px solid blue;}
+      div {
+       text-align: right;
+       margin: 20px;}
+      div.about {
+        font-size: smaller;
+        font-style: italic;
+        margin-right: 2px;
+        text-align: right;}
+      div.link {
+        text-align:center;
+        margin: 10px;
+        padding: 5px;}
+      div.instructions {
+        font-size: 8pt;
+        text-align:left;
+        text-indent: 1em;}
+    -->
+    </style>
+  </head>
+
+  <script type="text/javascript"">
+
+    var iniList;
+  
+    function main() {
+        var text = document.mainForm.text.value;
+        var url = document.mainForm.url.value;
+        document.getElementById('link').href = url;
+        document.getElementById('link').innerHTML = text;
+        document.mainForm.output.value = '<a href="' + url + '">' + text + '</a>';
+    }
+    
+    function init() {
+      top.resizeTo(550,450);
+      document.mainForm.text.focus();
+      
+      document.mainForm.text.value = "Google";
+      document.mainForm.url.value = "http://google.com";
+      main();
+    }
+ 
+  </script>
+  <body onLoad="init()">
+  <form name = "mainForm" />
+   <div class="instructions">  This tool serves as an example of an HTA.  It just builds a hyperlink
+     out of a URL and the display text.  (Originally, the point was to get links to a propietary protocol
+     into programs such as Outlook, but I've removed all that for the example.)  The option buttons aren't used.
+   </div>
+   <div >
+     Text: <input style="width:60ex" name="text" onkeyup="main()" />
+   </div>
+   <div >
+    URL: <input style="width:60ex" name="url" onkeyup="main()" />
+   </div>
+   <div id="options" class="group">
+    <input type="radio" name="options" value="YES" onclick="main()" checked="checked" />Yes &nbsp;
+    <input type="radio" name="options" value="NO" onclick="main()" />No &nbsp;
+    <input type="radio" name="options" value="MAYBE" onclick="main()" />Maybe &nbsp;
+   </div>
+   <div>
+     HTML: <input style="width:60ex" name="output" onkeyup="main()" />
+   </div>
+   <div class="link">
+    HyperLink: 
+    <a id="link" href="">no link yet</a>
+   <div>
+   <div class="about">
+     URL Maker - a Sample JavaScript HTA by Oran Looney <br />
+     Special thanks to Farhan Ahmad.
+   </div>
+  </form>
+  </body>
+</html>

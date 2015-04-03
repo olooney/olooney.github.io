@@ -1,0 +1,338 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss xmlns:atom="http://www.w3.org/2005/Atom" version="2.0"><channel><title>OranLooney.com</title><link>http://oranlooney.com/</link><description>quietly programming away: thoughts, tutorials, and vignettes</description><atom:link href="http://example.com/feeds/blog/" rel="self"></atom:link><language>en-us</language><lastBuildDate>Fri, 03 Apr 2015 14:07:35 -0000</lastBuildDate><item><title>Calling Superclass Methods in JavaScript
+</title><link>http://oranlooney/super-javascript/</link><description>
+  &lt;a href="http://oranlooney.com/super-javascript/" class="title"&gt;read this essay with its original formatting&lt;/a&gt;&lt;br&gt;
+  
+    &lt;img src="http://oranlooney.com/static/media/images/lead/3031088430_a679723a72.jpg" alt="colorful lead photo"&gt;
+  
+  &lt;div&gt;
+    
+&lt;p&gt;Overriding a method and invoking the same method on the superclass is core
+   technique in object-oriented programming. It's great: you automatically preserve the
+   behavior of the superclass now and in the future. In JavaScript, the most straight forward way
+   is to refer to the superclass's method directly and use &lt;code&gt;apply()&lt;/code&gt; to pass it
+   the current scope and arguments:
+&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;function Wagon() {}
+subclass(Wagon, Vehical, {
+    drive: function() {
+        this.moveForward(3);
+    }
+});
+
+function RickityWagon() {}
+subclass(RickityWagon, Wagon, {
+    drive: function() {
+        this.clatter();
+        return Wagon.prototype.drive.apply(this, arguments);
+    }
+});
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;No matter how Wagon's &lt;code&gt;drive()&lt;/code&gt; method evolves - adding more complex
+   logic, calling other methods, adding option arguments, returning a value
+   - RickityWagon's &lt;code&gt;drive()&lt;/code&gt; method will always behave the same way, just
+   with additional clattering.
+&lt;/p&gt;
+&lt;p&gt;It may seem strange to refer to the superclass directly if you come to Java,
+   but that's perfectly natural for those of us coming from C++. You see, in C++ you can have multiple
+   base classes, so &lt;code&gt;super.method&lt;/code&gt; is ambiguous, so you have to say which
+   class you mean.
+&lt;/p&gt;
+&lt;p&gt;So that's superclass chaining. Pretty much everyone agrees that it's a good
+   thing.  Some people, however, think the obvious way, 
+   &lt;code&gt;return SuperClass.prototype.method.apply(this, arguments)&lt;/code&gt;, is too verbose and go looking for an easier way. I'd like to discuss of few of those approaches and why they don't quite work, and argue for sticking to the simple, explicit, and obvious way.
+&lt;/p&gt;
+&lt;p&gt;The first thing you'd think of is to put a &lt;code&gt;super&lt;/code&gt; property on the class's prototype, so you
+   could say something like &lt;code&gt;this.super.drive&lt;/code&gt;. Unfortunately, this breaks down
+   for more than one level of inheritance. If you call up to a superclass, and it
+   tries to call up to &lt;em&gt;it's&lt;/em&gt; superclass, it will end up calling back into itself,
+   causing an infinite loop.
+&lt;/p&gt;
+
+&lt;h2&gt;Resig's _super()&lt;/h2&gt;
+&lt;p&gt;John Resig attacks this problem directly in his &lt;a href="http://ejohn.org/blog/simple-javascript-inheritance/"&gt;Class.extend utility&lt;/a&gt;:
+&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;prototype[name] = typeof prop[name] == &amp;quot;function&amp;quot; &amp;amp;&amp;amp; 
+    typeof _super[name] == &amp;quot;function&amp;quot; &amp;amp;&amp;amp; fnTest.test(prop[name]) ?
+    (function(name, fn){
+      return function() {
+        var tmp = this._super;
+
+        // Add a new ._super() method that is the same method
+        // but on the super-class
+        this._super = _super[name];
+
+        // The method only need to be bound temporarily, so we
+        // remove it when we're done executing
+        var ret = fn.apply(this, arguments);        
+        this._super = tmp;
+
+        return ret;
+      };
+    })(name, prop[name]) :
+    prop[name];
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;His approach is very direct: when you call &lt;code&gt;_super&lt;/code&gt;, swap out &lt;code&gt;_super&lt;/code&gt; on the
+   parent temporarily, and then put it back when you're done. Which is great,
+   unless &lt;code&gt;fn&lt;/code&gt; throws an exception, in which case it doesn't get put back.  You
+   could put a try/catch/rethrow around it, but that usually drops important stack
+   trace information from the exception.
+&lt;/p&gt;
+
+&lt;h2&gt;Using &lt;code&gt;caller&lt;/code&gt;&lt;/h2&gt;
+&lt;p&gt;There's another interesting way to implement &lt;code&gt;super&lt;/code&gt;: relying on
+   &lt;code&gt;arguments.callee.caller&lt;/code&gt;. Using that, you could implemnt a &lt;code&gt;superApply&lt;/code&gt; method
+   that you call like so:
+&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;function RickityWagon() {}
+subclass(RickityWagon, Wagon, {
+    drive: function() {
+        this.clatter();
+        return this.superApply(arguments);
+    }
+});
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;code&gt;superApply&lt;/code&gt; could use &lt;code&gt;arguments.callee.caller&lt;/code&gt; to get a reference to the
+   method it's inside, which you could link back to the overridden method on the
+   superclass if you set up a link when creating the class. Let's say you detect
+   overridden methods at class creation at set a &lt;code&gt;parentMethod&lt;/code&gt; property on the
+   overriding method. The &lt;code&gt;superApply&lt;/code&gt; could be implemented as:
+&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;function superApply(args) {
+    var pm = arguments.callee.caller.parentMethod;
+    if ( pm ) return pm.apply(this, args);
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;There are a couple of problems with that. First of all, &lt;code&gt;caller&lt;/code&gt; is deprecated:
+   you really shouldn't be using it at all, and especially not for some merely convenient syntactic sugar.
+   If an environment drops support for it altogether (and many JavaScript engines &lt;strong&gt;already&lt;/strong&gt; provide a
+   faster &amp;quot;strict&amp;quot; mode where &lt;code&gt;callee&lt;/code&gt; is not supported) you'll have to change a &lt;em&gt;lot&lt;/em&gt; of code
+   to get it working again.
+&lt;/p&gt;
+&lt;p&gt;Second, this relies on behind-the-scenes stuff happening correctly at class
+   creation. It pretty much ties you to one class creation mechanism. If anyone tries to modify the class on after the fact, they'll have to know about those magic properties.  &lt;br&gt;
+&lt;/p&gt;
+
+&lt;h2&gt;Just Too Complex&lt;/h2&gt;
+&lt;p&gt;Both those approaches are just too complex. They're hard to understand, hard to explain, and
+   buggy in practice. They are, however the best solutions that top minds have
+   come up with for implementing &lt;code&gt;super&lt;/code&gt; starting from &lt;code&gt;this&lt;/code&gt;. I certainly wasn't able to come up with anything nearly as good.  As a result, I seriously doubt there &lt;em&gt;is&lt;/em&gt; a clean way to make this work. My conclusion would be simply
+   &amp;quot;don't do that.&amp;quot;
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;A guy goes to a doctor and says, &amp;quot;every time I lift my arm like this, I get a sharp pain.&amp;quot; So the doctor says, &amp;quot;don't do that.&amp;quot;
+&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h2&gt;Hanging Super on the Class&lt;/h2&gt;
+&lt;p&gt;So, &lt;code&gt;super&lt;/code&gt; behavior has to hang off the class.  We're all in agreement on
+   that, right? The only remaining question is if we should reference the
+   superclass directly, or go through our own class. If we just hard-code
+   in the name of the superclass, it looks like this:
+&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;return Wagon.prototype.drive.apply(this, arguments);
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;If on the other hand, we keep a reference to the superclass's prototype
+   on the base class, say, &lt;code&gt;_super&lt;/code&gt;, then we can write this:
+&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;return RickityWagon._super.drive.apply(this, arguments);
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Not much difference, really, but some people prefer this so that it's
+   easy to change the class later to have another base class. That's not a
+   particularly common refactoring, in my experience, but it doesn't sound
+   like a bad idea to configure the superclass in one place.
+&lt;/p&gt;
+&lt;p&gt;So what's not wrong with this, I ask? It's not &lt;em&gt;unclear&lt;/em&gt;, is it?  It's very, very clear.  If you understand
+   &lt;code&gt;prototype&lt;/code&gt;, and you understand &lt;code&gt;apply&lt;/code&gt;, &lt;code&gt;this&lt;/code&gt;, and &lt;code&gt;arguments&lt;/code&gt;... it's just
+   so painfully obvious and clear. Is it so ugly, then? To me, the baroque
+   alternatives are a thousand times uglier.  Perhaps we should simply meditate on
+   the lessons of this expression instead of trying to replace it with
+   something barely more concise but opaque and fraught with hidden complexity.
+   And if a beginner asks you what it means, perhaps you could encourage them to
+   come to a deeper understanding of JavaScript by internalizing these
+   fundamental concepts.
+&lt;/p&gt;
+
+
+
+  &lt;/div&gt;
+  &lt;p&gt;
+    &lt;div class="signature"&gt;- Oran Looney&lt;/div&gt;
+  &lt;/p&gt;
+  &lt;p class="thank-you"&gt;
+    Thanks for reading.
+  &lt;/p&gt;
+
+  &lt;p&gt;
+    
+	
+	Read &lt;a href="http://oranlooney.com/super-javascript/#comments" title="read and leave comment"&gt;two comments&lt;/a&gt; on this essay or &lt;a href="http://oranlooney.com/super-javascript/#comments" title="read and leave comment"&gt;leave your own&lt;/a&gt;.
+	
+
+  &lt;/p&gt;
+
+  
+
+  &lt;p&gt;
+	Browse the complete &lt;a href="http://oranlooney.com/archive/" alt="older essays" title="older posts"&gt;archive&lt;/a&gt; at &lt;a href="http://oranlooney.com/"&gt;OranLooney.com&lt;/a&gt;
+  &lt;/p&gt;
+
+</description><guid>http://oranlooney/super-javascript/</guid></item><item><title>JSON Round Trip with node.js
+</title><link>http://oranlooney/json-round-trip/</link><description>
+  &lt;a href="http://oranlooney.com/json-round-trip/" class="title"&gt;read this essay with its original formatting&lt;/a&gt;&lt;br&gt;
+  
+    &lt;img src="http://oranlooney.com/static/media/images/lead/3958281492_da16207ff0.jpg" alt="colorful lead photo"&gt;
+  
+  &lt;div&gt;
+    
+&lt;p&gt;I've been playing around with node.js a lot recently, because, well, server-side JavaScript is the future of web development, at least for rich internet applications. Basically, if your project uses a lot of JavaScript on the client and primarily uses AJAX and JSON to communicate with the server, then the parsimony, code reuse, and low impedance mismatch of also using JavaScript on the server mean that you'll be at least twice as fast as teams that have to deal with two languages, write separate utilities for the server and client, and massage messages to work in both languages.
+&lt;/p&gt;
+&lt;p&gt;One of the first things you need to do, if you're serious about writing a RIA with a JavaScript backend, is be able to quickly send messages to and from the server. JSON is obviously the best format for JavaScript-to-JavaScript communication. So, I set up a simple example of a node.js server that can both send and receive JSON objects via AJAX, and cache them in memory on the server. The full code of the example is out on &lt;a href="http://github.com/"&gt;github&lt;/a&gt;:
+&lt;/p&gt;
+&lt;ul&gt;
+ &lt;li&gt;
+     &lt;a href="https://github.com/olooney/json-cache-example/"&gt;https://github.com/olooney/json-cache-example/&lt;/a&gt;
+ &lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;I'm going to pluck out the juicy bits right here, though, and explain them.
+&lt;/p&gt;
+
+&lt;h2&gt;Client To Server&lt;/h2&gt;
+&lt;p&gt;The first thing you need to do is be able to POST a JSON object. This is easy enough with &lt;a href="http://jquery.com/"&gt;jQuery&lt;/a&gt;:
+&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;function put(id, data, callback) {
+    $.ajax('http://127.0.0.1:8181/' + id + '/', {
+        type: 'POST',
+        data: JSON.stringify(data),
+        contentType: 'text/json',
+        success: function() { if ( callback ) callback(true); },
+        error  : function() { if ( callback ) callback(false); }
+    });
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Note that the body of the POST is &lt;em&gt;not&lt;/em&gt; URL encoded, like that of a POSTed form: that's verbose and wasteful, and gets us nothing since we'd have to decode it on the server anyway. Note also that I'm using &lt;code&gt;JSON.stringify&lt;/code&gt;. This is in the ECMA-262 standard, built into modern browsers, and Douglas Crockford has written a &lt;a href="https://github.com/douglascrockford/JSON-js"&gt;JSON compatibility library&lt;/a&gt; for legacy browsers.
+&lt;/p&gt;
+&lt;p&gt;The next step is to receive that message on the server. Inside of a HTTP response handler:
+&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;http.createServer(function(request, response) {
+    ...
+    if ( request.method === 'POST' ) {
+        // the body of the POST is JSON payload.
+        var data = '';
+        request.addListener('data', function(chunk) { data += chunk; });
+        request.addListener('end', function() {
+            store[id] = JSON.parse(data);
+            response.writeHead(200, {'content-type': 'text/plain' });
+            response.end()
+        });
+    }
+    ...
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;The request is emitting multiple &amp;quot;data&amp;quot; events, each with a piece of the JSON string: we have to accumulate all of these into one string. When all data is received, the &amp;quot;end&amp;quot; event is emitted, and we can proceed to parse the now-complete JSON string. In this case our handling consists only of tucking away the deserialized object in the store. Afterwards, we return a empty document with a &amp;quot;200 OK&amp;quot; status.
+&lt;/p&gt;
+&lt;p&gt;I should probably do error handling on the JSON.parse as it's likely to throw an exception, but I forgot. Typical error handling looks like this:
+&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;try {
+    store[id] = JSON.parse(data);
+} catch ( e ) {
+    response.writeHead(500, {'content-type': 'text/plain' });
+    response.write('ERROR:' + e);
+    response.end('\n');
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h2&gt;Server To Client&lt;/h2&gt;
+&lt;p&gt;This is very simple. On the server, we just have to get the object out of the store, serialize it, and write it out. 
+&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;if ( request.method === 'GET' ) {
+    // exact id lookup.
+    if ( id in store ) {
+        response.writeHead(200, {'content-type': 'text/json' });
+        response.write( JSON.stringify(store[id]) );
+        response.end('\n');
+    } else {
+        response.writeHead(404, {'content-type': 'text/plain' });
+        response.write('no data for ' + id);
+        response.end('\n');
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Note that I'm using the mime type &lt;code&gt;text/json&lt;/code&gt;. The official MIME type is &lt;code&gt;application/json&lt;/code&gt;, but I've had trouble with frameworks treating that as unencoded binary data. You should probably use the standard, though, unless you have a good reason.
+&lt;/p&gt;
+&lt;p&gt;jQuery supports JSON data right out of the box, so there's barely anything for us to do on the client:
+&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;function get(id, callback) {
+    $.ajax('http://127.0.0.1:8181/' + id + '/', {
+        type: 'GET',
+        dataType: 'json',
+        success: function(data) { if ( callback ) callback(data); },
+        error  : function()     { if ( callback ) callback(null); }
+    });
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h2&gt;Conclusion&lt;/h2&gt;
+&lt;p&gt;It's easy to send JSON from the client to the server, and even easier to get it from the server to the client. There are no no mismatched data types, no parsing or serialization algorithms, just two environments that speak the same language communicating in a minimal (but not trivial) subset of that language. Can you see why I'm so excited about this stuff?
+&lt;/p&gt;
+
+
+
+  &lt;/div&gt;
+  &lt;p&gt;
+    &lt;div class="signature"&gt;- Oran Looney&lt;/div&gt;
+  &lt;/p&gt;
+  &lt;p class="thank-you"&gt;
+    Thanks for reading.
+  &lt;/p&gt;
+
+  &lt;p&gt;
+    
+	
+	Read &lt;a href="http://oranlooney.com/json-round-trip/#comments" title="read and leave comment"&gt;12 comments&lt;/a&gt; on this essay or &lt;a href="http://oranlooney.com/json-round-trip/#comments" title="read and leave comment"&gt;leave your own&lt;/a&gt;.
+	
+
+  &lt;/p&gt;
+
+  
+
+  &lt;p&gt;
+	Browse the complete &lt;a href="http://oranlooney.com/archive/" alt="older essays" title="older posts"&gt;archive&lt;/a&gt; at &lt;a href="http://oranlooney.com/"&gt;OranLooney.com&lt;/a&gt;
+  &lt;/p&gt;
+
+</description><guid>http://oranlooney/json-round-trip/</guid></item><item><title>JavaScript Map Filter Reduce
+</title><link>http://oranlooney/js-map-filter-reduce/</link><description>
+  &lt;a href="http://oranlooney.com/js-map-filter-reduce/" class="title"&gt;read this essay with its original formatting&lt;/a&gt;&lt;br&gt;
+  
+    &lt;img src="http://oranlooney.com/static/media/images/lead/seashell.jpg" alt="colorful lead photo"&gt;
+  
+  &lt;div&gt;
+    
+&lt;p&gt;Hey! Do you want to use the standard JavaScript array algorithms such as &lt;code&gt;map()&lt;/code&gt;, &lt;code&gt;filter()&lt;/code&gt;, and yes, even &lt;code&gt;reduce()&lt;/code&gt; (left &lt;em&gt;and&lt;/em&gt; right) in all browsers, not just the modern ones? Do you hate reading licenses to figure out if you can include a library in your project? Do you mistrust all code, including your own, until you've seen it pass an exhaustive suite of tests?  Do you like standards? Then boy do I have the library for you!
+&lt;/p&gt;
+&lt;ul&gt;
+ &lt;li&gt;
+     &lt;a href="https://github.com/olooney/attache-array-js"&gt;attache-array-js&lt;/a&gt;
+ &lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;The idea is simple: implement a compatability layer for &lt;em&gt;all&lt;/em&gt; the array algorithms specified in the ECMA-262 5th edition standard: &lt;code&gt;indexOf()&lt;/code&gt;, &lt;code&gt;lastIndexOf()&lt;/code&gt;, &lt;code&gt;every()&lt;/code&gt;, &lt;code&gt;some()&lt;/code&gt;, &lt;code&gt;forEach()&lt;/code&gt;, &lt;code&gt;filter()&lt;/code&gt;, &lt;code&gt;map()&lt;/code&gt;, &lt;code&gt;reduce()&lt;/code&gt;, and &lt;code&gt;reduceRight()&lt;/code&gt;.  None of these are implemented in IE6, 7, or 8 so you can't use &lt;em&gt;any&lt;/em&gt; of them on the web unless you use a library.  MDC provides &lt;a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Array/reduce"&gt;copy-and-paste examples of these functions&lt;/a&gt;, but doesn't provide any unit tests or a deployable library.  So, I implemented my own versions, following the standard closely, wrote a full suite of tests, put them all into one convenient, minified &lt;code&gt;.js&lt;/code&gt; file and released it in the public domain (or MIT license, for countries were &amp;quot;public domain&amp;quot; is meaningless.) That means you can it these wherever and however you like, worry-free. 
+&lt;/p&gt;
+&lt;p&gt;And you &lt;em&gt;should&lt;/em&gt; be using them! You see, while each of these algorithms is a convenience by itself, they also work extraordinarily well together. Informally speaking, they form an orthonormal basis for all array algorithms.  By chaining map, filter, and reduce calls, you're able to clearly, safely, and correctly manipulate arrays. More importantly, thinking about arrays in this way is very powerful and very easy: even very complex problems can be quickly solved if you have these algorithms and your fingertips.
+&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;A programming language serves two related purposes: it provides a vehicle for the programmer to specify actions to be executed, and it provides a set of concepts for the programmer to use when thinking about what can be done. -Bjarne Stroustrup
+&lt;/p&gt;
+&lt;/blockquote&gt;&lt;p&gt;Now if only JavaScript had equivalent algorithms for associative arrays...
+&lt;/p&gt;
+
+
+
+  &lt;/div&gt;
+  &lt;p&gt;
+    &lt;div class="signature"&gt;- Oran Looney&lt;/div&gt;
+  &lt;/p&gt;
+  &lt;p class="thank-you"&gt;
+    Thanks for reading.
+  &lt;/p&gt;
+
+  &lt;p&gt;
+    
+	
+	  Be the &lt;a href="http://oranlooney.com/js-map-filter-reduce/#comments" title="read and leave comment"&gt;first to comment on this article&lt;/a&gt;!
+	
+
+  &lt;/p&gt;
+
+  
+
+  &lt;p&gt;
+	Browse the complete &lt;a href="http://oranlooney.com/archive/" alt="older essays" title="older posts"&gt;archive&lt;/a&gt; at &lt;a href="http://oranlooney.com/"&gt;OranLooney.com&lt;/a&gt;
+  &lt;/p&gt;
+
+</description><guid>http://oranlooney/js-map-filter-reduce/</guid></item></channel></rss>

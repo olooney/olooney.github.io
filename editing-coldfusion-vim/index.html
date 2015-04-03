@@ -1,0 +1,227 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang="en-us" dir="ltr">
+<head>
+<!-- meta -->
+<meta http-equiv="content-type" content="text/html; charset=utf-8">
+<meta name="author" content="Oran Looney">
+<meta name="robots" content="INDEX,FOLLOW">
+<meta name="description" content="Oran quitely programming away and sharing a few of the lessons learned">
+<meta name="keywords" content="Programming,Code,Coding,Software,Software Development,Web,Web Development,Python,JavaScript,C++">
+<meta name="verify-v1" content="GmOM2OF0gDOQiM8uS0yKm1ZA0gUI8Hqk4BamNHp7iCg=">
+<meta name="viewport" content="width=800,initial-scale=0.6">
+<link rel="alternate" type="application/rss+xml" href="/feeds/blog/" title="OranLooney.com RSS Blog Feed">
+
+<title>OranLooney - Editing ColdFusion with VIM</title>
+
+<!-- style -->
+<link rel="stylesheet" type="text/css" href="/static/site/css/yui-reset-min.css">
+<link rel="stylesheet" type="text/css" href="/static/site/css/main.css">
+<link rel="stylesheet" type="text/css" media="print" href="/static/site/css/print.css">
+<!--[if lt IE 7.]>
+	<link rel="stylesheet" type="text/css" href="/static/site/css/icons_gif.css">
+<![endif]-->
+
+
+
+</head>
+
+
+<body>
+
+  <div id="banner">
+	<a href="/">OranLooney.com</a>
+	<h6>quietly programming away</h6>
+  </div>
+  <div class="box" id="sidebar">
+	
+		<form id="quick-search" method="get" action="/search/">
+			<div>
+				<input type="hidden" name="alltags">
+				<input type="text" name="keyword" class="keyword-field">
+				<button type="submit" class="search-submit-button">Search</button>
+		  	</div>
+		  </form>
+	
+
+    <ul class="menu">
+      
+        <li class="menu_home"><a href="/">Home</a></li>
+      
+
+      
+		<li class="menu_rss_feed"><a href="/feeds/blog/" title="subscribe to the RSS feed">RSS Feed</a></li>
+        <li class="menu_tags"><a href="/tags/" title="search articles by tag">Tags</a></li>
+        <li class="menu_index"><a href="/archive" title="search articles chronologically">Archive</a></li>
+        <li class="menu_break"></li>
+        <li class="menu_bookshelf" title="my books on librarything.com"><a href="http://www.librarything.com/catalog.php?view=olooney&amp;offset=0&amp;shelf_rows=10&amp;previousOffset=0&amp;shelf=shelf">Bookshelf</a></li>
+        <li class="menu_sig" title="my endorsement of Agile"><a href="http://agilemanifesto.org/sign/display.cgi?ms=000000203">Manifesto</a></li>
+
+        <li class="menu_about_site" title="about the site itself"><a href="/colophon/">Colophon</a></li>
+        <li class="menu_about_me"><a href="/author/" title="about the author">Author</a></li> 
+      
+      
+      
+      
+          <li class="menu_break"></li>
+        
+          <li class="menu_login"><a href="/admin/">Login</a></li> 
+        
+      
+    </ul>
+  </div>
+  <div id="main-wrapper">
+	
+      
+      <div class="content-page">
+        
+  <a href="/editing-coldfusion-vim/" class="title">Editing ColdFusion with VIM</a>
+
+  
+    <a href="http://www.flickr.com/photos/notionscapital/2347033974/">
+      <img alt="colorful lead photo" src="/static/media/images/lead/2347033974_658ea3b8f0.jpg">
+    </a>
+  
+
+<div>
+  
+<p>This is a quick how-to tutorial for configuring <a href="http://www.vim.org/">VIM</a> for maximum productivity when Editing <a href="http://en.wikipedia.org/wiki/Adobe_ColdFusion">ColdFusion</a> files.  Not to keep you waiting, here's the configuration file:
+</p>
+<p><a href="/static/docs/.vimrc">.vimrc for ColdFusion</a>
+</p>
+<p> However, the configuration file is only one of three parts, and you'll need to go get the other two yourself.  It's worth the leg-work through: when you're done you'll have syntax highlighting, keyword completion, and tag completion for .cfc and .cfm files in <a href="http://www.vim.org/">VIM</a>.  Sure, other editors have those features too, but they can't match <a href="http://www.vim.org/">VIM</a>'s raw plain-text editing power.
+</p>
+
+<h2>The Dictionary</h2>
+<p> <a href="http://www.vim.org/">VIM</a> has an auto-completion feature, usually activated with Ctrl-n and Ctrl-p.  It can work off any dictionary, so all we need to do is come up with a list of every <a href="http://en.wikipedia.org/wiki/Adobe_ColdFusion">ColdFusion</a> tag name and function name we want to auto-complete.  Luckily, this has already been done for us:
+</p>
+<p><a href="http://www.interaktonline.com/blogs/cristic/">http://www.interaktonline.com/blogs/cristic/</a>
+</p>
+<p>The <a href="/static/docs/.vimrc">.vimrc</a> looks for CF.dict in your home directory (~) by default, so either put CF.dict there or edit <a href="/static/docs/.vimrc">.vimrc</a>.
+</p>
+<p> The CF.dict file uses the mixedCase convention for function names and lowercase for tag names, and any keyword will be converted to that convention when you auto-complete.  If this violates your local coding conventions, I recommend running a script over CF.dict to do a case conversion.
+</p>
+
+<h2>XML Editing</h2>
+<p> <a href="http://en.wikipedia.org/wiki/Adobe_ColdFusion">ColdFusion</a> files aren't <a href="http://www.w3.org/TR/2006/REC-xml-20060816/">XML</a>, of course, but they're close enough that we can benfit from some <a href="http://www.w3.org/TR/2006/REC-xml-20060816/">XML</a> editing functionality.  There's a good filetype plugin for editing <a href="http://www.w3.org/TR/2006/REC-xml-20060816/">XML</a>:
+</p>
+<p><a href="http://www.vim.org/scripts/script.php?script_id=301">xmledit</a>
+</p>
+<p> It has an indispensible tag completion feature.  Rename the <a href="http://www.w3.org/TR/2006/REC-xml-20060816/">xml</a>.vim file to cf.vim (not cfc.vim or cfm.vim) and place it in the <a href="http://www.vim.org/">VIM</a> ftplugins directory.
+</p>
+<p> The <a href="/static/docs/.vimrc">.vimrc</a> provides single key mappings for the most useful xmledit functions.  You might want to take a look at the xmledit documentation to see if there's anything else you want.  It should be clear from the <a href="/static/docs/.vimrc">.vimrc</a> what's being mapped, and you can easily edit those lines out if they conflict with your other mappings.
+</p>
+
+<h2>Bonus! Windows XP File Extensions</h2>
+<p> I'm sure you already know the simple way to associate a file extension with a program in XP: right-click -&gt; open with program -&gt; select program from list -&gt; always use this program.
+</p>
+<p> The problem with that technique is that you can only associate the default action to a program.  What if you want to use different programs for Open and Edit?  Say, if you wanted to use <a href="http://www.vim.org/">gVIM</a> to Edit HTML files, but still use FireFox to Open them?
+</p>
+<p> Here's how: Windows Explorer -&gt; Tools menu -&gt; Folder Options -&gt; File Types Tab.  Select an extension and an action, and the full path of the program to use.  (BTW, the -R option opens <a href="http://www.vim.org/">gVIM</a> in readonly mode. I'll let you put the pieces together.)
+</p>
+
+
+
+</div>
+<p>
+  <span class="signature">- Oran Looney</span>
+  <span class="signature-date">December 21st 2007</span>
+</p>
+  <p class="thank-you">
+    Thanks for reading.  Please subscribe to the <a href="/feeds/blog/">RSS feed</a> and remember that
+    future readers will thank you for leaving your comments and criticisms.
+    <a href="/feeds/blog/" title="Subscribe to RSS Feed" class="big-rss-link">Subscribe to RSS Feed</a>
+  </p>
+<p class="article-tags">
+     
+        <a href="/tag/tutorial/">Tutorial</a> 
+     
+        <a href="/tag/web/">Web</a> 
+    
+</p>
+
+
+      </div>
+      
+  
+  <div class="content-page comments" style="border-top: none">
+    <a name="comments"></a>
+    
+	  <h1>Comments (5)</h1>
+      <div>
+        
+          <div class="comment">
+    <div class="comment-date">September 11th 2012</div>
+	<h4><span class="comment-username">Spy</span> said: </h4>
+	<p>Thanx for that work, sustain the great fuctnion Excellent fuctnion, I&#39;m planning to start off a tiny Web site Engine program perform employing your website I am hoping you take pleasure in running a blog with all the well-known BlogEngine.internet.Thethoughts you express are truly amazing. Wish you are going to correct some a lot more posts.</p>
+</div>
+
+        
+          <div class="comment">
+    <div class="comment-date">June 21st 2012</div>
+	<h4><span class="comment-username">shay</span> said: </h4>
+	<p>Any news on where to find the vimrc file that is referenced?</p>
+</div>
+
+        
+          <div class="comment">
+    <div class="comment-date">April 19th 2012</div>
+	<h4><span class="comment-username">Stephen</span> said: </h4>
+	<p>The link to .vimrc is broken.</p>
+</div>
+
+        
+          <div class="comment">
+    <div class="comment-date">June 7th 2010</div>
+	<h4><span class="comment-username">travis</span> said: </h4>
+	<p>Thanks! I made a CFWheels dictionary file - http://www.vim.org/scripts/script.php?script_id=3116</p>
+</div>
+
+        
+          <div class="comment">
+    <div class="comment-date">December 2nd 2009</div>
+	<h4><span class="comment-username">speeves</span> said: </h4>
+	<p>I have made a backup of the CF.dict at my blog, since your link is coming up blank:
+http://speeves.erikin.com/2009/12/vim-cfdict-for-coldfusion-programming.html</p>
+</div>
+
+        
+      </div>
+    
+    <h1>Leave a Comment</h1>
+    
+<form method="post" action="/editing-coldfusion-vim/leave-comment/" class="leave-comment-form">
+  <div style='display:none'><input type='hidden' name='csrfmiddlewaretoken' value='7c54419eea61d947291c188320a452fc' /></div>
+  <div>
+    Your Name: <br>
+    
+    <input id="id_user_name" type="text" name="user_name" maxlength="12" />
+  </div>
+  <div>
+    Comment: <br>
+    
+    <textarea id="id_content" rows="10" cols="40" name="content"></textarea>
+  </div>
+  <div>
+    Enter this phrase: <br>
+    
+    <img src="/static/site/images/captcha.png" alt="captcha">
+    <input id="id_captcha" type="text" name="captcha" maxlength="20" /> 
+  </div>
+  <div>
+    <input class="submit-button" type="submit" value="Leave Comment">
+  </div>
+</form>
+
+  </div>
+  
+
+	
+  </div>
+
+
+
+  <script src="http://www.google-analytics.com/urchin.js" type="text/javascript"></script>
+  <script type="text/javascript"> _uacct = "UA-2535855-1"; urchinTracker(); </script>
+
+</body>
+</html>

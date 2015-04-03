@@ -1,0 +1,494 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang="en-us" dir="ltr">
+<head>
+<!-- meta -->
+<meta http-equiv="content-type" content="text/html; charset=utf-8">
+<meta name="author" content="Oran Looney">
+<meta name="robots" content="INDEX,FOLLOW">
+<meta name="description" content="Oran quitely programming away and sharing a few of the lessons learned">
+<meta name="keywords" content="Programming,Code,Coding,Software,Software Development,Web,Web Development,Python,JavaScript,C++">
+<meta name="verify-v1" content="GmOM2OF0gDOQiM8uS0yKm1ZA0gUI8Hqk4BamNHp7iCg=">
+<meta name="viewport" content="width=800,initial-scale=0.6">
+<link rel="alternate" type="application/rss+xml" href="/feeds/blog/" title="OranLooney.com RSS Blog Feed">
+
+<title>OranLooney - A Literate Program on the 3rd Normal Form</title>
+
+<!-- style -->
+<link rel="stylesheet" type="text/css" href="/static/site/css/yui-reset-min.css">
+<link rel="stylesheet" type="text/css" href="/static/site/css/main.css">
+<link rel="stylesheet" type="text/css" media="print" href="/static/site/css/print.css">
+<!--[if lt IE 7.]>
+	<link rel="stylesheet" type="text/css" href="/static/site/css/icons_gif.css">
+<![endif]-->
+
+
+
+</head>
+
+
+<body>
+
+  <div id="banner">
+	<a href="/">OranLooney.com</a>
+	<h6>quietly programming away</h6>
+  </div>
+  <div class="box" id="sidebar">
+	
+		<form id="quick-search" method="get" action="/search/">
+			<div>
+				<input type="hidden" name="alltags">
+				<input type="text" name="keyword" class="keyword-field">
+				<button type="submit" class="search-submit-button">Search</button>
+		  	</div>
+		  </form>
+	
+
+    <ul class="menu">
+      
+        <li class="menu_home"><a href="/">Home</a></li>
+      
+
+      
+		<li class="menu_rss_feed"><a href="/feeds/blog/" title="subscribe to the RSS feed">RSS Feed</a></li>
+        <li class="menu_tags"><a href="/tags/" title="search articles by tag">Tags</a></li>
+        <li class="menu_index"><a href="/archive" title="search articles chronologically">Archive</a></li>
+        <li class="menu_break"></li>
+        <li class="menu_bookshelf" title="my books on librarything.com"><a href="http://www.librarything.com/catalog.php?view=olooney&amp;offset=0&amp;shelf_rows=10&amp;previousOffset=0&amp;shelf=shelf">Bookshelf</a></li>
+        <li class="menu_sig" title="my endorsement of Agile"><a href="http://agilemanifesto.org/sign/display.cgi?ms=000000203">Manifesto</a></li>
+
+        <li class="menu_about_site" title="about the site itself"><a href="/colophon/">Colophon</a></li>
+        <li class="menu_about_me"><a href="/author/" title="about the author">Author</a></li> 
+      
+      
+      
+      
+          <li class="menu_break"></li>
+        
+          <li class="menu_login"><a href="/admin/">Login</a></li> 
+        
+      
+    </ul>
+  </div>
+  <div id="main-wrapper">
+	
+      
+      <div class="content-page">
+        
+  <a href="/literate-program-3rd-normal-form/" class="title">A Literate Program on the 3rd Normal Form</a>
+
+  
+    <a href="http://www.flickr.com/photos/suzijane/32454407/">
+      <img alt="colorful lead photo" src="/static/media/images/lead/32454407_024b10cfd7_.jpg">
+    </a>
+  
+
+<div>
+  
+<p>I wrote this article in an unusual way:
+   I started from the source code of a <a href="http://python.org/">Python</a> module, commented it thoroughly,
+   made some minor formatting changes, and fed it through the <a href="http://daringfireball.net/projects/markdown/">markdown</a> HTML
+   expander.  The result is what I'd like to think is pretty good example
+   of a <a href="http://www.literateprogramming.com/">literate program</a>.  You can see the <a href="http://www.oranlooney.com/static/python/phoneNormalizer.py">original</a> or <a href="http://www.oranlooney.com/static/python/phoneNormalizer.html">formatted source code</a> too, or the <a href="http://www.oranlooney.com/static/python/phoneNormalizer.txt">pre-markdown text file</a>, if you like.
+</p>
+
+<h2>phoneNormalizer.py</h2>
+<p>The <code>phoneNormalizer</code> module demonstrates how a formatted string (a phone number is used
+   as an example) can be divided into useful atomic parts without loss of
+   information and without introducing dependencies for storage
+   in a relational database.  In other words, it addresses issues of <a href="http://en.wikipedia.org/wiki/Third_normal_form">3NF</a> storage of
+   data that is not trivially atomic.  The module is self testing, and it has been
+   thoroughly documented in an attempt at <a href="http://www.literateprogramming.com/">literate programming</a>.
+</p>
+
+<h2>Avoiding Dependent Columns</h2>
+<p>Here's the problem: Storing the raw string phone number into a single text
+   column in a database makes it un-searchable and unusable.  Storing only
+   atomic fields (ZIP code, extension, etc.) throws away important information
+   and makes handling edge cases like international numbers unnecessarily
+   challenging.  However, storing both the raw string and the atomic fields
+   introduces a dependency between columns (since the atomic fields can be
+   computed from the raw string) which introduces the possibility of a
+   corrupt database.
+</p>
+<p>Now, I can't imagine anyone would lose any sleep over these theoretical
+   problems just for the case of phone numbers.  The problem is more general,
+   and this module demonstrates a general technique.  The lesson here is to
+   remember that it is ALWAYS possible to factor the atomic parts out of a
+   complicated data type.  <br>
+</p>
+
+<h2>Testing Strategy</h2>
+<p>The following snippet (copied from an interactive session) is included in the header
+   string of the module.  But even though it's not code, it will be identified
+   and parsed by <code>doctest</code>. <code>doctest</code> will run the 'commands' and validate the
+   'output':
+</p>
+<pre><code>&gt;&gt;&gt; normalize('work 123 (456)7890 x12 ')
+('123', '456', '7890', '12', 'work %s (%s)%s x%s ')
+&gt;&gt;&gt; reconstruct(_)
+'work 123 (456)7890 x12 '
+&gt;&gt;&gt; normalize('home 345-6789')
+('', '345', '6789', '', 'home %s%s-%s%s')
+&gt;&gt;&gt; reconstruct(_)
+'home 345-6789'
+</code></pre><p>Using <code>doctest</code> has two advantages: we can quickly create simple unit tests,
+   and we provide documentation that is guaranteed to be accurate.  However,
+   the testing is too simple to give us any real confidence in the functions.
+   For that, we supply a 'luggage test' function that generates random
+   phone numbers in an attempt to cover a large portion of the input space.
+</p>
+<p>The luggage test actually did catch a major bug: I forgot to escape the %
+   characters when I first wrote the function.  That's great, but the unit testing actually performed a more 
+   important service. I had to tweak the regular expressions several times
+   to catch all the cases.  Each time I changed the regular
+   expression, I couldn't be sure that the previous cases would continue
+   to work.  However, I was able to tweak and massage the regular expression
+   safely and easily, with the unit tests providing the safety net.
+</p>
+<blockquote><p>Unit tests enable painless refactoring.
+</p>
+</blockquote><p>There are two kinds of functions: those that are amenable to unit testing
+   and those that are not.  I feel this distinction is important because it
+   reminds us to factor the unit testable portion out and test it thoroughly.
+   That way we can &quot;rely on reliable things.&quot;  As the non-unit-testable portion
+   of our code shrinks and simplifies, human testing becomes more productive.
+</p>
+
+<h2>Initialization</h2>
+<p>First, we import the regular expression module, which we'll rely heavily on:
+</p>
+<pre><code>    import re
+</code></pre><p>We'll need two regular expressions.  The first matches a phone number, with area code, including an optional extension:
+</p>
+<pre><code>    _phonePattern = re.compile(
+        r'^(.*)(\d{3})(\D*)(\d{3})(\D*)(\d{4})(\D*)(\d*)(\D*)$'
+    )
+</code></pre><p>The second matches a local phone number (no area code) and optional extension:   <br>
+</p>
+<pre><code>    _localPhonePattern = re.compile(
+        r'^(.*)()()(\d{3})(\D*)(\d{4})(\D*)(\d*)(\D*)$'
+    )
+</code></pre><p>These two regular expressions could be combined, but only at a tremendous cost
+   is readability.  Note that the patterns are compiled just once, when the
+   module loads.  The leading '_' is a <a href="http://python.org/">Python</a> idiom indicating these are semi-
+   private variables, and should not normally be used.
+</p>
+
+<h2>Seperate Atomic Fields from Formatting</h2>
+<p><code>normalize()</code> is the essence of this module.  Notice that I chose to return
+   a simple tuple, instead of defining a 'phone number' class.  It can be
+   argued that every abstraction should be represented as a class, but
+   I feel that a class should provide a significant service, and in this
+   case it wouldn't do much more than group the data together.
+</p>
+<p>Using a tuple has the practical advantage of keeping the code
+   simple.  I wanted the to take advantage of <a href="http://python.org/">Python</a>'s built-in templating
+   operator %.  The % operator can take either a tuple or a dictionary
+   as the RHS.  I then chose the tuple over the dictionary because the
+   components of a phone number come in a specific order, making it more
+   tuple-like. Because the tuple really is the right logical choice, a
+   lot of little things tended to work out; for example, the <code>repr()</code> of
+   the tuple is quite readable.
+</p>
+<pre><code>def normalize(phoneNumber):
+    'Maps a phone number in string format to (areaCode,trunk,branch,ext,form).'
+    'assert: form % (areaCode,trunk,branch,ext) == phoneNumber'
+</code></pre><p><code>form</code> is the original string with the identified atomic substrings
+   factored out as '%s'.
+   The assert statement is not validated by <code>doctest</code>--it's just a compact
+   way to express a property that the return value will always have, even
+   if the argument passed in isn't a recognized phone number.
+</p>
+<p>We'll try to match each pattern in turn:
+</p>
+<pre><code>    match = _phonePattern.match(phoneNumber)
+    if not match: match = _localPhonePattern.match(phoneNumber)
+</code></pre><p>If none of the patterns match, we'll return empty strings '' for
+   each atomic field and append the four placeholders to the end of the raw pattern field
+   so it may safely be <code>%</code>'ed with the 4-tuple of atomic fields:
+</p>
+<pre><code>    if not match: return ('','','','',phoneNumber.replace('%','%%') +('%s'*4))
+</code></pre><p>Note that replacing '%'s with '%%'s escapes them from the % operator.  <br>
+   Now that we have a regular expression match, we'll seperate out the atomic fields
+   from the format.  We'll construct a a string containing all the non-phone number
+   characters from the string with <code>%s</code> place-holders for the atomic fields:
+</p>
+<pre><code>    form = '%s'.join(tween.replace('%','%%') for tween in match.groups()[::2])
+</code></pre><p>For example, &quot;work (%s)%s-%s x%s&quot;.  Note that here and below I use
+   the <code>[::2]</code> slice operator.  This says take every other field.  So, I'm
+   construct the form out the even groups, and the atomic fields are
+   the odd groups:
+</p>
+<pre><code>    return match.groups()[1::2] + (form,)
+</code></pre><p>So we see that normalize returns a 5-tuple: the four atomic fields and the form field at the end.
+</p>
+<p>Now that we're done with <code>normalize()</code>, it might be a good time to comment
+   on <a href="http://python.org/">Python</a>'s docstrings.  The first line of the docstring is considered
+   special; it's what you'll see pop-up in an IDE while typing the function.
+   the rest of the docstring is available in <code>__doc__</code>, but the first line
+   should be self-sufficient for maximum clarity.  <code>#</code> comments (such as this paragraph)
+   are even lower on the totem pole; they're 'private' comments that
+   will only been seen by someone reading the code.
+</p>
+
+<h2>Reconstructing the Original String</h2>
+<p>The entire point of this exercise is to separate the atomic information
+   in a string from its formatting without duplication and without
+   destroying information.  Therefore, it's important that we can retrieve the
+   original input.  Note that if someone ran a conversion on the database,
+   perhaps updating the ZIP code column, the reconstructed string would
+   reflect the updated value.  This is not appropriate for all cases,
+   such as when there's a legal reason to record the input as-is.
+</p>
+<pre><code>def reconstruct(phoneTuple):
+    '(areaCode,trunk,branch,ext,form) -&gt; original formatted phone number'
+    return phoneTuple[4] % phoneTuple[0:4]
+</code></pre><p><code>reconstruct()</code> turns out to be a trivial function; our simple design
+   is now paying dividends!
+</p>
+
+<h2>The Testing Framework</h2>
+<p>We'll start by creating a single entry point for all unit testing of the module:
+</p>
+<pre><code>def _test():
+    'test the module quietly and complain loudly on failure.'
+    'the tests may take a few seconds to run.'
+
+    import doctest
+    doctest.testmod()
+</code></pre><p>I think <code>doctest</code> is a very nice <a href="http://python.org/">Python</a> module.  Here, I'm simply
+   validating the few basic tests in the module header above.
+</p>
+<pre><code>    _luggageTest(1000)
+</code></pre><p>Again, notice the leading <code>_</code>, indicating semi-private functions.
+</p>
+
+<h2>The Old Luggage Test</h2>
+<p><code>luggageTest()</code> builds strings composed of random digits and
+   non-digits.  It handles the different formats that normalize
+   accepts as separate cases.  It does not achieve complete
+   coverage.  It merely tries to exercise a large number of
+   variants on the known cases.
+</p>
+<pre><code>def _luggageTest(count):
+    'tests against randomly generated phone numbers.'
+</code></pre><p>To construct the strings, we need to be clear about what we mean by a
+   digit and a non-digit.  The string module provides a string of digits,
+   and we construct a string of non-digits from that.  We have to
+   exclude the newline character because the regular expressions were
+   not defined to be multiline, although doing so would not be difficult.
+</p>
+<pre><code>    from string import digits, printable
+    nonDigits = ''.join(c for c in printable if c not in digits and c != '\n')
+</code></pre><p>Next, we'll define helper functions for producing random strings.
+   these are considered 'notation' and are therefore given short
+   names; while it's true that you have to look up a few lines to
+   figure out what each means, the string constructions below
+   fit neatly onto a single line.
+</p>
+<pre><code>    import random
+    def rD(count):  # r for random, D for regex non-digit
+        return ''.join(random.choice(nonDigits) for i in range(count))
+
+    def rd(count):  #r for random, D for regex digit
+        return ''.join(random.choice(digits) for i in range(count))
+
+    def rInt(count=3): #small random integer
+        return random.randint(0,count)
+
+    def rDdD(count=2): #string containing digits in the middle
+        return rD(rInt(count)+1) + rd(rInt(count)) + rD(rInt(count)+1)
+</code></pre><p>   <br>
+   Now that we have all the tools we need, we'll exercise each known accepted format using the random string generators:
+</p>
+<pre><code>    for i in xrange(count):
+        #with area code
+        phoneNumber = rD(rInt()) + \
+             rd(3) + \
+             rD(rInt()) + \
+             rd(3) + \
+             rD(rInt()) + \
+             rd(4) + \
+             rD(rInt()) + \
+             rd(rInt()) + \
+             rD(rInt())            
+        _check(phoneNumber)
+
+        #local
+        phoneNumber = rD(rInt()) + \
+             rd(3) + \
+             rD(rInt()) + \
+             rd(4) + \
+             rD(rInt()) + \
+             rd(rInt()) + \
+             rD(rInt())            
+        _check(phoneNumber)
+
+        # area code, together
+        phoneNumber = rD(rInt()) + rd(10) + rD(rInt())
+        _check(phoneNumber)
+
+        #local, together
+        phoneNumber = rD(rInt()) + rd(7) + rD(rInt())
+        _check(phoneNumber)
+
+        # area code, scatter in some digits at the front.
+        phoneNumber = rDdD() + \
+             rd(3) + \
+             rD(rInt()) + \
+             rd(3) + \
+             rD(rInt()) + \
+             rd(4) + \
+             rD(rInt()) + \
+             rd(rInt()) + \
+             rD(rInt())            
+        _check(phoneNumber)
+
+        # local, scatter in some digits at the front.
+        phoneNumber = rDdD() + \
+             rd(3) + \
+             rD(rInt()) + \
+             rd(4) + \
+             rD(rInt()) + \
+             rd(rInt()) + \
+             rD(rInt()) 
+
+        _check(phoneNumber)
+</code></pre><p>We'll also test some cases where we know it is NOT a phone number.
+   we will be able to reconstruct the original, but all the atomic
+   fields will be empty strings:
+</p>
+<pre><code>    for i in xrange(count): # not a phone number
+        string = rD(rInt()+5)
+        norm = normalize(string)
+        recon = reconstruct(norm)
+        if ( recon != string ) or \
+           ( norm[1] !='' ):
+            print string
+            print norm
+            print
+</code></pre><p>That's the end of <code>_luggageTest()</code>.  <br>
+</p>
+
+<h2>Checking Each Phone Number</h2>
+<p>We still have to define this helper function:
+</p>
+<pre><code>def _check(phoneNumber):
+    'Verifies that normalize() detects the atomic fields in the phone number.'
+    norm = normalize(phoneNumber)
+    recon = reconstruct(norm)
+    if (recon != phoneNumber) or \
+       (norm[1] == '') or \
+       (norm[2] == ''):
+        print phoneNumber
+        print norm
+        print recon
+        print
+</code></pre><p>And we're done with the testing framework.  All we need now is a convenient way to kick off the test.
+   It's another <a href="http://python.org/">Python</a> idiom to check the <code>__name__</code> to see if
+   we're being run from the command line.  For modules that
+   are meant to be imported into other <a href="http://python.org/">python</a> scripts, (as
+   opposed to <a href="http://python.org/">Python</a> command line scripts) it's common to
+   use this check to self-test the module.  Here I've isolated the test
+   code in _test(), which is my personal preference.
+</p>
+<pre><code>if __name__ == '__main__':
+    _test()
+</code></pre>
+<h2>Closing Thoughts</h2>
+<p>I've explored three concepts in this program: the 3NF problem that the
+   module is designed to explore, the unit testing that made it possible
+   to trust code depending heavily on a couple unreadable regular expressions,
+   and the literate programming style of explaining the first two.
+</p>
+<blockquote><p>Suppose I were to say the string was a regular expression. And suppose I were to say the string was unreadable.  But I repeat myself.
+   - Mark Twain.
+</p>
+</blockquote><p>Python comes with a unit test framework that I did not use here, because
+   it would not have helped me write the brute force <code>_luggageTest()</code> and I prefer
+   the elegance of <code>doctest</code>.  <br>
+</p>
+
+<h2>Afterword</h2>
+<p>I originally wrote this article as comments embedded in the source itself. I did have to apply a few transformations to get it into neatly formatted HTML, but I that only took a few minutes.  Proof-reading took longer, because comments tend to be terse labels, not perfect English.  I would say the results were reasonable.  If you compare the proof-reading changes in this document to the <a href="http://www.oranlooney.com/static/python/phoneNormalizer.html">source code</a>, you'll see that I significantly changed the section structure to better fit the program.  It seems precise section and boundary formatting is needed to do proper <a href="http://www.literateprogramming.com/">literate programming</a>.
+</p>
+
+
+
+</div>
+<p>
+  <span class="signature">- Oran Looney</span>
+  <span class="signature-date">May 8th 2007</span>
+</p>
+  <p class="thank-you">
+    Thanks for reading.  Please subscribe to the <a href="/feeds/blog/">RSS feed</a> and remember that
+    future readers will thank you for leaving your comments and criticisms.
+    <a href="/feeds/blog/" title="Subscribe to RSS Feed" class="big-rss-link">Subscribe to RSS Feed</a>
+  </p>
+<p class="article-tags">
+     
+        <a href="/tag/python/">Python</a> 
+     
+        <a href="/tag/coding-style/">Coding Style</a> 
+     
+        <a href="/tag/literate/">Literate Programming</a> 
+    
+</p>
+
+
+      </div>
+      
+  
+  <div class="content-page comments" style="border-top: none">
+    <a name="comments"></a>
+    
+	  <h1>Comments (1)</h1>
+      <div>
+        
+          <div class="comment">
+    <div class="comment-date">September 11th 2012</div>
+	<h4><span class="comment-username">Rose</span> said: </h4>
+	<p>表示英文太菜，可否把Guy的评论也稍微翻译下。。。My version of the qoestiun starts out by restricting the input to seven letters (for Scrabble) and it was assumed you&#39;d discard any word longer than the rack or shorter than the current best solution so a 32-bit word suffices with some finesses hinted below.Candidates who think a bitmask alone would suffice, don&#39;t understand the distinction between a bag and a set. //set俺懂，bag是啥意思？关键字眼不理解真是害死人啊。。。</p>
+</div>
+
+        
+      </div>
+    
+    <h1>Leave a Comment</h1>
+    
+<form method="post" action="/literate-program-3rd-normal-form/leave-comment/" class="leave-comment-form">
+  <div style='display:none'><input type='hidden' name='csrfmiddlewaretoken' value='7c54419eea61d947291c188320a452fc' /></div>
+  <div>
+    Your Name: <br>
+    
+    <input id="id_user_name" type="text" name="user_name" maxlength="12" />
+  </div>
+  <div>
+    Comment: <br>
+    
+    <textarea id="id_content" rows="10" cols="40" name="content"></textarea>
+  </div>
+  <div>
+    Enter this phrase: <br>
+    
+    <img src="/static/site/images/captcha.png" alt="captcha">
+    <input id="id_captcha" type="text" name="captcha" maxlength="20" /> 
+  </div>
+  <div>
+    <input class="submit-button" type="submit" value="Leave Comment">
+  </div>
+</form>
+
+  </div>
+  
+
+	
+  </div>
+
+
+
+  <script src="http://www.google-analytics.com/urchin.js" type="text/javascript"></script>
+  <script type="text/javascript"> _uacct = "UA-2535855-1"; urchinTracker(); </script>
+
+</body>
+</html>

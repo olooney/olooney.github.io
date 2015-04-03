@@ -1,0 +1,115 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html><head>
+<title></title>
+  <style type="text/css">
+    <!--code { font-family: Courier New, Courier; font-size: 10pt; margin: 0px; }-->
+  </style>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+</head><body>
+
+
+<!-- ======================================================== -->
+<!-- = Java Sourcecode to HTML automatically converted code = -->
+<!-- =   Java2Html Converter 5.0 [2006-02-26] by Markus Gebhard  markus@jave.de   = -->
+<!-- =     Further information: http://www.java2html.de     = -->
+<div align="left" class="java">
+<table border="0" cellpadding="3" cellspacing="0" bgcolor="#ffffff">
+   <tr>
+  <!-- start source code -->
+   <td nowrap="nowrap" valign="top" align="left">
+    <code>
+<font color="#7f0055"><b>package&nbsp;</b></font><font color="#000000">genericcard;</font><br />
+<font color="#ffffff"></font><br />
+<font color="#7f0055"><b>import&nbsp;</b></font><font color="#000000">java.awt.Color;</font><br />
+<font color="#7f0055"><b>import&nbsp;</b></font><font color="#000000">java.awt.Dimension;</font><br />
+<font color="#7f0055"><b>import&nbsp;</b></font><font color="#000000">java.awt.Graphics;</font><br />
+<font color="#7f0055"><b>import&nbsp;</b></font><font color="#000000">java.awt.Point;</font><br />
+<font color="#ffffff"></font><br />
+<font color="#ffffff"></font><br />
+<font color="#3f5fbf">/**</font><br />
+<font color="#ffffff">&nbsp;</font><font color="#3f5fbf">*</font><br />
+<font color="#ffffff">&nbsp;</font><font color="#3f5fbf">*&nbsp;</font><font color="#7f9fbf">@author&nbsp;</font><font color="#3f5fbf">Oran</font><br />
+<font color="#ffffff">&nbsp;</font><font color="#3f5fbf">*/</font><br />
+<font color="#7f0055"><b>public&nbsp;class&nbsp;</b></font><font color="#000000">GenericCard</font><font color="#000000">{</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>private&nbsp;</b></font><font color="#7f0055"><b>int&nbsp;</b></font><font color="#000000">HEIGHT=</font><font color="#990000">80</font><font color="#000000">,WIDTH=</font><font color="#990000">50</font><font color="#000000">,ARC=</font><font color="#990000">5</font><font color="#000000">;</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>boolean&nbsp;</b></font><font color="#000000">faceup,sideways;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#3f7f5f">//a&nbsp;sideways&nbsp;card&nbsp;exchanges&nbsp;HEIGHT&nbsp;and&nbsp;WIDTH</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">Point&nbsp;location;</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#3f5fbf">/**&nbsp;Creates&nbsp;a&nbsp;new&nbsp;instance&nbsp;of&nbsp;GenericCard&nbsp;*/</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>public&nbsp;</b></font><font color="#000000">GenericCard</font><font color="#000000">()&nbsp;{</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">location=</font><font color="#7f0055"><b>new&nbsp;</b></font><font color="#000000">Point</font><font color="#000000">(</font><font color="#990000">0</font><font color="#000000">,</font><font color="#990000">0</font><font color="#000000">)</font><font color="#000000">;</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">faceup=</font><font color="#7f0055"><b>true</b></font><font color="#000000">;</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">sideways=</font><font color="#7f0055"><b>false</b></font><font color="#000000">;</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">}</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>public&nbsp;</b></font><font color="#7f0055"><b>boolean&nbsp;</b></font><font color="#000000">contains</font><font color="#000000">(</font><font color="#7f0055"><b>int&nbsp;</b></font><font color="#000000">x,int&nbsp;y</font><font color="#000000">){</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>boolean&nbsp;</b></font><font color="#000000">r=</font><font color="#7f0055"><b>false</b></font><font color="#000000">;</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>int&nbsp;</b></font><font color="#000000">w,h;</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>if</b></font><font color="#000000">(</font><font color="#000000">sideways</font><font color="#000000">){</font><font color="#000000">w=HEIGHT;h=WIDTH;</font><font color="#000000">}</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>else&nbsp;</b></font><font color="#000000">{</font><font color="#000000">w=WIDTH;h=HEIGHT;</font><font color="#000000">}</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>if</b></font><font color="#000000">(</font><font color="#000000">x&gt;=location.x&nbsp;&amp;&amp;&nbsp;y&gt;=location.y&nbsp;&amp;&amp;&nbsp;x&lt;=location.x+w&nbsp;&amp;&amp;&nbsp;y&lt;=location.y+h</font><font color="#000000">)</font><font color="#000000">r=</font><font color="#7f0055"><b>true</b></font><font color="#000000">;</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>return&nbsp;</b></font><font color="#000000">r;</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">}</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>protected&nbsp;</b></font><font color="#7f0055"><b>void&nbsp;</b></font><font color="#000000">setHeight</font><font color="#000000">(</font><font color="#7f0055"><b>int&nbsp;</b></font><font color="#000000">h</font><font color="#000000">){</font><font color="#000000">HEIGHT=h;</font><font color="#000000">}</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>protected&nbsp;</b></font><font color="#7f0055"><b>void&nbsp;</b></font><font color="#000000">setWidth</font><font color="#000000">(</font><font color="#7f0055"><b>int&nbsp;</b></font><font color="#000000">w</font><font color="#000000">){</font><font color="#000000">WIDTH=w;</font><font color="#000000">}</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>protected&nbsp;</b></font><font color="#7f0055"><b>void&nbsp;</b></font><font color="#000000">setDimensions</font><font color="#000000">(</font><font color="#000000">Dimension&nbsp;d,int&nbsp;a</font><font color="#000000">){</font><font color="#000000">HEIGHT=d.height;WIDTH=d.width;ARC=a;</font><font color="#000000">}</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>protected&nbsp;</b></font><font color="#7f0055"><b>void&nbsp;</b></font><font color="#000000">setArc</font><font color="#000000">(</font><font color="#7f0055"><b>int&nbsp;</b></font><font color="#000000">a</font><font color="#000000">){</font><font color="#000000">ARC=a;</font><font color="#000000">}</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>public&nbsp;</b></font><font color="#7f0055"><b>boolean&nbsp;</b></font><font color="#000000">contains</font><font color="#000000">(</font><font color="#000000">Point&nbsp;p</font><font color="#000000">){</font><font color="#7f0055"><b>return&nbsp;</b></font><font color="#000000">contains</font><font color="#000000">(</font><font color="#000000">p.x,p.y</font><font color="#000000">)</font><font color="#000000">;</font><font color="#000000">}</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>public&nbsp;</b></font><font color="#7f0055"><b>int&nbsp;</b></font><font color="#000000">getArc</font><font color="#000000">(){</font><font color="#7f0055"><b>return&nbsp;</b></font><font color="#000000">ARC;</font><font color="#000000">}</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>public&nbsp;</b></font><font color="#7f0055"><b>int&nbsp;</b></font><font color="#000000">getHeight</font><font color="#000000">(){</font><font color="#7f0055"><b>return&nbsp;</b></font><font color="#000000">HEIGHT;</font><font color="#000000">}</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>public&nbsp;</b></font><font color="#7f0055"><b>int&nbsp;</b></font><font color="#000000">getWidth</font><font color="#000000">(){</font><font color="#7f0055"><b>return&nbsp;</b></font><font color="#000000">WIDTH;</font><font color="#000000">}</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>public&nbsp;</b></font><font color="#000000">Point&nbsp;getLocation</font><font color="#000000">(){</font><font color="#000000">Point&nbsp;r=</font><font color="#7f0055"><b>new&nbsp;</b></font><font color="#000000">Point</font><font color="#000000">(</font><font color="#000000">location</font><font color="#000000">)</font><font color="#000000">;</font><font color="#7f0055"><b>return&nbsp;</b></font><font color="#000000">r;</font><font color="#000000">}</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>public&nbsp;</b></font><font color="#000000">Dimension&nbsp;getSize</font><font color="#000000">(){</font><font color="#000000">Dimension&nbsp;d=</font><font color="#7f0055"><b>new&nbsp;</b></font><font color="#000000">Dimension</font><font color="#000000">(</font><font color="#000000">HEIGHT,WIDTH</font><font color="#000000">)</font><font color="#000000">;</font><font color="#7f0055"><b>return&nbsp;</b></font><font color="#000000">d;</font><font color="#000000">}</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>public&nbsp;</b></font><font color="#7f0055"><b>int&nbsp;</b></font><font color="#000000">getX</font><font color="#000000">(){</font><font color="#7f0055"><b>return&nbsp;</b></font><font color="#000000">location.x;</font><font color="#000000">}</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>public&nbsp;</b></font><font color="#7f0055"><b>int&nbsp;</b></font><font color="#000000">getY</font><font color="#000000">(){</font><font color="#7f0055"><b>return&nbsp;</b></font><font color="#000000">location.y;</font><font color="#000000">}</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>public&nbsp;</b></font><font color="#7f0055"><b>boolean&nbsp;</b></font><font color="#000000">isFaceup</font><font color="#000000">(){</font><font color="#7f0055"><b>return&nbsp;</b></font><font color="#000000">faceup;</font><font color="#000000">}</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>public&nbsp;</b></font><font color="#7f0055"><b>boolean&nbsp;</b></font><font color="#000000">isSideways</font><font color="#000000">(){</font><font color="#7f0055"><b>return&nbsp;</b></font><font color="#000000">sideways;</font><font color="#000000">}</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>public&nbsp;</b></font><font color="#7f0055"><b>void&nbsp;</b></font><font color="#000000">setFaceup</font><font color="#000000">(</font><font color="#7f0055"><b>boolean&nbsp;</b></font><font color="#000000">f</font><font color="#000000">){</font><font color="#000000">faceup=f;</font><font color="#000000">}</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>public&nbsp;</b></font><font color="#7f0055"><b>void&nbsp;</b></font><font color="#000000">setSideways</font><font color="#000000">(</font><font color="#7f0055"><b>boolean&nbsp;</b></font><font color="#000000">s</font><font color="#000000">){</font><font color="#000000">sideways=s;</font><font color="#000000">}</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>public&nbsp;</b></font><font color="#7f0055"><b>void&nbsp;</b></font><font color="#000000">turnOver</font><font color="#000000">(){</font><font color="#000000">faceup=!faceup;</font><font color="#000000">}</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>public&nbsp;</b></font><font color="#7f0055"><b>void&nbsp;</b></font><font color="#000000">turnSideways</font><font color="#000000">(){</font><font color="#000000">sideways=!sideways;</font><font color="#000000">}</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>public&nbsp;</b></font><font color="#7f0055"><b>void&nbsp;</b></font><font color="#000000">setLocation</font><font color="#000000">(</font><font color="#7f0055"><b>int&nbsp;</b></font><font color="#000000">x,int&nbsp;y</font><font color="#000000">){</font><font color="#000000">location.x=x;location.y=y;</font><font color="#000000">}</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>public&nbsp;</b></font><font color="#7f0055"><b>void&nbsp;</b></font><font color="#000000">setLocation</font><font color="#000000">(</font><font color="#000000">Point&nbsp;p</font><font color="#000000">){</font><font color="#000000">location=</font><font color="#000000">(</font><font color="#000000">Point</font><font color="#000000">)</font><font color="#000000">p.clone</font><font color="#000000">()</font><font color="#000000">;</font><font color="#000000">}</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#3f7f5f">//toString?</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>public&nbsp;</b></font><font color="#7f0055"><b>void&nbsp;</b></font><font color="#000000">translate</font><font color="#000000">(</font><font color="#7f0055"><b>int&nbsp;</b></font><font color="#000000">dx,int&nbsp;dy</font><font color="#000000">){</font><font color="#000000">location.x+=dx;location.y+=dy;</font><font color="#000000">}</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>public&nbsp;</b></font><font color="#7f0055"><b>void&nbsp;</b></font><font color="#000000">translate</font><font color="#000000">(</font><font color="#000000">Point&nbsp;dp</font><font color="#000000">){</font><font color="#000000">location.x+=dp.x;location.y+=dp.y;</font><font color="#000000">}</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>public&nbsp;</b></font><font color="#7f0055"><b>void&nbsp;</b></font><font color="#000000">drawFront</font><font color="#000000">(</font><font color="#000000">Graphics&nbsp;g</font><font color="#000000">){</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>int&nbsp;</b></font><font color="#000000">w,h;</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>if</b></font><font color="#000000">(</font><font color="#000000">sideways</font><font color="#000000">){</font><font color="#000000">w=HEIGHT;h=WIDTH;</font><font color="#000000">}</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>else&nbsp;</b></font><font color="#000000">{</font><font color="#000000">w=WIDTH;h=HEIGHT;</font><font color="#000000">}</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">g.setColor</font><font color="#000000">(</font><font color="#000000">Color.white</font><font color="#000000">)</font><font color="#000000">;</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">g.fillRoundRect</font><font color="#000000">(</font><font color="#000000">location.x,location.y,w,h,ARC,ARC</font><font color="#000000">)</font><font color="#000000">;</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">}</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>public&nbsp;</b></font><font color="#7f0055"><b>void&nbsp;</b></font><font color="#000000">drawBack</font><font color="#000000">(</font><font color="#000000">Graphics&nbsp;g</font><font color="#000000">){</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>int&nbsp;</b></font><font color="#000000">w,h;</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>if</b></font><font color="#000000">(</font><font color="#000000">sideways</font><font color="#000000">){</font><font color="#000000">w=HEIGHT;h=WIDTH;</font><font color="#000000">}</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>else&nbsp;</b></font><font color="#000000">{</font><font color="#000000">w=WIDTH;h=HEIGHT;</font><font color="#000000">}</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">g.setColor</font><font color="#000000">(</font><font color="#000000">Color.white</font><font color="#000000">)</font><font color="#000000">;</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">g.fillRoundRect</font><font color="#000000">(</font><font color="#000000">location.x,location.y,w,h,ARC,ARC</font><font color="#000000">)</font><font color="#000000">;</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">g.setColor</font><font color="#000000">(</font><font color="#000000">Color.blue</font><font color="#000000">)</font><font color="#000000">;</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">g.fillRoundRect</font><font color="#000000">(</font><font color="#000000">location.x+ARC,location.y+ARC,w-</font><font color="#990000">2</font><font color="#000000">*ARC,h-</font><font color="#990000">2</font><font color="#000000">*ARC,ARC,ARC</font><font color="#000000">)</font><font color="#000000">;</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">}</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>public&nbsp;</b></font><font color="#7f0055"><b>void&nbsp;</b></font><font color="#000000">paint</font><font color="#000000">(</font><font color="#000000">Graphics&nbsp;g</font><font color="#000000">){</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>if</b></font><font color="#000000">(</font><font color="#000000">faceup</font><font color="#000000">)</font><font color="#000000">drawFront</font><font color="#000000">(</font><font color="#000000">g</font><font color="#000000">)</font><font color="#000000">;</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#7f0055"><b>else&nbsp;</b></font><font color="#000000">drawBack</font><font color="#000000">(</font><font color="#000000">g</font><font color="#000000">)</font><font color="#000000">;</font><br />
+<font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font color="#000000">}</font><br />
+<font color="#000000">}</font></code>
+
+   </td>
+  <!-- end source code -->
+   </tr>
+  <!-- start Java2Html link -->
+   <tr>
+    <td align="right">
+<small>
+<a href="http://www.java2html.de" target="_blank">Java2html</a>
+</small>
+    </td>
+   </tr>
+  <!-- end Java2Html link -->
+</table>
+</div>
+<!-- =       END of automatically generated HTML code       = -->
+<!-- ======================================================== -->
+
+
+
+</body></html>

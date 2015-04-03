@@ -1,0 +1,77 @@
+<!DOCTYPE HTML>
+
+<html>
+<head>
+	<title>Test Plurals</title>
+	<script type="text/javascript" src="pluralize.js"></script>
+	<script type="text/javascript" src="test_plurals.js"></script>
+	<style>
+		.success { 
+			color: #040; 
+			margin: 3px; 
+			padding: 3px;
+			border: 2px solid green;
+			background-color: #DFD;
+		}
+		.failure { 
+			color: red; 
+			margin: 3px; 
+			padding: 3px;
+			border: 2px solid red;
+			background-color: #FDD;
+		}
+		#main {
+			margin: 5px auto;
+			width: 600px;
+		} 
+		.results {
+			padding: 5px;
+		}
+		#license {
+			font-size: 80%;
+		}
+	</style>
+</head>
+<body>
+	<div id="main">
+		<div class="ad-hoc">
+			<h3>Ad-Hoc Test</h3>
+			Singular: <input id="singular-text-field" name="singular">
+			<button onclick="document.getElementById('plural-text-field').value = owl.pluralize(document.getElementById('singular-text-field').value)">Pluralize</button>
+			Plural: <input id="plural-text-field" name="plural">
+		</div>
+		<div class="results">
+			<h3>Pluralization Test Results</h3>
+			<script>
+				function log(success, message) {
+					var cssClass = success ? "success" : "failure";
+					document.write(
+						'<div class="' + cssClass + '">' + 
+							message +
+						'</div>'
+					);
+				}
+				log(false, 'Note: failed tests will show in red, like this.');
+				testPlurals(log);
+			</script>
+		</div>
+		<pre id="license">
+
+This file is part of OWL Pluralization.
+
+OWL Pluralization is free software: you can redistribute it and/or 
+modify it under the terms of the GNU Lesser General Public License
+as published by the Free Software Foundation, either version 3 of
+the License, or (at your option) any later version.
+
+OWL Pluralization is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Lesser General Public License for more details.
+
+You should have received a copy of the <a href="lgpl.txt">GNU Lesser General Public 
+License</a> along with OWL Pluralization.  If not, see 
+<a href="http://www.gnu.org/licenses/">http://www.gnu.org/licenses/</a>
+		</pre>
+	</div>
+</body>

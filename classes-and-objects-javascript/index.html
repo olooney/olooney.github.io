@@ -1,0 +1,423 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang="en-us" dir="ltr">
+<head>
+<!-- meta -->
+<meta http-equiv="content-type" content="text/html; charset=utf-8">
+<meta name="author" content="Oran Looney">
+<meta name="robots" content="INDEX,FOLLOW">
+<meta name="description" content="Oran quitely programming away and sharing a few of the lessons learned">
+<meta name="keywords" content="Programming,Code,Coding,Software,Software Development,Web,Web Development,Python,JavaScript,C++">
+<meta name="verify-v1" content="GmOM2OF0gDOQiM8uS0yKm1ZA0gUI8Hqk4BamNHp7iCg=">
+<meta name="viewport" content="width=800,initial-scale=0.6">
+<link rel="alternate" type="application/rss+xml" href="/feeds/blog/" title="OranLooney.com RSS Blog Feed">
+
+<title>OranLooney - Classes and Objects in JavaScript</title>
+
+<!-- style -->
+<link rel="stylesheet" type="text/css" href="/static/site/css/yui-reset-min.css">
+<link rel="stylesheet" type="text/css" href="/static/site/css/main.css">
+<link rel="stylesheet" type="text/css" media="print" href="/static/site/css/print.css">
+<!--[if lt IE 7.]>
+	<link rel="stylesheet" type="text/css" href="/static/site/css/icons_gif.css">
+<![endif]-->
+
+
+
+</head>
+
+
+<body>
+
+  <div id="banner">
+	<a href="/">OranLooney.com</a>
+	<h6>quietly programming away</h6>
+  </div>
+  <div class="box" id="sidebar">
+	
+		<form id="quick-search" method="get" action="/search/">
+			<div>
+				<input type="hidden" name="alltags">
+				<input type="text" name="keyword" class="keyword-field">
+				<button type="submit" class="search-submit-button">Search</button>
+		  	</div>
+		  </form>
+	
+
+    <ul class="menu">
+      
+        <li class="menu_home"><a href="/">Home</a></li>
+      
+
+      
+		<li class="menu_rss_feed"><a href="/feeds/blog/" title="subscribe to the RSS feed">RSS Feed</a></li>
+        <li class="menu_tags"><a href="/tags/" title="search articles by tag">Tags</a></li>
+        <li class="menu_index"><a href="/archive" title="search articles chronologically">Archive</a></li>
+        <li class="menu_break"></li>
+        <li class="menu_bookshelf" title="my books on librarything.com"><a href="http://www.librarything.com/catalog.php?view=olooney&amp;offset=0&amp;shelf_rows=10&amp;previousOffset=0&amp;shelf=shelf">Bookshelf</a></li>
+        <li class="menu_sig" title="my endorsement of Agile"><a href="http://agilemanifesto.org/sign/display.cgi?ms=000000203">Manifesto</a></li>
+
+        <li class="menu_about_site" title="about the site itself"><a href="/colophon/">Colophon</a></li>
+        <li class="menu_about_me"><a href="/author/" title="about the author">Author</a></li> 
+      
+      
+      
+      
+          <li class="menu_break"></li>
+        
+          <li class="menu_login"><a href="/admin/">Login</a></li> 
+        
+      
+    </ul>
+  </div>
+  <div id="main-wrapper">
+	
+      
+      <div class="content-page">
+        
+  <a href="/classes-and-objects-javascript/" class="title">Classes and Objects in JavaScript</a>
+
+  
+    <a href="http://www.flickr.com/photos/gi/103902134/">
+      <img alt="colorful lead photo" src="/static/media/images/lead/103902134_f7339f2ad1.jpg">
+    </a>
+  
+
+<div>
+  
+<p>JavaScript supports object-oriented programming, with classes, objects, methods, and inheritance even though it doesn't have a <code>class</code> keyword.  (This article is about <a href="http://en.wikipedia.org/wiki/JavaScript#Versions">JavaScript 1.5</a> and the <a href="http://www.ecma-international.org/publications/standards/Ecma-262.htm">EMCA-262 V3</a> standard and applies to all modern browsers.  It is not about the future 2.0 proposal to the language.) Instead, JavaScript uses <a href="http://en.wikipedia.org/wiki/Prototype-based_programming">prototype-based inheritance</a> to provide these features.  It also provides several standard classes that serve as examples of what a proper JavaScript class should look like.  This essay explains how to get the full benefit of object-oriented programming in JavaScript.  It is not a primer on either object-oriented concepts or basic JavaScript syntax: I assume you're already familiar with both (or at least willing to look them up.)
+</p>
+<p>First, a word about frameworks.  Good frameworks such as <a href="http://extjs.com/">ExtJS</a> and <a href="http://api.prototypejs.org/">Prototype.js</a> have utilities that help you define classes correctly (e.g. <code>Ext.extend()</code> and <code>Class.create()</code>)  Such functions are basically doing what I describe here, then adding their own non-standard, idiosyncratic, and incompatible features.  For this reason, if you're using a framework, I recommend always using its class definition mechanism.  Not doing so may introduce incompatibilities. 
+</p>
+
+<h2>Constructors</h2>
+<p>Classes in JavaScript are synonymous with constructors.  To define a new class, you write a constructor function which initializes new objects of that class.  It's traditional but not required to start constructor names with an uppercase letter.
+</p>
+<pre><code>// A plain-text virtual post-it note
+function Note(text) {
+    this.text = text || &quot;&quot;;
+}
+</code></pre><p>Notice that the constructor doesn't return anything.  If we called it as an ordinary function, it would return <code>undefined</code>.  To call it as a constructor, we use the <code>new</code> operator:
+</p>
+<pre><code>var note = new Note(&quot;Sarah's #: 555-1212&quot;);
+</code></pre><p>The <code>new</code> operator does two things.  Before the function is called, it creates a new <code>this</code> object in a special way.  After the constructor is called, it returns that new object.  So when we write a constructor, we know two thing: that <code>this</code> will be the new object to initialize, and that we don't have to return anything.
+</p>
+<p>If you do return something from a function, <code>this</code> will be thrown away and the returned object used.  This is occasionally useful, for example for writing Singletons or Factories, but normally constructors should not have a return statement.
+</p>
+<p>Because of these rules, it doesn't make sense to call a constructor without the <code>new</code> operator.  That's why it's helpful to distinguish constructors by starting them with an uppercase letter: it's a hint to other programmers that they should use <code>new</code>.
+</p>
+
+<h2>Prototype</h2>
+<p>When the <code>new</code> operator is used with a constructor to create a new object, that object is given a special relationship with the constructors <code>prototype</code> property.  Here's how the standard describes it:
+</p>
+<blockquote><p>When a reference is made to a property in an object, that reference is to the property of that name in the first object in the prototype chain that contains a property of that name. In other words, first the object mentioned directly is examined for such a property; if that object contains the named property, that is the property to which the reference refers; if that object does not contain the named property, the prototype for that object is examined next; and so on.
+</p>
+</blockquote><p>Basically, the prototype provides defaults for the object.  By adding properties to the classes prototypes, we can supply default properties for all objects of that class.
+</p>
+<pre><code>Note.prototype = {
+    constructor: Note,
+
+    cssClass: 'yellow-note',
+
+    render: function() {
+        return '&lt;div class=&quot;' + this.cssClass + '&quot;&gt;' + 
+            this.text + 
+        '&lt;/div&gt;';
+    }
+};
+</code></pre><p>Now, every Note object appears to have <code>cssClass</code> and <code>render</code> properties.
+</p>
+<p>Notice that I gave <code>Note.prototype</code> a property called <code>constructor</code>.  Every standard JavaScript object has a constructor property, so our classes should too.  Here's the bare essentials for a base class (A base class doesn't extend any other class.  We'll discuss extending classes below.):
+</p>
+<pre><code>function SomeClass() {
+}
+SomeClass.prototype = {
+    constructor: SomeClass
+};
+</code></pre>
+<h2>Methods</h2>
+<p>Now, one of the default properties we added to <code>Note.prototype</code> was the function <code>render</code>.  JavaScript does special handling to make function properties behave like methods.  You see how I'm referring to <code>this</code> twice in the render method?  When we call it like so:
+</p>
+<pre><code>var noteHtml = note.render();
+</code></pre><p><code>this</code> will be the <code>note</code> object. <code>this.text</code> is the string &quot;Sarah's #: 555-1212&quot; set in the Note constructor, and <code>this.cssClass</code> is &quot;yellow-note&quot;, the default from the prototype.  Note that this is identical to method invocation syntax in Java and C++.  This is by design and should make it easy to remember.  However, unlike C++ and Java, you <em>must</em> use <code>this</code> before member variables and other methods when writing methods.  Example:
+</p>
+<pre><code>SomeClass.prototype = {
+    constructor: SomeClass,
+
+    idPrefix: 'some-thing-',
+
+    createId: function() {
+        return this.idPrefix + idSequence.next();
+    },
+
+    getId: function() {
+        if ( !this.id ) {
+            this.id = this.createId();
+        }
+        return this.id;
+    }
+};
+</code></pre><p>By adding functions to the class's prototype that refer to the current object as <code>this</code>, we can give our class methods. That's basically all you need to know to define and use methods, but <a href="/function-scope-javascript/">this other essay</a> discusses some advanced usages.
+</p>
+
+<h2>Subclasses</h2>
+<p>Above, I showed a pattern for defining a base class.  It's also possible to extend/inherit-from/subclass a class.  Here's the obvious way to do that:
+</p>
+<pre><code>// a subclass of Note that appears on a certain date.
+function Reminder(text, date) {
+    Note.call(this, text);
+    this.date = new Date(date);
+}
+Reminder.prototype = new Note();
+Reminder.prototype.constructor = Reminder;
+Reminder.prototype.cssClass = 'reminder-note';
+Reminder.prototype.isDueToday = function() {
+    var today = new Date();
+    return today.getDateString() === this.date.getDateString();
+}
+
+// example of creating a Reminder
+var reminder = new Reminder(&quot;Sarah's birthday.&quot;, &quot;1/23/2010&quot;);
+</code></pre><p>What's going on here?  The key is setting <code>Reminder.prototype</code> to a Note object.  This sets up a prototype chain: <code>reminder -&gt; Reminder.prototype -&gt; Note.prototype</code>.  So, when we access a property on a Reminder, JavaScript first looks on that object, then the Reminder's prototype, then the Note's prototype.  Let's break that down for the different properties:
+</p>
+<ul>
+ <li>
+     <code>text</code> and <code>date</code> are on the reminder instance.
+ </li>
+
+ <li>
+     <code>cssClass</code> is at the Reminder class level.  We &quot;overrode&quot; the default we inherited from Note with our own value.
+ </li>
+
+ <li>
+     We're still using the <code>render</code> method we inherited from Note. It still works, and will now use <code>reminder-note</code> CSS class.
+ </li>
+
+ <li>
+     <code>isDueToday</code> is a new method that is only defined for the Reminders, not for Notes.
+ </li>
+</ul>
+<p>You see in the constructor, were it says <code>Note.call(this, text)</code>?  This applies the superclass's constructor to the new object (sometimes called constructor chaining.)  In this example, that's actually when the instance's <code>text</code> method is initialized.  (This is a special case of invoking a superclass method, described <a href="#calling-super">below</a>.)  In most cases, you should call the superclass's constructor on the first line of code inside the subclass.  Occasionally it's helpful to do other setup before calling it, and you have freedom about exactly what you pass into it.  However, I've never seen a case where it would be appropriate to not call the superclass constructor at all.  If you're coming from Java, be aware that JavaScript doesn't automatically invoke the superclass's default constructor if it's omitted.  You <em>always</em> have to explicitly call it yourself.
+</p>
+<p>In short, everything works just the way you'd expect if you're familiar with inheritance in other OO languages.  <br>
+</p>
+<p>Unfortunately, the above is a little too simple.  The problem is this line of code:
+</p>
+<pre><code>Reminder.prototype = new Note();
+</code></pre><p>It creates a new Note by calling the Note constructor with no arguments.  That happens to work OK for Note, but many classes can't be correctly constructed with no arguments.  And since we're going to call superclass constructor from our constructor anyway, the superclass's constructor ends up getting applied twice.  How can we set up a correct prototype chain, while avoiding invoking the superclass's constructor on the prototype?
+</p>
+<p>The following syntax seems like it should work, but in fact is exactly the same as above, executing the constructor with no arguments.  (This behavior is specified in the standard; it is not a bug or browser specific.)
+</p>
+<pre><code>Reminder.prototype = new Note;
+</code></pre><p>Happily, there's a technique to accomplish this which is standard-compliant, works in all browsers, and has been used in at least two major JavaScript libraries that I know of (<a href="http://extjs.com/">ExtJS</a> and <a href="http://mochikit.com/">Mochikit</a>) and probably many others.  What you do is, you use an empty function, temporarily set its prototype to the superclass's prototype, call the empty function with the <code>new</code> operator, and make the result to the subclasses prototype.  If you think it through logically, the resulting prototype chain is exactly the same, which is all we care about.  Using this technique we can come up with a generalized function to handle all the details for us.  This implementation uses my <code>clone()</code> method, described <a href="/functional-javascript/">elsewhere</a>.  <br>
+</p>
+<pre><code>// see the clone essay for more about this function.
+function Clone() { }
+function clone(obj) {
+    Clone.prototype = obj;
+    return new Clone();
+}
+
+// Pass in the subclass constructor, superclass constructor,
+// and an Object of methods/static properties to
+// add to the subclass.  The function correctly sets up
+// subclass.prototype.
+function extend(subclass, superclass, methods) {
+    subclass.prototype = clone(superclass.prototype);
+    subclass.prototype.constructor = subclass;
+    for ( var key in methods ) {
+        subclass.prototype[key] = methods[key];
+    }
+}
+</code></pre><p>This <code>extend()</code> function captures the three essential steps for inheritance in JavaScript: setting up the prototype chain, setting the constructor property, and adding stuff to the subclasses prototype.  Here's how it could be used to streamline the Reminder example:
+</p>
+<pre><code>// a subclass of Note that appears on a certain date.
+function Reminder(text, date) {
+    Note.call(this, text);
+    this.date = new Date(date);
+}
+extend(Reminder, Note, {
+    cssClass: 'reminder-note',
+
+    isDueToday: function() {
+        var today = new Date();
+        return today.getDateString() === this.date.getDateString();
+    }
+});
+</code></pre><p>Some frameworks go a little further and write the constructor for you. That way, they can make sure the superclass constructor is invoked.  However, there are some disadvantages to that approach. The generated constructor can't have the right name unless <code>eval()</code> is used.  It also eliminates the freedom to invoke the superclass constructor when and how you want.  For these reasons, it's better to write the subclass constructor explicitly.
+</p>
+<p>Frameworks tend to do other stuff at this point too. For example, <a href="http://extjs.com/">ExtJS</a> adds a <code>superclass</code> property to the base class, so you can use <code>BaseClass.superclass</code> to get a reference to the superclass's prototype, similar to Java's <code>super</code>, which is kinda useful.  (<code>super</code> is a reserved word in JavaScript.)  Unfortunately, there's no consistency, so consult your framework's docs for details and avoid such features if you want your code to be portable between frameworks.
+</p>
+
+<h2>Calling Superclass Methods</h2>
+<p><a name="calling-super"></a>
+   When you override a method, it's common to invoke the overridden superclass method.  JavaScript doesn't have a native <code>super</code> keyword, so we do this &quot;C++ style,&quot; using the explicit name of the superclass.  We also have to invoke the superclass method with <code>call()</code> or <code>apply()</code> to get the scope right.  I've covered [the <code>this</code> keyword][FSJS] and [the <code>arguments</code> collection][JSA] in detail elsewhere, so I'll just give the basic patterns here:
+</p>
+<pre><code>// the superclass method
+SuperClass.prototype.someMethod = function(arg1, arg2) {
+    // does some important logic.
+    // returns some important result.
+}
+
+// variant 1: using Function::call()
+SubClass.prototype.someMethod = function(arg1, arg2) {
+    // does some additional logic first
+    return SuperClass.prototype.someMethod.call(this, arg1, arg2);
+}
+
+// variant 2: using Function::apply()
+SubClass.prototype.someMethod = function(arg1, arg2) {
+    // does some additional logic first
+    return SuperClass.prototype.someMethod.apply(this, arguments);
+}
+
+// variant 3: doing stuff after the superclass method.
+SubClass.prototype.someMethod = function(arg1, arg2) {
+    // maybe some additional logic first
+    var ret = SuperClass.prototype.someMethod.apply(this, arguments);
+    // more additional logic afterwards
+    return ret;
+}
+</code></pre><p>Using <code>apply(this, arguments)</code> is more future-proof: if arguments are added to the superclass method later (and adding additional option arguments to a function is a very common way for code to evolve) then all arguments will still be passed through correctly to the superclass method.  So variant 2 is usually preferred, or variant 3 only if the precise order of execution is important, or if we need to change or use the return value in some way.
+</p>
+<p>Calling the superclass method is optional; often you want to completely replace the method, instead of adding behavior to it.  The only exception is the constructor: it's a very bad idea to not invoke the superclass constructor from the subclass.  Skipping that step will not give the superclass a chance to initialize its private (logically private, I mean: privacy isn't enforced in JavaScript) state, which places severe restrictions on the future evolution of the superclass.  With methods, it depends: sometimes it's useful to delegate the core behavior of the method to the superclass and just add our own on top of that, and sometimes it's useful to completely redefine how the method behaves.
+</p>
+
+<h2><code>instanceof</code> Operator</h2>
+<p>The <code>instanceof</code> operator is JavaScript's built-in way of doing type checking on objects.  It tells you if a given object is an instance of a given class, or equivalently, if it was created by a given constructor.
+</p>
+<pre><code>note instanceof Note; // true
+note instanceof Reminder; // false
+</code></pre><p>It also searches up the class hierarchy, and returns true if the object is an instance of a <em>subclass</em> of the given class:
+</p>
+<pre><code>reminder instanceof Reminder; // true
+reminder instanceof Note; // true: a Reminder is-a Note
+</code></pre><p>The logic is simple: search of the prototype chain of the object on the left and return true if you encounter the <code>prototype</code> property of the constructor on the right.  (<code>instanceof</code> always returns false if the left-hand-side is not of type &quot;object&quot;; use the <code>typeof</code> operator if you need do distinguish other types such a &quot;string&quot; or &quot;number&quot;.)  If you follow the above pattern for extending a class, the instanceof operator will work correctly for you.
+</p>
+
+<h2>Private, Protected, and Public</h2>
+<p>JavaScript has no concept of &quot;private&quot; or &quot;protected&quot; members.  Often, programmers simulate these with some kind of convention, like the leading underscore (&quot;_protected&quot;) convention borrowed from <a href="http://python.org/">Python</a>.  That works fine for protected members, which are very similar to public ones: it's just a matter of whether they're interesting to every user of the class, or just to those programmers who want to extend it.  Private is another matter.  The equivalent idiom from <a href="http://python.org/">Python</a> of a double underscore (&quot;__private&quot;) doesn't really work, because <a href="http://python.org/">Python</a> is actually mangling double-underscore names to implicitly include the class name, and JavaScript doesn't do anything like that.  <br>
+</p>
+<p>To see why the double underscore doesn't help, imagine programmer A writes a class with a &quot;private&quot; member <code>__id</code> and two public methods, <code>getId()</code> and <code>setId()</code>.  Because <code>__id</code> is private and encapsulated, it's not documented or mentioned anywhere. Later, programmer B extends that class, and decides to use his own private <code>__id</code> member for another purpose.  Now there's a conflict; a conflict that wouldn't exist in C++, Java, <a href="http://python.org/">Python</a>, or any other language with explicit support for private members.
+</p>
+<p>The most anal retentive solution is to manually mangle private variable names using some formula of the class name, perhaps like <code>_SuperClassName_memberName</code>.  That's pretty tedious.  The 80/20 solution is to list your private variables, without describing what they are, and politely ask subclass implementers not to use those names.  However, this does not protect subclasses when new members are added to the superclass later.  The laissez faire solution is to do nothing, and let subclass implementors read the source code or inspect objects in a debugger to discover which names to avoid.  You'll have to find the right balance for your project.  My advice would be to avoid standardizing on anything with high overhead until it becomes a problem in practice.
+</p>
+
+<h2>Multiple Inheritance</h2>
+<p>JavaScript doesn't support multiple inheritance.  An object can have at most one prototype.  There are ways do achieve equivalent effects in many cases, though. For example, one might implement <a href="http://en.wikipedia.org/wiki/Mixin">Mixins</a> like so:
+</p>
+<pre><code>function createMixin(methods) {
+    return function(TargetClass) {
+        for ( var key in methods ) {
+            TargetClass.prototype[key] = methods[key];
+        }
+    }
+}
+
+var mixinLock = createMixin({
+    lock: function() {
+        if ( this.locked ) {
+            throw new Exception(&quot;Already locked.&quot;);
+        }
+        this.locked = true;
+    },
+
+    unlock: function() {
+        this.locked = false;
+    }
+});
+
+mixinLock(SomeLockableClass);
+</code></pre><p>In this example, we're defining a reusable concept of a lockable object, then applying it to some class that we want to be lockable.  However, this kind of stuff is limited and non-standard.  For example, it is very difficult to define a Mixin utility that can handle overriding methods.  <br>
+</p>
+<p>Another common use of multiple inheritance is to implement interfaces, by inheriting from some abstract base class that defines the interface.  If JavaScript, this is unnecessary and you'll find that <a href="http://en.wikipedia.org/wiki/Duck_typing">Duck Typing</a> is a better approach: simply document which methods and properties a class should have to implement the interface, then implement those methods on classes that support it.  Unit tests can substitute for type checking in this case.
+</p>
+<p>The <code>instanceof</code> operator will never work with any pseudo-multiple-inheritance trick.
+</p>
+<p>The bottom line is, JavaScript doesn't support multiple inheritance.  In some sense you're on your own, but you're not totally out of luck because the dynamic features can also be used to implement similar features.
+</p>
+
+<h2>Is It Worth It?</h2>
+<p>Yes, eventually.  There are some limitations and complexities you need to get past to write object oriented code in JavaScript, but it does pay off after a few thousand lines of code.  Many project, where simple DHTML scripts slightly enhance mostly-server-generated content, will never reach that point: use <a href="http://jquery.com/">jQuery</a> and don't worry about this stuff.  But for JavaScript-heavy projects that want to see some level of code re-use, these techniques really do help keep things organized, and really don't cause significant headaches or excessive wheel-spinning.
+</p>
+<p>In a very real sense, this is how JavaScript was meant to be written. <code>prototype</code>, <code>this</code>, <code>instanceof</code> and the rest are there for a reason: to support programming in exactly this way.  We're not swimming upstream, trying to get some hopeless scripting language to jump through object-oriented hoops: we're going with the flow, using standard language features as intended, following the example of the standard classes.  That's why it works.
+</p>
+
+
+
+</div>
+<p>
+  <span class="signature">- Oran Looney</span>
+  <span class="signature-date">November 24th 2009</span>
+</p>
+  <p class="thank-you">
+    Thanks for reading.  Please subscribe to the <a href="/feeds/blog/">RSS feed</a> and remember that
+    future readers will thank you for leaving your comments and criticisms.
+    <a href="/feeds/blog/" title="Subscribe to RSS Feed" class="big-rss-link">Subscribe to RSS Feed</a>
+  </p>
+<p class="article-tags">
+     
+        <a href="/tag/coding-style/">Coding Style</a> 
+     
+        <a href="/tag/tutorial/">Tutorial</a> 
+     
+        <a href="/tag/web/">Web</a> 
+    
+</p>
+
+
+      </div>
+      
+  
+  <div class="content-page comments" style="border-top: none">
+    <a name="comments"></a>
+    
+	  <h1>Comments (1)</h1>
+      <div>
+        
+          <div class="comment">
+    <div class="comment-date">July 9th 2010</div>
+	<h4><span class="comment-username">Galileo</span> said: </h4>
+	<p>Nice explanation about javascript class inheritance, very clear.</p>
+</div>
+
+        
+      </div>
+    
+    <h1>Leave a Comment</h1>
+    
+<form method="post" action="/classes-and-objects-javascript/leave-comment/" class="leave-comment-form">
+  <div style='display:none'><input type='hidden' name='csrfmiddlewaretoken' value='7c54419eea61d947291c188320a452fc' /></div>
+  <div>
+    Your Name: <br>
+    
+    <input id="id_user_name" type="text" name="user_name" maxlength="12" />
+  </div>
+  <div>
+    Comment: <br>
+    
+    <textarea id="id_content" rows="10" cols="40" name="content"></textarea>
+  </div>
+  <div>
+    Enter this phrase: <br>
+    
+    <img src="/static/site/images/captcha.png" alt="captcha">
+    <input id="id_captcha" type="text" name="captcha" maxlength="20" /> 
+  </div>
+  <div>
+    <input class="submit-button" type="submit" value="Leave Comment">
+  </div>
+</form>
+
+  </div>
+  
+
+	
+  </div>
+
+
+
+  <script src="http://www.google-analytics.com/urchin.js" type="text/javascript"></script>
+  <script type="text/javascript"> _uacct = "UA-2535855-1"; urchinTracker(); </script>
+
+</body>
+</html>

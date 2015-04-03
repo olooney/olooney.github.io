@@ -1,0 +1,348 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang="en-us" dir="ltr">
+<head>
+<!-- meta -->
+<meta http-equiv="content-type" content="text/html; charset=utf-8">
+<meta name="author" content="Oran Looney">
+<meta name="robots" content="INDEX,FOLLOW">
+<meta name="description" content="Oran quitely programming away and sharing a few of the lessons learned">
+<meta name="keywords" content="Programming,Code,Coding,Software,Software Development,Web,Web Development,Python,JavaScript,C++">
+<meta name="verify-v1" content="GmOM2OF0gDOQiM8uS0yKm1ZA0gUI8Hqk4BamNHp7iCg=">
+<meta name="viewport" content="width=800,initial-scale=0.6">
+<link rel="alternate" type="application/rss+xml" href="/feeds/blog/" title="OranLooney.com RSS Blog Feed">
+
+<title>OranLooney - LBYL vs. EAFP</title>
+
+<!-- style -->
+<link rel="stylesheet" type="text/css" href="/static/site/css/yui-reset-min.css">
+<link rel="stylesheet" type="text/css" href="/static/site/css/main.css">
+<link rel="stylesheet" type="text/css" media="print" href="/static/site/css/print.css">
+<!--[if lt IE 7.]>
+	<link rel="stylesheet" type="text/css" href="/static/site/css/icons_gif.css">
+<![endif]-->
+
+
+
+</head>
+
+
+<body>
+
+  <div id="banner">
+	<a href="/">OranLooney.com</a>
+	<h6>quietly programming away</h6>
+  </div>
+  <div class="box" id="sidebar">
+	
+		<form id="quick-search" method="get" action="/search/">
+			<div>
+				<input type="hidden" name="alltags">
+				<input type="text" name="keyword" class="keyword-field">
+				<button type="submit" class="search-submit-button">Search</button>
+		  	</div>
+		  </form>
+	
+
+    <ul class="menu">
+      
+        <li class="menu_home"><a href="/">Home</a></li>
+      
+
+      
+		<li class="menu_rss_feed"><a href="/feeds/blog/" title="subscribe to the RSS feed">RSS Feed</a></li>
+        <li class="menu_tags"><a href="/tags/" title="search articles by tag">Tags</a></li>
+        <li class="menu_index"><a href="/archive" title="search articles chronologically">Archive</a></li>
+        <li class="menu_break"></li>
+        <li class="menu_bookshelf" title="my books on librarything.com"><a href="http://www.librarything.com/catalog.php?view=olooney&amp;offset=0&amp;shelf_rows=10&amp;previousOffset=0&amp;shelf=shelf">Bookshelf</a></li>
+        <li class="menu_sig" title="my endorsement of Agile"><a href="http://agilemanifesto.org/sign/display.cgi?ms=000000203">Manifesto</a></li>
+
+        <li class="menu_about_site" title="about the site itself"><a href="/colophon/">Colophon</a></li>
+        <li class="menu_about_me"><a href="/author/" title="about the author">Author</a></li> 
+      
+      
+      
+      
+          <li class="menu_break"></li>
+        
+          <li class="menu_login"><a href="/admin/">Login</a></li> 
+        
+      
+    </ul>
+  </div>
+  <div id="main-wrapper">
+	
+      
+      <div class="content-page">
+        
+  <a href="/lbyl-vs-eafp/" class="title">LBYL vs. EAFP</a>
+
+  
+    <a href="http://www.flickr.com/photos/clickflashphotos/3512146240/">
+      <img alt="colorful lead photo" src="/static/media/images/lead/3512146240_7793379067.jpg">
+    </a>
+  
+
+<div>
+  
+<p>There are basically two error handling strategies:
+</p>
+<ul>
+ <li>
+     Look Before You Leap  (LBYL)
+ </li>
+
+ <li>
+     It's Easier to Ask Forgiveness than Permission (EAFP)
+ </li>
+</ul>
+<p>I'm going to assume that you're familiar with both these approaches - most programmers have worked with both - and I'm going to talk about in the <em>why and wherefore</em> of the two approaches.  This is my perspective on the subject, which is somewhat idiosyncratic.
+</p>
+
+<h2>LBYL</h2>
+<p>LBYL is the 'old' way.  We validate every piece of data before we use it.  It has some problems: Basically, that we have to know, and say, what 'valid' means.  That requires a lot of knowledge of the function/object we're trying to validate, so it can violates encapsulation.  Idioms help a little: in C, a NULL pointer generally indicates an error.  Unfortunately, it doesn't contain very much information about why the error occurred, and there are no idioms for functions that return other non-pointer types.  <br>
+</p>
+<p>We have to write all the validation code, which in practice means writing lots of boilerplate code (not to mention frequently forgetting to check some arcane condition.)  This is particularly annoying when it prevents us from chaining expressions naturally:  Instead of
+</p>
+<pre><code>int key_length = strlen(getval(map,key));
+</code></pre><p>We are constrained to write
+</p>
+<pre><code>int key_length = 0;
+char* value = getval(map,key);
+if (val != 0 ) {
+    key_length = strlen(value);
+}
+</code></pre><p>lest <code>strlen()</code> cause a seg fault.
+</p>
+
+<h2>EAFP</h2>
+<p>The 'new' way is EAFP, typically through the use of exceptions.  This solves pretty much all the problems of LBYL, but unfortunately introduces its own set.  Let's talk about the strengths of EAFP first.  <br>
+</p>
+
+<h2>EAFP rocks!</h2>
+<p>Let's try a thought experiment: imagine we're wrapping a LBYL library with an EAFP API.  We would implement the LBYL in the wrapper functions, and raise an exception if something goes wrong, otherwise proceeding normally. If the LBYL functions return an error, we raise an exception for that, too.  Clearly, what we've doing here is centralizing and formalizing the knowledge about the valid cases for calling the LBYL in the system. 
+   We are:
+</p>
+<ul>
+ <li>
+     providing a well defined, consistent interface for communicating errors back to the client
+ </li>
+
+ <li>
+     creating functions/classes that have exactly one responsibility (validation)
+ </li>
+
+ <li>
+     adhering to the DRY principle: Don't Repeat Yourself.  <br>
+ </li>
+
+ <li>
+     making the code more readable by separating out the successful case from the exceptional case
+ </li>
+</ul>
+<p>EAFP (implemented with exceptions) in fact solves every problem with LBYL that we found above.
+</p>
+
+<h2>EAFP sucks!</h2>
+<p>Unfortunately, it also introduces it's own set of problems.  The root of the problem seems
+   to be that it's basically an invisible goto.  Take a look at this <a href="http://python.org/">Python</a> method:
+</p>
+<pre><code>persistSomehow(self):
+    'Commit the object to the file it is bound to.'
+    try:
+        self.saveCount += 1
+        if self.fileName:
+            f = open(self.fileName,'w')
+        else:
+            f = bindToBlobInDatabase(self.tableName,'w')
+        f.write(self.externalId)
+        f.write(self.seralize)
+    except:
+        logError(self,&quot;persistSomehow&quot;)
+        return False
+    finally:
+        f.close()
+        return True
+</code></pre><p>This <em>looks</em> ok, at first glance.  But in fact, if there's a problem opening the file, it will raise an error (an unhelpfulUnboundLocalError at that.) Even worse, If the error happens on the write - perhaps the disk is full - then the file will be corrupted and not corrected.  Even the local copy will have incorrectly incremented its <code>saveCount</code>.  Even the return value is wrong:
+   the function <em>always</em> returns True, because the return statement in the <code>finally</code> always executes! 
+</p>
+<p>The point is not that it's incorrect - I'd like to think I could easily write incorrect code in any language - but that it doesn't look wrong.  Moreover, in order to make it correct, I would need a complicated set of nested try-except-finally blocks that would be <em>more</em> confusing the equivalent LBYL code. The cyclomatic complexity of the this method is not 2, but rather 6, since any call that can raise an exception is a branch point.  That's a lot of hidden complexity! In this simple example, we can mentally trace the various execution paths through the code fairly easily.  In complex code - and by complex I mean only the typical complexity of production code - it's not possible for <em>any</em> programmer to see the many possible execution 
+   paths through the code that exceptions allow for.  By hiding the complexity of branching on exceptional cases, the programmer has been tricked into writing code too complex to be proved, tested, or debugged.  <br>
+</p>
+<p>Raymond Chen has discussed this at some length:
+</p>
+<ul>
+ <li>
+     <a href="http://blogs.msdn.com/oldnewthing/archive/2004/04/22/118161.aspx">Cleaner, more elegant, and wrong</a>
+ </li>
+
+ <li>
+     <a href="http://blogs.msdn.com/oldnewthing/archive/2005/01/14/352949.aspx">Cleaner, more elegant, and harder to recognize</a>
+ </li>
+</ul>
+<p>I believe it's important to document and track how much thought, testing, and debugging has gone into a piece of code.  (For example, unit tests are good in part because they document exactly which cases have been tested.)  If Raymond is right and it's hard to tell if EAFP code is correct, we're doing the exact opposite. Peer code review won't catch as many bugs and any future maintainer will have to spend more time understanding the code before making a modification.  <br>
+</p>
+<p>Even in languages that primarily use exceptions to communicate error conditions, we can still use the LBYL paradigm when we want to.  We just &quot;program into&quot; the language instead of programming in&quot; the language.
+</p>
+
+<h2>Lack of Conclusion</h2>
+<p>Now would be the time to make a call one way or the other, EAFP or LBYL.  But there's no point in doing so. Both paradigms are deeply embedded in common languages, so programmers have got to know and use both.  No exceptions.  But sometimes we do get to choose, and there are some principles to guide us:
+</p>
+<ul>
+ <li>
+     Use EAFP when you don't actually expect anything to go wrong and there is a single, clear &quot;normal&quot; case.
+ </li>
+
+ <li>
+     Use LBYL for complex cases.  That will be more work, but the program will not be correct unless we deal with that complexity directly.
+ </li>
+
+ <li>
+     We can also deal with complex cases by breaking it into smaller cases, and use EAFP on each one.  That's even more work, but might be more maintainable.
+ </li>
+
+ <li>
+     Use EAFP when it's ok (or even desirable) to bubble an error several layers; a single try-catch on the higher layer can save us tons of work on the lower levels.
+ </li>
+
+ <li>
+     Use LBYL when dealing with persistence, files, and any other irrevocable action. We need the extra control to avoid corrupting data.
+ </li>
+
+ <li>
+     Use EAFP when working with exception safe local objects that follow the <a href="http://www.research.att.com/~bs/glossary.html#Gresource-acquisition-is-initialization">Resource Acquisition Is Initialization</a> idiom.  Most C++ STL classes are exception safe.
+ </li>
+
+ <li>
+     When working with a file system or database that supports transactions, EAFP is almost always correct because of the safety net rollbacks provide. Also, LBYL tends to require several trips to the server, which can be a significant performance concern.
+ </li>
+
+ <li>
+     All else being equal, we should use the preferred paradigm of the language, even if it's not our preferred paradigm.  This will make the poor saps who maintain our code happy.
+ </li>
+</ul>
+<p>One final point:
+</p>
+<blockquote><p>Test all error handling code.
+</p>
+</blockquote><p>Error handling code is paradoxically among the least tested code, probably because by definition it deals with rare cases.  Hard-code <code>raise</code> statements, override API functions with stubs simply return errors, do whatever it takes to test those cases.  The reason's very simple: QA probably can't create most of these exceptional cases, so if we don't test it our self, it will
+   get released un-tested.
+</p>
+
+
+
+</div>
+<p>
+  <span class="signature">- Oran Looney</span>
+  <span class="signature-date">May 23rd 2007</span>
+</p>
+  <p class="thank-you">
+    Thanks for reading.  Please subscribe to the <a href="/feeds/blog/">RSS feed</a> and remember that
+    future readers will thank you for leaving your comments and criticisms.
+    <a href="/feeds/blog/" title="Subscribe to RSS Feed" class="big-rss-link">Subscribe to RSS Feed</a>
+  </p>
+<p class="article-tags">
+     
+        <a href="/tag/coding-style/">Coding Style</a> 
+     
+        <a href="/tag/engineering/">Engineering</a> 
+    
+</p>
+
+
+      </div>
+      
+  
+  <div class="content-page comments" style="border-top: none">
+    <a name="comments"></a>
+    
+	  <h1>Comments (4)</h1>
+      <div>
+        
+          <div class="comment">
+    <div class="comment-date">March 7th 2014</div>
+	<h4><span class="comment-username">Chris Barker</span> said: </h4>
+	<p>One more thought:
+
+You&#39;ve left off a core advantage of EAFP: it eliminates the possible race condition problem: What if you check if a file exists before opening it? And in a very unusual case, something deletes that file in between the check and actually opening it -- presto! Error. And a really hard to diagnose one at that.
+
+All that being said, there is aplace for both.
+</p>
+</div>
+
+        
+          <div class="comment">
+    <div class="comment-date">March 7th 2014</div>
+	<h4><span class="comment-username">Chris Barker</span> said: </h4>
+	<p>I can&#39;t say I disagree with the message of this post, but I&#39;m a big fan of EAFP myself, and the &quot;bad&quot; exammple is pretty poorly done:
+
+1) that&#39;s why Python now has context managers (with)
+
+2) NEVER use a raw &quot;except&quot;. That except should be catching an exception you know how to handle, and you can have multipel except blocks, so can handle different exceptions differently.
+
+3) as someone else pointed out, no need for the return True in be in the finally block
+
+4) it&#39;s kind of an odd place to make the selection between writing to a file or a database.
+
+
+</p>
+</div>
+
+        
+          <div class="comment">
+    <div class="comment-date">October 20th 2012</div>
+	<h4><span class="comment-username">S. Schwarzer</span> said: </h4>
+	<p>First, check if the blog keeps code formatting, because my comment would mainly consist of a code example.
+
+if is_formatted_correcty:
+    enter_comment()
+</p>
+</div>
+
+        
+          <div class="comment">
+    <div class="comment-date">September 11th 2012</div>
+	<h4><span class="comment-username">Jesus</span> said: </h4>
+	<p>Was totally stuck until I read this, now back up and riunnng.</p>
+</div>
+
+        
+      </div>
+    
+    <h1>Leave a Comment</h1>
+    
+<form method="post" action="/lbyl-vs-eafp/leave-comment/" class="leave-comment-form">
+  <div style='display:none'><input type='hidden' name='csrfmiddlewaretoken' value='7c54419eea61d947291c188320a452fc' /></div>
+  <div>
+    Your Name: <br>
+    
+    <input id="id_user_name" type="text" name="user_name" maxlength="12" />
+  </div>
+  <div>
+    Comment: <br>
+    
+    <textarea id="id_content" rows="10" cols="40" name="content"></textarea>
+  </div>
+  <div>
+    Enter this phrase: <br>
+    
+    <img src="/static/site/images/captcha.png" alt="captcha">
+    <input id="id_captcha" type="text" name="captcha" maxlength="20" /> 
+  </div>
+  <div>
+    <input class="submit-button" type="submit" value="Leave Comment">
+  </div>
+</form>
+
+  </div>
+  
+
+	
+  </div>
+
+
+
+  <script src="http://www.google-analytics.com/urchin.js" type="text/javascript"></script>
+  <script type="text/javascript"> _uacct = "UA-2535855-1"; urchinTracker(); </script>
+
+</body>
+</html>

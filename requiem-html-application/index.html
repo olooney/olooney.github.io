@@ -1,0 +1,205 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang="en-us" dir="ltr">
+<head>
+<!-- meta -->
+<meta http-equiv="content-type" content="text/html; charset=utf-8">
+<meta name="author" content="Oran Looney">
+<meta name="robots" content="INDEX,FOLLOW">
+<meta name="description" content="Oran quitely programming away and sharing a few of the lessons learned">
+<meta name="keywords" content="Programming,Code,Coding,Software,Software Development,Web,Web Development,Python,JavaScript,C++">
+<meta name="verify-v1" content="GmOM2OF0gDOQiM8uS0yKm1ZA0gUI8Hqk4BamNHp7iCg=">
+<meta name="viewport" content="width=800,initial-scale=0.6">
+<link rel="alternate" type="application/rss+xml" href="/feeds/blog/" title="OranLooney.com RSS Blog Feed">
+
+<title>OranLooney - Requiem for an HTML Application</title>
+
+<!-- style -->
+<link rel="stylesheet" type="text/css" href="/static/site/css/yui-reset-min.css">
+<link rel="stylesheet" type="text/css" href="/static/site/css/main.css">
+<link rel="stylesheet" type="text/css" media="print" href="/static/site/css/print.css">
+<!--[if lt IE 7.]>
+	<link rel="stylesheet" type="text/css" href="/static/site/css/icons_gif.css">
+<![endif]-->
+
+
+
+</head>
+
+
+<body>
+
+  <div id="banner">
+	<a href="/">OranLooney.com</a>
+	<h6>quietly programming away</h6>
+  </div>
+  <div class="box" id="sidebar">
+	
+		<form id="quick-search" method="get" action="/search/">
+			<div>
+				<input type="hidden" name="alltags">
+				<input type="text" name="keyword" class="keyword-field">
+				<button type="submit" class="search-submit-button">Search</button>
+		  	</div>
+		  </form>
+	
+
+    <ul class="menu">
+      
+        <li class="menu_home"><a href="/">Home</a></li>
+      
+
+      
+		<li class="menu_rss_feed"><a href="/feeds/blog/" title="subscribe to the RSS feed">RSS Feed</a></li>
+        <li class="menu_tags"><a href="/tags/" title="search articles by tag">Tags</a></li>
+        <li class="menu_index"><a href="/archive" title="search articles chronologically">Archive</a></li>
+        <li class="menu_break"></li>
+        <li class="menu_bookshelf" title="my books on librarything.com"><a href="http://www.librarything.com/catalog.php?view=olooney&amp;offset=0&amp;shelf_rows=10&amp;previousOffset=0&amp;shelf=shelf">Bookshelf</a></li>
+        <li class="menu_sig" title="my endorsement of Agile"><a href="http://agilemanifesto.org/sign/display.cgi?ms=000000203">Manifesto</a></li>
+
+        <li class="menu_about_site" title="about the site itself"><a href="/colophon/">Colophon</a></li>
+        <li class="menu_about_me"><a href="/author/" title="about the author">Author</a></li> 
+      
+      
+      
+      
+          <li class="menu_break"></li>
+        
+          <li class="menu_login"><a href="/admin/">Login</a></li> 
+        
+      
+    </ul>
+  </div>
+  <div id="main-wrapper">
+	
+      
+      <div class="content-page">
+        
+  <a href="/requiem-html-application/" class="title">Requiem for an HTML Application</a>
+
+  
+    <a href="http://www.flickr.com/photos/kkoshy/2635358222/">
+      <img alt="colorful lead photo" src="/static/media/images/lead/2635358222_0dac4d3d85.jpg">
+    </a>
+  
+
+<div>
+  
+<p>Once upon a time, I had to conform to a <a href="http://c2.com/cgi/wiki?BadCodingStandards">coding style that demands elaborate headers</a> for every function, no matter how small.  Worse, the header contained the <em>name</em> and <em>parameter list</em> from the function, introducing an annoying touch of duplication.  I'm too <a href="http://www.netropolis.org/hash/perl/virtue.html">impatient</a> to type something twice, and too <a href="http://www.netropolis.org/hash/perl/virtue.html">lazy</a> to get the formatting juuust right, so I decided to write a tool to do it for me.  Since I suffer from <a href="http://www.netropolis.org/hash/perl/virtue.html">hubris</a>, I assumed everyone else would want my tool too.
+</p>
+<p>The problem was fundamentally trivial: take a function declaration, pull out the name and formatting list, and output the header to be copy-and-pasted into the IDE.  So, I had to choose an environment/release mechanism.  These were the constraints:
+</p>
+<ul>
+ <li>
+     the environment needed regular expressions
+ </li>
+
+ <li>
+     it should look nice and include on-screen instructions
+ </li>
+
+ <li>
+     It had to have some option buttons to choose between a couple of formats
+ </li>
+
+ <li>
+     <strong>it should be super easy to deploy</strong>
+ </li>
+
+ <li>
+     it should be able to be called from a hotkey
+ </li>
+</ul>
+<p>&quot;Super easy to deploy&quot; is critical. I once saw a tool for laptops that would cache a bunch of important information so you could still be productive with a slow or nonexistent connection.  It couldn't have been more than a page of code, <em>but it required the .NET runtime, which wasn't installed on our laptops by default.</em>  I found myself in a hotel room on dial-up, with this tool telling me it had to download thirty megabytes if I wanted to get anything done on the flight.  <a href="http://www.joelonsoftware.com/articles/PleaseLinker.html">Joel Spolsky had a similar experience with another trivial .NET program.</a>
+</p>
+<p>Easy to deploy usually means a web app.  That would work: I could publish it on the intranet and use JavaScript to do the regular expression parsing.  And it's easy enough to include instructions and options button in an HTML document.  However, that meant that it would have to live on the network.  I (and the other programmers) travel sometimes, so we often work on laptops, not connected to the intranet, or over a slow connection.  So, I decided a local file would be better.
+</p>
+<p>Do you see the problem for HTML?
+</p>
+<p>Internet explorer locks down JavaScript for any HTML document run from a local file (because it has some access to the local drive.) and it takes two clicks to enable it.  Two clicks is forever!
+</p>
+<p>That's when <a href="http://thebitguru.com/blog/view/88">Farhan Ahmad</a> put me onto <a href="http://msdn2.microsoft.com/en-us/library/ms536496.aspx">HTML Applications.</a>  HTAs are just HTML that runs with increased permissions from local files.  Normally, you'd use VBScript to access whatever you needed, but I'd never used VBScript, and didn't need to access anything, so I used JavaScript.  It worked pretty well, and since then I've used the same strategy to come up with several similar small utilities.  HTAs are an evolutionary dead-end; there's no reason to invest time in learning about them.  On the other hand, it simply doesn't take very long, and it's an interesting precursor to WPF.  Starting from <a href="http://thebitguru.com/blog/view/88">Farhan's VBScript example</a>, Here's <a href="/static/hta/example.hta">my JavaScript example</a> if you're interested:
+</p>
+<p><a href="/static/hta/example.hta">
+   <img src="/static/hta/screenshot.GIF" alt="Screen shot of sample HTA application"/>
+   </a>
+</p>
+<p>HTAs are not popular and will soon be forgotten completely, replaced by more sophisticated solutions.  But at one particular moment in time they solved one particular deployment problem quite neatly.
+</p>
+
+
+
+</div>
+<p>
+  <span class="signature">- Oran Looney</span>
+  <span class="signature-date">June 17th 2007</span>
+</p>
+  <p class="thank-you">
+    Thanks for reading.  Please subscribe to the <a href="/feeds/blog/">RSS feed</a> and remember that
+    future readers will thank you for leaving your comments and criticisms.
+    <a href="/feeds/blog/" title="Subscribe to RSS Feed" class="big-rss-link">Subscribe to RSS Feed</a>
+  </p>
+<p class="article-tags">
+     
+        <a href="/tag/silly/">Silly</a> 
+     
+        <a href="/tag/web/">Web</a> 
+    
+</p>
+
+
+      </div>
+      
+  
+  <div class="content-page comments" style="border-top: none">
+    <a name="comments"></a>
+    
+	  <h1>Comments (1)</h1>
+      <div>
+        
+          <div class="comment">
+    <div class="comment-date">September 11th 2012</div>
+	<h4><span class="comment-username">Travon</span> said: </h4>
+	<p>Your articles are for when it absolutely, positively, needs to be udnertsood overnight.</p>
+</div>
+
+        
+      </div>
+    
+    <h1>Leave a Comment</h1>
+    
+<form method="post" action="/requiem-html-application/leave-comment/" class="leave-comment-form">
+  <div style='display:none'><input type='hidden' name='csrfmiddlewaretoken' value='7c54419eea61d947291c188320a452fc' /></div>
+  <div>
+    Your Name: <br>
+    
+    <input id="id_user_name" type="text" name="user_name" maxlength="12" />
+  </div>
+  <div>
+    Comment: <br>
+    
+    <textarea id="id_content" rows="10" cols="40" name="content"></textarea>
+  </div>
+  <div>
+    Enter this phrase: <br>
+    
+    <img src="/static/site/images/captcha.png" alt="captcha">
+    <input id="id_captcha" type="text" name="captcha" maxlength="20" /> 
+  </div>
+  <div>
+    <input class="submit-button" type="submit" value="Leave Comment">
+  </div>
+</form>
+
+  </div>
+  
+
+	
+  </div>
+
+
+
+  <script src="http://www.google-analytics.com/urchin.js" type="text/javascript"></script>
+  <script type="text/javascript"> _uacct = "UA-2535855-1"; urchinTracker(); </script>
+
+</body>
+</html>

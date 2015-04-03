@@ -11,7 +11,7 @@
 <meta name="viewport" content="width=800,initial-scale=0.6">
 <link rel="alternate" type="application/rss+xml" href="/feeds/blog/" title="OranLooney.com RSS Blog Feed">
 
-<title>OranLooney - Home</title>
+<title>OranLooney - Calling Superclass Methods in JavaScript</title>
 
 <!-- style -->
 <link rel="stylesheet" type="text/css" href="/static/site/css/yui-reset-min.css">
@@ -45,6 +45,8 @@
 
     <ul class="menu">
       
+        <li class="menu_home"><a href="/">Home</a></li>
+      
 
       
 		<li class="menu_rss_feed"><a href="/feeds/blog/" title="subscribe to the RSS feed">RSS Feed</a></li>
@@ -72,8 +74,7 @@
       
       <div class="content-page">
         
-  
-    <a href="/super-javascript/" class="title">Calling Superclass Methods in JavaScript</a>
+  <a href="/super-javascript/" class="title">Calling Superclass Methods in JavaScript</a>
 
   
     <a href="http://www.flickr.com/photos/jurvetson/3031088430/">
@@ -237,21 +238,64 @@ subclass(RickityWagon, Wagon, {
     
 </p>
 
-  
-  <p>
-  
-    
-	
-	Read <a href="http://oranlooney.com/super-javascript/#comments" title="read and leave comment">two comments</a> on this essay or <a href="http://oranlooney.com/super-javascript/#comments" title="read and leave comment">leave your own</a>.
-	
-
-  
-  </p>
-<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js" type="text/javascript"></script>
-<script src="/static/site/scripts/infinite.js" type="text/javascript"></script>
 
       </div>
       
+  
+  <div class="content-page comments" style="border-top: none">
+    <a name="comments"></a>
+    
+	  <h1>Comments (2)</h1>
+      <div>
+        
+          <div class="comment">
+    <div class="comment-date">April 26th 2012</div>
+	<h4><span class="comment-username">Tan Nhu</span> said: </h4>
+	<p>Wrapper is always expensive. Direct call from parent constructor/parent prototype is the best way to gain performance. It might look a little verbosed but the benefit is clear (http://jsperf.com/oop-benchmark/6).</p>
+</div>
+
+        
+          <div class="comment">
+    <div class="comment-date">June 6th 2011</div>
+	<h4><span class="comment-username">SomeGuy</span> said: </h4>
+	<p>Douglas Crockford talks about a similar &quot;uber&quot; method:
+
+http://javascript.crockford.com/inheritance.html
+
+but concludes it isn&#39;t very useful in JavaScript.</p>
+</div>
+
+        
+      </div>
+    
+    <h1>Leave a Comment</h1>
+    
+<form method="post" action="/super-javascript/leave-comment/" class="leave-comment-form">
+  <div style='display:none'><input type='hidden' name='csrfmiddlewaretoken' value='7c54419eea61d947291c188320a452fc' /></div>
+  <div>
+    Your Name: <br>
+    
+    <input id="id_user_name" type="text" name="user_name" maxlength="12" />
+  </div>
+  <div>
+    Comment: <br>
+    
+    <textarea id="id_content" rows="10" cols="40" name="content"></textarea>
+  </div>
+  <div>
+    Enter this phrase: <br>
+    
+    <img src="/static/site/images/captcha.png" alt="captcha">
+    <input id="id_captcha" type="text" name="captcha" maxlength="20" /> 
+  </div>
+  <div>
+    <input class="submit-button" type="submit" value="Leave Comment">
+  </div>
+</form>
+
+  </div>
+  
+
 	
   </div>
 
