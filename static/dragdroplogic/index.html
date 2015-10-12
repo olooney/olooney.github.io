@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>	  <html lang="en" class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>		 <html lang="en" class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>		 <html lang="en" class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html lang="en" class="no-js"> <!--<![endif]-->
+	<head>
+		<!-- technical meta -->
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatibele" content="IE=edge">
+		<meta http-equiv="content-type" content="text/html; charset=utf-8">
+		<meta name="robots" content="index,noarchive,nofollow">
+
+		<title>Include/Exclude Drag/Drop Example</title>
+
+		<!-- seo meta -->
+		<meta name="description" content="">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<meta name="keywords" content="">
+
+		<!-- bootstrap -->
+		<link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css">
+		<link rel="stylesheet" href="http://netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css">
+        <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css">
+  
+
+		<style type="text/css">
+
+            /* normal sortable lists */
+			.sortable-things {
+				padding: 10px;
+				border: 5px solid lightblue;
+				border-radius: 10px;
+                min-height: 50px;
+			}
+			.sortable-thing-placeholder {
+				border: 1px dotted lightblue;
+				background-color: #EEF;
+				padding: 15px;
+			}
+			.sortable-things .ui-sortable-helper {
+				-webkit-box-shadow: 4px 4px 5px rgba(50, 50, 50, 0.5);
+				-moz-box-shadow:    4px 4px 5px rgba(50, 50, 50, 0.5);
+				box-shadow:         4px 4px 5px rgba(50, 50, 50, 0.5);
+
+				-webkit-transition: -webkit-box-shadow 100ms linear;
+				-moz-transition: -moz-box-shadow 100ms linear;
+				-ms-transition: box-shadow 100ms linear;
+				-kthtml-transition: box-shadow 100ms linear;
+				transition: box-shadow 100ms linear;
+			}
+
+            /* grid-style lists */
+			.sortable-grid {
+				overflow: hidden;
+				min-height: 120px;
+				padding: 0;
+				list-style-type: none;
+				border-color: #CFC;
+			}
+			.sortable-grid li {
+				float: left;
+				width: 100px;
+				height: 100px;
+				margin: 10px; 
+				position: relative;
+				border-radius: 5px;
+			}
+            /* template clones */
+			.new-things {
+				padding: 10px;
+				border: 5px solid #AFA;
+				border-radius: 10px;
+			}
+            /* trash can */
+			.trash-things {
+				padding: 10px;
+				border: 5px solid #F55;
+				border-radius: 10px;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="container">
+			<div class="row">
+				<div class="col-lg-2 col-md-4 col-sm-6">
+                    Basic Criteria 
+					<ul class="list-group new-things">
+						<li id="new-thing-template1" class="list-group-item new-thing">
+							Age
+						</li>
+						<li id="new-thing-template2" class="list-group-item new-thing">
+							Gender
+						</li>
+						<li id="new-thing-template3" class="list-group-item new-thing">
+							Region
+						</li>
+                    </ul>
+                    Advanced Logic:
+					<ul class="list-group new-things">
+						<li id="new-thing-template4" class="list-group-item new-thing thing-container">
+                            AND
+                            <div class="list-group sortable-things"></div>
+						</li>
+						<li id="new-thing-template5" class="list-group-item new-thing thing-container">
+                            OR
+                            <div class="list-group sortable-things"></div>
+						</li>
+						<li id="new-thing-template6" class="list-group-item new-thing thing-container">
+                            NOT 
+                            <div class="list-group sortable-things"></div>
+						</li>
+					</ul>
+                    Trash
+					<ul class="list-group trash-things">
+                    </ul>
+				</div>
+				<div class="col-lg-5 col-md-4 col-sm-6">
+                    Include
+					<ul class="list-group sortable-things">
+						<li class="list-group-item">
+							Age 18+
+						</li>
+					</ul>
+				</div>
+				<div class="col-lg-5 col-md-4 col-sm-6">
+                    Exclude
+					<ul class="list-group sortable-things">
+						<li class="list-group-item">
+							Deceased
+						</li>
+						<li class="list-group-item">
+							Do Not Solicit
+						</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+
+<div id="new-thing-dialog" title="Add New Thing">
+  <fieldset>
+    <label for="new-thing-field">Text</label>
+    <input type="text" name="text" id="new-thing-field" class="text ui-widget-content ui-corner-all" value="New Thing">
+  </fieldset>
+</div>
+
+		<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+		<script src="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
+		<script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
+		<script>
+			function init() {
+
+                // the main sortable lists. There are two of these, for include and exclude,
+                // and the connect to the trash can for disposal of unnecessary things.
+				$(".sortable-things").not('.new-thing .sortable-things').sortable({
+					connectWith: ".sortable-things, .trash-things",
+					distance: 10,
+					placeholder: 'list-group-item sortable-thing-placeholder',
+                    receive: function(ev, ui) {
+                        if ( 
+                            ui.helper && 
+                            ui.helper.hasClass('new-thing') &&
+                            !ui.helper.hasClass('thing-container')
+                        ) {
+                            $('#new-thing-dialog').dialog("open");
+                        } else {
+                            var newThing = $('.new-thing:not([id^=new-thing-template])');
+                            tearDown();
+                            newThing.removeClass('new-thing');
+                            init();
+                        }
+                    }
+				}).disableSelection();
+
+                // The user can drag from new things, and it clones the element and puts
+                // it in the target list. The original is not effected. Finding
+                // the element we just created is a bit tricky since jQuery UI
+                // decided not to surface the newly created element in the event,
+                // so here I use a trick which relies on the fact that the "clone"
+                // of an element cannot have the same id attribute (since IDs are unique.)
+                $(".new-things li").draggable({
+                    helper: 'clone',
+                    connectToSortable: ".sortable-things",
+                    distance: 10,
+                    start: function(ev, ui) {
+                        // when the dialogue pops up, it will show the templates text
+                        // as the default value.
+                        $('#new-thing-field').val( $(this).html().trim() );
+                    }
+                }).disableSelection();
+
+                // a very simple trash can which immediately empties as soon
+                // as anything is dropped into it.
+                $('.trash-things').sortable({
+                    receive: function(ev, ui) {
+                        $(this).empty(); 
+                    }
+                });
+
+
+                // prepare the dialog which pops up when a cloned element is dragged into one
+                // of the lists. This givees the user an opportunity to edit the thing just
+                // as it is placed into the list. Also, Cancel immediately removes the newly
+                // created clone
+                $('#new-thing-dialog').dialog({
+                    autoOpen: false,
+                    height: 300,
+                    width: 350,
+                    modal: true,
+                    buttons: {
+                        "OK": function() {
+                            var newThing = $('.new-thing:not([id^=new-thing-template])');
+                            if ( newThing ) {
+                                newThing.html( $('#new-thing-field').val() );
+                                newThing.removeClass('new-thing');
+                                $('#new-thing-field').val('New Thing');
+                            }
+                            $(this).dialog('close');
+                         },
+                        Cancel: function() {
+                            $('.new-thing:not([id^=new-thing-template])').remove();
+                            $(this).dialog('close');
+                        }
+                    }
+                });
+			};
+
+            function tearDown() {
+				$(".sortable-things").not('.new-thing .sortable-things').sortable("destroy");
+				$( ".new-things li").draggable("destroy");
+            }
+
+            $(init);
+
+		</script>
+	</body>
+</html>
