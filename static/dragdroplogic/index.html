@@ -27,26 +27,26 @@
 
             /* normal sortable lists */
 			.sortable-things {
-				padding: 10px;
-				border: 5px solid lightblue;
-				border-radius: 10px;
-                min-height: 50px;
+				padding: 5px;
+				border: 2px solid lightblue;
+				border-radius: 5px;
+                min-height: 40px;
 			}
+            .filter-list {
+                min-height: 600px;
+            }
 			.sortable-thing-placeholder {
 				border: 1px dotted lightblue;
+				border-radius: 5px;
 				background-color: #EEF;
 				padding: 15px;
 			}
-			.sortable-things .ui-sortable-helper {
+			.sortable-things .ui-sortable-helper, .new-things .ui-draggable-dragging {
+                z-index: 42;
+                width: 300px !important;
 				-webkit-box-shadow: 4px 4px 5px rgba(50, 50, 50, 0.5);
 				-moz-box-shadow:    4px 4px 5px rgba(50, 50, 50, 0.5);
 				box-shadow:         4px 4px 5px rgba(50, 50, 50, 0.5);
-
-				-webkit-transition: -webkit-box-shadow 100ms linear;
-				-moz-transition: -moz-box-shadow 100ms linear;
-				-ms-transition: box-shadow 100ms linear;
-				-kthtml-transition: box-shadow 100ms linear;
-				transition: box-shadow 100ms linear;
 			}
 
             /* grid-style lists */
@@ -63,20 +63,31 @@
 				height: 100px;
 				margin: 10px; 
 				position: relative;
-				border-radius: 5px;
 			}
             /* template clones */
 			.new-things {
-				padding: 10px;
-				border: 5px solid #AFA;
-				border-radius: 10px;
+				padding: 5px;
+				border: 2px solid #AFA;
+				border-radius: 5px;
 			}
             /* trash can */
 			.trash-things {
-				padding: 10px;
-				border: 5px solid #F55;
-				border-radius: 10px;
+				padding: 5px;
+				border: 2px solid #F55;
+				border-radius: 5px;
+                min-height: 50px;
 			}
+
+            /* logic lists */
+            .and-list li:after { content: ' and'; }
+            .and-list > li:last-child:after { content: ''; }
+            
+            .or-list > li:after { content: ' or'; }
+            .or-list > li:last-child:after { content: ''; }
+
+            .list-group {
+                margin-bottom: 5px;
+            }
 		</style>
 	</head>
 	<body>
@@ -94,37 +105,60 @@
 						<li id="new-thing-template3" class="list-group-item new-thing">
 							Region
 						</li>
+						<li id="new-thing-template3" class="list-group-item new-thing">
+							Other
+						</li>
                     </ul>
                     Advanced Logic:
 					<ul class="list-group new-things">
 						<li id="new-thing-template4" class="list-group-item new-thing thing-container">
-                            AND
-                            <div class="list-group sortable-things"></div>
+                            <ul class="list-group sortable-things and-list">
+                            All of:
+                            </ul>
 						</li>
 						<li id="new-thing-template5" class="list-group-item new-thing thing-container">
-                            OR
-                            <div class="list-group sortable-things"></div>
+                            <ul class="list-group sortable-things or-list">
+                            Any of:
+                            </ul>
 						</li>
 						<li id="new-thing-template6" class="list-group-item new-thing thing-container">
-                            NOT 
-                            <div class="list-group sortable-things"></div>
+                            <ul class="list-group sortable-things and-list">
+                            Not:
+                            </ul>
 						</li>
 					</ul>
-                    Trash
+                    Trash:
 					<ul class="list-group trash-things">
                     </ul>
 				</div>
-				<div class="col-lg-5 col-md-4 col-sm-6">
+                <div class="col-lg-5 col-md-4 col-sm-6">
                     Include
-					<ul class="list-group sortable-things">
+					<ul class="list-group sortable-things filter-list ui-sortable">
 						<li class="list-group-item">
 							Age 18+
 						</li>
-					</ul>
+						
+                    <li class="list-group-item ui-draggable" style="display: block;">Region PSA</li><li class="list-group-item thing-container ui-draggable" style="display: block;">
+                            <ul class="list-group sortable-things or-list ui-sortable">
+                            Any of:
+                            <li class="list-group-item thing-container ui-draggable" style="display: block;">
+                            <ul class="list-group sortable-things and-list ui-sortable">
+                            All of:
+                            <li class="list-group-item ui-draggable" style="display: block;">Men</li><li class="list-group-item ui-draggable" style="display: block;">Age 55+</li></ul>
+						</li><li class="list-group-item thing-container ui-draggable" style="display: block;">
+                            <ul class="list-group sortable-things and-list ui-sortable">
+                            All of:
+                            <li class="list-group-item ui-draggable" style="display: block;">Women</li><li class="list-group-item ui-draggable" style="display: block;">Age 45+</li><li class="list-group-item thing-container ui-draggable" style="display: block;">
+                            <ul class="list-group sortable-things and-list ui-sortable">
+                            Not:
+                            <li class="list-group-item ui-draggable" style="display: block; position: relative;">Hysterectomy</li></ul>
+						</li></ul>
+						</li></ul>
+						</li></ul>
 				</div>
 				<div class="col-lg-5 col-md-4 col-sm-6">
                     Exclude
-					<ul class="list-group sortable-things">
+					<ul class="list-group sortable-things filter-list">
 						<li class="list-group-item">
 							Deceased
 						</li>
@@ -184,7 +218,7 @@
                     start: function(ev, ui) {
                         // when the dialogue pops up, it will show the templates text
                         // as the default value.
-                        $('#new-thing-field').val( $(this).html().trim() );
+                        $('#new-thing-field').val( $(this).html().trim().replace('Other', '') );
                     }
                 }).disableSelection();
 
@@ -201,25 +235,38 @@
                 // of the lists. This givees the user an opportunity to edit the thing just
                 // as it is placed into the list. Also, Cancel immediately removes the newly
                 // created clone
+                
+                function submitDialog() {
+                    var newThing = $('.new-thing:not([id^=new-thing-template])');
+                    if ( newThing ) {
+                        var value = $('#new-thing-field').val();
+                        if ( value ) {
+                            newThing.html(value);
+                            newThing.removeClass('new-thing');
+                            $('#new-thing-field').val('New Thing');
+                        } else {
+                            $('.new-thing:not([id^=new-thing-template])').remove();
+                        }
+                    }
+                    $('#new-thing-dialog').dialog('close');
+                }
+
                 $('#new-thing-dialog').dialog({
                     autoOpen: false,
                     height: 300,
                     width: 350,
                     modal: true,
                     buttons: {
-                        "OK": function() {
-                            var newThing = $('.new-thing:not([id^=new-thing-template])');
-                            if ( newThing ) {
-                                newThing.html( $('#new-thing-field').val() );
-                                newThing.removeClass('new-thing');
-                                $('#new-thing-field').val('New Thing');
-                            }
-                            $(this).dialog('close');
-                         },
+                        "OK": submitDialog,
                         Cancel: function() {
                             $('.new-thing:not([id^=new-thing-template])').remove();
                             $(this).dialog('close');
                         }
+                    }
+                });
+                $('#new-thing-dialog').keypress(function(ev) {
+                    if ( ev.which == 13 ) { // enter key
+                        submitDialog();
                     }
                 });
 			};
