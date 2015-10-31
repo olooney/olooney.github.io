@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+
+body {
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  margin: auto;
+  position: relative;
+  width: 960px;
+}
+
+form {
+  position: absolute;
+  right: 10px;
+  top: 10px;
+}
+
+svg.pie-chart g.label {
+    pointer-events: none;
+}
+
+div.tooltip {
+    text-align: center;
+    background-color: rgba(255,255,255,0.8);
+    box-shadow: 3px 3px 3px rgba(0,0,0,0.2);
+    padding: 2px 5px;
+    border-radius: 0.5em;
+    min-width: 100px;
+}
+
+
+</style>
+<form>
+</form>
+<script src="http://d3js.org/d3.v3.min.js"></script>
+<script>
+// markers!
+(function() { 
+
+    d3.marker = function(namespace, color) {
+        if ( namespace == undefined ) namespace = 'd3_marker_';
+        if ( color == undefined ) color = 'black';
+        return {
+            namespace: namespace,
+            define: function(svg) {
+              var markerTypes = [
+                  { id: 0, name: 'circle', path: 'M 0, 0  m -5, 0  a 5,5 0 1,0 10,0  a 5,5 0 1,0 -10,0', viewbox: '-6 -6 12 12' }, 
+                  { id: 1, name: 'square', path: 'M 0,0 m -5,-5 L 5,-5 L 5,5 L -5,5 Z', viewbox: '-5 -5 10 10' },
+                  { id: 2, name: 'arrow', path: 'M 0,0 m -5,-5 L 5,0 L -5,5 Z', viewbox: '-5 -5 10 10' },
+                  { id: 2, name: 'stub', path: 'M 0,0 m -1,-5 L 1,-5 L 1,5 L -1,5 Z', viewbox: '-1 -5 2 10' }
+              ];
+
+              var defs = svg.append('svg:defs')
+
+              var markers = defs.selectAll('marker')
+                .data(markerTypes)
+                .enter()
+                .append('svg:marker')
+                  .attr('id', function(d){ return namespace + d.name})
+                  .attr('markerHeight', 5)
+                  .attr('markerWidth', 5)
+                  .attr('markerUnits', 'strokeWidth')
+                  .attr('orient', 'auto')
+                  .attr('refX', 0)
+                  .attr('refY', 0)
+                  .attr('viewBox', function(d){ return d.viewbox })
+                  .append('svg:path')
+                    .attr('d', function(d){ return d.path })
+                    .attr('fill', function(d,i) { return color; });
+
+            },
+            url: function(name) { 
+                return 'url(#' + namespace + name  + ')'; 
+            }
+        };
+    }
+})();
+</script>
+<script>
+
+var width = 1200,
+    height = 800,
+    radius = Math.floor(Math.min(width, height) / 3),
+    color = d3.scale.category20();
+
+var svg = d3.select("body").append("svg")
+    .attr("class", "pie-chart")
+    .attr("width", width)
+    .attr("height", height)
+  .append("g")
+    .attr("transform", "translate(" + width / 2 + "," + height * .50 + ")");
+
+var partition = d3.layout.partition()
+    .sort(null)
+    .size([2 * Math.PI, radius * radius])
+    .value(function(d) { return d.size; });
+
+var arc = d3.svg.arc()
+    .startAngle(function(d) { return d.x; })
+    .endAngle(function(d) { return d.x + d.dx; })
+    .innerRadius(function(d) { return Math.sqrt(d.y); })
+    .outerRadius(function(d) { return Math.sqrt(d.y + d.dy); });
+
+var tooltip = d3.select("body")
+    .append("div")
+    .attr("class", "tooltip")
+    .style("position", "absolute")
+    .style("z-index", "10")
+    .style("visibility", "hidden");
+
+
+// distance between any two points
+function distance(a, b) {
+    return Math.sqrt( 
+        Math.pow(a[0]-b[0], 2) +
+        Math.pow(a[1]-b[1], 2)
+    );
+}
+
+function parseTsvTree(rootName, tsv) {
+    owl = tsv;
+    // creates a new, empty node
+    function newNode(name) { return { name: name, children: [] }; }
+
+    // finds or creates the named child node under the parent
+    function getChild(parentNode, childName) {
+        var children = parentNode.children;
+        for ( var i=0; i < children.length; i++ ) {
+            var child = children[i];
+            if ( child.name === childName ) {
+                return child;
+            }
+        }
+        var newChild = newNode(childName);
+        children.push(newChild);
+        return newChild;
+    }
+
+    var root = newNode(rootName);
+
+    var lines = tsv.split("\n").slice(1);
+    lines.forEach(function(line) {
+        var fields = line
+            .split('\t')
+            .map(function(f) { return f.trim(); })
+            .filter(function(f) { return f !== ""; });
+
+        if ( fields.length >= 4 ) {
+            var topLevel = getChild(root, fields[0]);
+            var group = getChild(topLevel, fields[1]);
+            var category = getChild(group, fields[2]);
+            category.size = fields[4].replace('$', '').replace(',', '');
+            delete category.children;
+        }
+    });
+
+    return root;
+}
+
+
+function rearrangeLabels(labelData, labelRadius) {
+    // slight modification to make labels ellipsoid
+    function distance(a, b) {
+        return Math.sqrt( 
+            Math.pow(a[0]-b[0], 2) +
+            Math.pow(a[1]-b[1], 2) *4
+        );
+    }
+
+    // minimum distance from this label to any other label in the set.
+    function minDistance(label) {
+
+        var min = Infinity;
+        for ( var i=0; i <labelData.length; i++ ) {
+            if ( label !== labelData[i] ) {
+                var dist = distance(label.destination, labelData[i].destination);
+                if ( dist < min ) min = dist;
+                var dist = distance(label.destination, labelData[i].target)*2;
+                if ( dist < min ) min = dist;
+            }
+        }
+        return min;
+    }
+
+    // moves the label further away from the origin
+    function shift(label) {
+        if ( label.depth >= 2 ) {
+            var xshift = 1.01, yshift = 1.01;
+        } else {
+            var xshift = .99, yshift = .99;
+        }
+        var old = label.destination;
+        var shifted = [ old[0]*xshift, old[1]*yshift];
+        label.destination = shifted;
+
+    }
+
+    // helps implement the custom sort
+    function cmp(x,y) { if ( x===y ) { return 0; } else if ( x < y ) { return -1; } else { return 1; } }
+
+    // sort the data by increasing distance from the origin
+    labelData.sort(function(x,y) { 
+        return cmp(distance(x.target, [0, 0]), distance(y.target, [0, 0]));
+    });
+
+    for ( var j=labelData.length-1; j >= 0; j-- ) {
+        var label = labelData[j];
+        while ( minDistance(label) < (labelRadius/2) ) {
+            shift(label);
+        }
+    }
+
+    // having mostly positioned the labels reasonably far from each other, we now nudge them away from each
+    // other to prevent overlaps.
+    for ( var i=0; i<30; i++ ) {
+        for ( var j=labelData.length-1; j >= 0; j-- ) {
+            var left = labelData[j];
+            var ld = left.destination;
+            for ( var k=labelData.length-1; k > j; k-- ) {
+                var right = labelData[k];
+                var rd = right.destination;
+                var dist = distance(ld, rd);
+                if ( dist < labelRadius ) {
+                    var direction = [ ld[0] - rd[0], ld[1] - rd[1] ];
+                    var unitDir = direction.map(function(x) { return x / distance(direction, [0, 0]); });
+                    left.destination = [ ld[0] + unitDir[0], ld[1] + unitDir[1] ];
+                    right.destination = [ rd[0] - unitDir[0], rd[1] - unitDir[1] ];
+                }
+            }
+        }
+    }
+
+    // finalize contact point
+    for ( var j=labelData.length-1; j >= 0; j-- ) {
+        var label = labelData[j];
+        
+        var offsets = [
+            [0, +8],
+            [0, -8]
+        ];
+        if ( Math.abs(label.destination[1] - label.target[1]) < 9 && 
+             Math.abs(label.destination[0] - label.target[0]) > 20
+        ) {
+            var labelWidth = label.label.length * 8;
+            offsets.push(
+                [ labelWidth/2, 0],
+                [ -labelWidth/2, 0]
+            )
+        }
+        var closestContactPoint = label.contact;
+        var closestDistance = Infinity;
+
+        offsets.forEach(function(offset) {
+            var trial = [ label.destination[0] + offset[0], label.destination[1] + offset[1] ];
+            var dist = window.distance(trial, label.target);
+            if ( dist < closestDistance - 1 ) {
+                closestDistance = dist;
+                closestContactPoint = trial;
+            }
+        });
+
+        label.contact = closestContactPoint;
+    }
+
+}
+
+
+d3.text('budget.tsv', function(error, tsvData) {
+
+  root = parseTsvTree("Budget", tsvData);
+
+  var path = svg.datum(root).selectAll("path")
+      .data(partition.nodes)
+    .enter().append("path")
+      //.attr("display", function(d) { return d.depth ? null : "none"; }) // hide inner ring
+      .attr("d", arc)
+      .style("stroke", "#fff")
+      .style("fill", function(d) { 
+        return d3.hsl(
+            (60 + (d.x + d.dx/2) * 360/ (2*Math.PI)) % 360, // hue
+            0.6,                                            // saturation
+            d.depth === 0 ? 1 : 0.50 + d.depth/10           // luminosity
+        ).toString();
+      })
+      .style("fill-rule", "evenodd")
+      .on("mouseover", function(){tooltip.style("visibility", "visible");})
+      .on("mousemove", function(){
+            var d = d3.select(this).datum();
+            tooltip.html([
+                d.name,
+                d3.format('$,')(d.value),
+                d3.format('.2%')(d.dx/(2*Math.PI))
+            ].join(' <br> '));
+            tooltip.style("top", (d3.event.layerY-25)+"px").style("left",(d3.event.layerX+10)+"px");
+      })
+      .on("mouseout", function(){tooltip.style("visibility", "hidden");});
+
+    labelData = path.data().map(function(d) {
+        if ( d.parent ) {
+            var center = arc.centroid(d);
+        } else {
+            var center = [0, 0];
+        }
+        return {
+            label: d.name,
+            depth: d.depth,
+            target: center,
+            destination: [center[0], center[1] - 10 ],
+            contact: center
+        };
+    });
+
+    rearrangeLabels(labelData,120);
+
+    var labelGroups = svg
+            .selectAll("g.label")
+            .data(labelData)
+        .enter().append("g")
+            .attr('class', 'label');
+
+    labelGroups
+        .append('text')
+            .attr("transform", function(ld) { 
+                return 'translate(' + ld.destination + ')';
+             })
+            .attr("dy", ".35em")
+            .attr("text-anchor", "middle")
+            .style("font-weight", function(ld) { return ld.depth <= 1 ? 'bold': undefined; })
+            .style("fill", '#333')
+            .text(function(ld) { return ld.label; });
+
+    labelMarkers = d3.marker('pielabel', 'rgba(0,0,0,0.5)');
+    d3.select('svg').call(labelMarkers.define);
+    labelGroups
+        .append('line')
+        .attr('stroke', 'rgba(0,0,0,0.3)')
+        .style('display', function(d) { return (distance(d.target, d.contact) < 17) ? 'none': 'display'; })
+        .attr('marker-start', labelMarkers.url('circle'))
+        .attr('x1', function(d) { return d.target[0]; })
+        .attr('y1', function(d) { return d.target[1]; })
+        .attr('x2', function(d) { return d.contact[0]; })
+        .attr('y2', function(d) { return d.contact[1]; });
+
+});
+
+
+</script>
+
+
