@@ -86,7 +86,7 @@
 </p>
 <ul>
  <li>
-     <a href="http://oranlooney.com/static/desktop/desktop.html">OWL Desktop</a>
+     <a href="http://www.oranlooney.com/static/desktop/desktop.html">OWL Desktop</a>
  </li>
 </ul>
 <p>Go and play around with it: it's largely self-documenting.  You'll find sample text files describing how things work and hints will appear automatically; there's even a built-in source code viewer.
@@ -103,7 +103,7 @@
 </p>
 
 <h2>Drag and Drop</h2>
-<img src="http://oranlooney.com/static/desktop/drag_and_drop.png">
+<img src="http://www.oranlooney.com/static/desktop/drag_and_drop.png">
 
 <p>Implementing drag-n-drop between windows was kind of a pain, but absolutely necessary to get that &quot;native desktop&quot; feel.  When windows overlap, and you drag a file into the intersection, <em>both</em> windows get notified of the drop.  It took me a while to figure out what was going on and come up with a solution. I queued up drop events without processing them right away, and then had a deferred handler go back and determine which drop was on top and ignoring all the others.  I had to dig pretty deeply into <a href="http://extjs.com/">ExtJS</a>'s drag-n-drop library but in the end I learned a tremendous amount and got a pretty good solution.
 </p>
@@ -121,13 +121,13 @@
 </p>
 
 <h2>Unit Tests</h2>
-<img src="http://oranlooney.com/static/desktop/unittest.png">
+<img src="http://www.oranlooney.com/static/desktop/unittest.png">
 
 <p>I'm a big advocate of unit testing, and for this project I wrote a complete JavaScript port of Kent Beck's unit testing framework.  My implementation is more closely related to his <a href="http://python.org/">Python</a> unittest module than JUnit, because that's what I'm most familiar with.  All essential features are there, though: separate TestCase, TestResult, and TestSuite classes, several test loaders, and a test runner, all de-coupled from one another.  The test runner is the only piece that depends on the OWL Desktop framework, by design.  To use this unittest framework in another project, all I'd have to write is a another test runner.  It even includes a &quot;MetaTest:&quot; a unit test suite that serves to test the unittest framework itself, exercising all the various asserts and so on.
 </p>
 
 <h2>Utilities</h2>
-<p>Also included, in the top-level <code>owl</code> namespace, are some really powerful utilities: a <a href="http://oranlooney.com/functional-javascript/">clone()</a> function, a powerful array search/slice utility, an extensible comparison operator called <code>same()</code> (inspired by the <a href="http://mochi.github.com/mochikit/">MochiKit</a> comparison framework) and a namespace utility.
+<p>Also included, in the top-level <code>owl</code> namespace, are some really powerful utilities: a <a href="http://www.oranlooney.com/functional-javascript/">clone()</a> function, a powerful array search/slice utility, an extensible comparison operator called <code>same()</code> (inspired by the <a href="http://mochi.github.com/mochikit/">MochiKit</a> comparison framework) and a namespace utility.
 </p>
 <p>The last one, the namespace utility, is probably the most widely useful of them all.  I can't even imagine starting a large JS project now without a similar utility.  It's a small thing, to be sure, but is needed again and again.  You can see throughout the source code how it's used to cleanly give each <code>.js</code> file its own namespace.
 </p>
