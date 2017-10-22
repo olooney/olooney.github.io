@@ -248,66 +248,6 @@ Thanks for reading. This blog is in "archive" mode and comments and RSS feed are
       </div>
       
   
-  <div class="content-page comments" style="border-top: none">
-    <a name="comments"></a>
-    
-	  <h1>Comments (4)</h1>
-      <div>
-        
-          <div class="comment">
-    <div class="comment-date">March 7th 2014</div>
-	<h4><span class="comment-username">Chris Barker</span> said: </h4>
-	<p>One more thought:
-
-You&#39;ve left off a core advantage of EAFP: it eliminates the possible race condition problem: What if you check if a file exists before opening it? And in a very unusual case, something deletes that file in between the check and actually opening it -- presto! Error. And a really hard to diagnose one at that.
-
-All that being said, there is aplace for both.
-</p>
-</div>
-
-        
-          <div class="comment">
-    <div class="comment-date">March 7th 2014</div>
-	<h4><span class="comment-username">Chris Barker</span> said: </h4>
-	<p>I can&#39;t say I disagree with the message of this post, but I&#39;m a big fan of EAFP myself, and the &quot;bad&quot; exammple is pretty poorly done:
-
-1) that&#39;s why Python now has context managers (with)
-
-2) NEVER use a raw &quot;except&quot;. That except should be catching an exception you know how to handle, and you can have multipel except blocks, so can handle different exceptions differently.
-
-3) as someone else pointed out, no need for the return True in be in the finally block
-
-4) it&#39;s kind of an odd place to make the selection between writing to a file or a database.
-
-
-</p>
-</div>
-
-        
-          <div class="comment">
-    <div class="comment-date">October 20th 2012</div>
-	<h4><span class="comment-username">S. Schwarzer</span> said: </h4>
-	<p>First, check if the blog keeps code formatting, because my comment would mainly consist of a code example.
-
-if is_formatted_correcty:
-    enter_comment()
-</p>
-</div>
-
-        
-          <div class="comment">
-    <div class="comment-date">September 11th 2012</div>
-	<h4><span class="comment-username">Jesus</span> said: </h4>
-	<p>Was totally stuck until I read this, now back up and riunnng.</p>
-</div>
-
-        
-      </div>
-    
-
-  </div>
-  
-
 	
   </div>
 

@@ -315,61 +315,6 @@ Thanks for reading. This blog is in "archive" mode and comments and RSS feed are
       </div>
       
   
-  <div class="content-page comments" style="border-top: none">
-    <a name="comments"></a>
-    
-	  <h1>Comments (3)</h1>
-      <div>
-        
-          <div class="comment">
-    <div class="comment-date">March 7th 2013</div>
-	<h4><span class="comment-username">Not a bot</span> said: </h4>
-	<p>I am also not a bot</p>
-</div>
-
-        
-          <div class="comment">
-    <div class="comment-date">February 12th 2013</div>
-	<h4><span class="comment-username">M.J.</span> said: </h4>
-	<p>//fix for your withDefaults() function
-
-function withDefaults(original, defaultArguments) {
-    return function() {
-        for( var i=0; i&lt;defaultArguments.length; i++ ) {
-            if ( arguments[i] === undefined ) {
-                arguments[i] = defaultArguments[i];
-            }
-        }
-        arguments.length=defaultArguments.length;
-        return original.apply(null, arguments);
-    }
-}</p>
-</div>
-
-        
-          <div class="comment">
-    <div class="comment-date">September 11th 2012</div>
-	<h4><span class="comment-username">dasdasd</span> said: </h4>
-	<p>function isArguments (test) {
-return Object.prototype.toString.call(arguments) == &#39;[object Arguments]&#39;;
-}
-
-function isArguments (test) {
-return test instanceof Arguments;
-}</p>
-</div>
-
-        
-      </div>
-    
-
-  </div>
-  
-
-	
-  </div>
-
-
 
   <script src="http://www.google-analytics.com/urchin.js" type="text/javascript"></script>
   <script type="text/javascript"> _uacct = "UA-2535855-1"; urchinTracker(); </script>
