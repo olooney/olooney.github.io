@@ -211,14 +211,16 @@ ul.menu li.menu_break {
 a:link, a:visited, a:active {
 }
 
-ul.index {
+html ul.index {
 	display: block;
 }
-ul.index li {
+html ul.index li {
+	background-image: none;
 	display: block;
 	margin: 0 0 75px;
 	padding: 0;
 }
+
 
 .article-stub {
 	position: relative;
