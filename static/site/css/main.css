@@ -21,9 +21,9 @@ strong {
 	background-color: #800000;
 }
 #banner a {
-	width: 600px;
-	margin: auto;
-	text-align: center;
+	width: 500px;
+	margin: 0 100px;
+	text-align: left;
 	display: block;
 	line-height: 1.1em;
 	font-size: 3em;
@@ -35,18 +35,18 @@ strong {
 }
 
 #sidebar {
-	width: 600px;
+	width: 500px;
     position: relative;
 	top: -1.5em;
     padding: 0;
-	margin: 0 auto;
+	margin: 0 100px;
 }
 
 /* Menu style */
 ul.menu {
-	width: 600px;
+	width: 500px;
 	display: block;
-	text-align: center;
+	text-align: left;
 	list-style-type: none;
 }
 ul.menu li {
@@ -87,13 +87,13 @@ ul.menu li.menu_break {
 	font-size: 13px;
 	line-height: 21px;
 	display: block;
-	margin: auto;
-	width: 600px;
+	margin: 0 100px;
+	width: 500px;
 }
 /* h1 and a.title look the same.  Use a.title if you want the page title to be a link. */
 .content-page h1 {
 	margin: .8em 0 0 0;
-	text-align: center;
+	text-align: left;
 	font-size: 1.7em;
 	font-weight: bold;
 	color: #800000;
@@ -103,7 +103,7 @@ ul.menu li.menu_break {
 .content-page a.title {
 	display: block;
 	margin: .8em 0 0 0;
-	text-align: center;
+	text-align: left;
 	font-size: 1.7em;
 	font-weight: bold;
 	text-decoration: none;
@@ -122,7 +122,7 @@ ul.menu li.menu_break {
 .content-page img {
 	display: block;
 	border: none;
-	margin: .5em auto;
+	margin: .5em 0;
 	-moz-border-radius: .6em;
 	border-radius: .6em;
 }
@@ -198,7 +198,7 @@ ul.menu li.menu_break {
 	font-style: italic;
 	text-indent: 1em;
 	padding: 50px 50px 35px;
-	margin: .2em auto;
+	margin: .2em 0;
 }
 .content-page blockquote p {
 	font-style: italic;
