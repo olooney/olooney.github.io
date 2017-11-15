@@ -7,7 +7,6 @@ body, html {
 }
 em {
 	font-family: "Palatino Linotype", Palatino, Palladio, "URW Palladio L", "Book Antiqua", Baskerville, "Bookman Old Style", "Bitstream Charter", "Nimbus Roman No9 L", Garamond, "Apple Garamond", "ITC Garamond Narrow", "New Century Schoolbook", "Century Schoolbook", "Century Schoolbook L", Georgia, serif;
-    font-style: italic;
     font-weight: bold;
 }
 strong {
@@ -21,12 +20,12 @@ strong {
 	background-color: #800000;
 }
 #banner a {
-	width: 500px;
-	margin: 0 100px;
-	text-align: left;
+	width: 700px;
+	margin: 0 40px;
+	text-align: center;
 	display: block;
 	line-height: 1.1em;
-	font-size: 3em;
+	font-size: 3.5em;
 	color: white;
 	text-decoration: none;
 }
@@ -35,19 +34,20 @@ strong {
 }
 
 #sidebar {
-	width: 500px;
+	width: 700px;
     position: relative;
 	top: -1.5em;
     padding: 0;
-	margin: 0 100px;
+	margin: 0 40px;
 }
 
 /* Menu style */
 ul.menu {
-	width: 500px;
+	width: 700px;
 	display: block;
-	text-align: left;
+	text-align: center;
 	list-style-type: none;
+	margin: 0 auto;
 }
 ul.menu li {
 	display: inline;
@@ -57,7 +57,7 @@ ul.menu li a {
 	display: inline;
 	padding: 2px 10px;
 	color: #FFF;
-	font-size: 10pt;
+	font-size: 9pt;
 	font-family: Verdana, sans-serif;
 	text-decoration: none;
 }
@@ -84,26 +84,27 @@ ul.menu li.menu_break {
 }
 .content-page {
 	color: #282828;
-	font-size: 13px;
-	line-height: 21px;
+	font-size: 16px;
+	line-height: 22px;
 	display: block;
-	margin: 0 100px;
-	width: 500px;
+	margin: 0 40px;
+	width: 700px;
 }
 /* h1 and a.title look the same.  Use a.title if you want the page title to be a link. */
 .content-page h1 {
 	margin: .8em 0 0 0;
-	text-align: left;
+	text-align: center;
 	font-size: 1.7em;
 	font-weight: bold;
 	color: #800000;
 	padding-bottom: 1ex;
 	margin-bottom: 1ex;
+	border-bottom: 1px solid #800000;
 }
 .content-page a.title {
 	display: block;
 	margin: .8em 0 0 0;
-	text-align: left;
+	text-align: center;
 	font-size: 1.7em;
 	font-weight: bold;
 	text-decoration: none;
@@ -111,18 +112,20 @@ ul.menu li.menu_break {
 	color: #800000;
 	padding-bottom: 1ex;
 	margin-bottom: 1ex;
+	border-bottom: 1px solid #800000;
 }
 
 .content-page h2 {
-	margin: .8em 0 0 0;
+	margin: 1em auto 0.5em auto;
 	font-size: 1.5em;
 	font-weight: bold;
 	color: #800000;
+	text-align: center;
 }
 .content-page img {
 	display: block;
 	border: none;
-	margin: .5em 0;
+	margin: .5em auto;
 	-moz-border-radius: .6em;
 	border-radius: .6em;
 }
@@ -159,25 +162,23 @@ ul.menu li.menu_break {
 	background-image: url(../images/innermost_bullet_point.png);
 }
 .content-page ol {
-	list-style: decimal inside;
+	list-style: decimal;
     padding-left: 1ex;
 }
-.content-page ol li {
-	list-style: decimal inside;
-    display: list-item;
+.content-page ol > li {
+	list-style: decimal;
 }
 /* shared styles for ul and ol items */
 .content-page li {
 	margin: 1em 0 1em;
-	font-size: 13px;
-	line-height: 17px;
+	font-size: 16px;
+	line-height: 22px;
 	font-family: Verdana, sans-serif;
 }
 
 .content-page code {
 	font-family: "Bitstream Vera Sans Mono", monospace;
 	font-style: normal;
-    font-weight: bold;
 	color: #005500;
 }
 .content-page pre {
@@ -190,7 +191,7 @@ ul.menu li.menu_break {
 }
 
 .content-page blockquote {
-	width: 400px;
+	width: 600px;
 	background-image: url(../images/quote_left.png);
 	background: url(../images/quote_left.png) top left no-repeat, url(../images/quote_right.png) bottom right no-repeat;
 	background-repeat: no-repeat;
@@ -295,7 +296,7 @@ body .article-stub-title {
 }
 
 .signature {
-	margin-left: 400px;
+	margin-left: 500px;
 	font-size: 1em;
 	font-family: "Palatino Linotype", Palatino, Palladio, "URW Palladio L", "Book Antiqua", Baskerville, "Bookman Old Style", "Bitstream Charter", "Nimbus Roman No9 L", Garamond, "Apple Garamond", "ITC Garamond Narrow", "New Century Schoolbook", "Century Schoolbook", "Century Schoolbook L", Georgia, serif;
 	font-style: italic;
